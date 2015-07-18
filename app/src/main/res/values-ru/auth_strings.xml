@@ -10,7 +10,7 @@
     <string name="we_will_send">Мы отправим СМС с кодом активации на ваш номер</string>
     <string name="enter_name">Имя</string>
     <string name="hint_first_name">Имя</string>
-    <string name="hint_last_name">Фамилия</string>
+    <string name="hint_last_name">Фамилия (не обязательно)</string>
     <string name="invalid_code">Неверный код активации</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="invalid_phone_number">Неверный номер телефона</string>

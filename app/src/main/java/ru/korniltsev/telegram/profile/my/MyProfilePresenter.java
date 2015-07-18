@@ -2,12 +2,14 @@ package ru.korniltsev.telegram.profile.my;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import flow.Flow;
 import mortar.ViewPresenter;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.profile.edit.name.EditNamePath;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,6 +37,13 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> {
     }
 
     public void editName() {
+        getView().post(new Runnable() {
+            @Override
+            public void run() {
+                Flow.get(getView())
+                        .set(new EditNamePath(path.user));
+            }
+        });
 
     }
 }

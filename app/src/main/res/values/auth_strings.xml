@@ -10,7 +10,7 @@
     <string name="phone_number_hint">Phone number</string>
     <string name="we_ve_sent">We\'ve sent an SMS with an activation code to your phone number %1$s</string>
     <string name="hint_first_name">Fist name</string>
-    <string name="hint_last_name">Last name</string>
+    <string name="hint_last_name">Last name (optional)</string>
     <string name="unknown_error">Unknown error</string>
     <string name="invalid_code">Activation code is not valid</string>
     <string name="invalid_code_empty">Activation code shoukd not be empty</string>
