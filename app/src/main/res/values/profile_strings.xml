@@ -8,4 +8,8 @@
     <string name="passcode_disabled">Disabled</string>
     <string name="passcode_enabled">Enabled</string>
     <string name="edit_name">Edit name</string>
+    <string name="passcode_how_to">When you set up an additional passcode, a lock icon will appear on the chats page. Tap it to lock and unlock your Telegram app.\n\nNote: if you forget the passcode, you\'ll need to delete and reinstall the app. All secretes chats will be lost.</string>
+    <string name="passcode_timing_how_to">Require passcode if you away for a time</string>
+    <string name="change_pass">Change Passcode</string>
+    <string name="auto_lock">Auto-Lock</string>
 </resources>

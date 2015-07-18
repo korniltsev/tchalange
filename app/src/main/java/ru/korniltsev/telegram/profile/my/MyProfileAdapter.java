@@ -17,9 +17,11 @@ public class MyProfileAdapter extends BaseAdapter<MyProfileAdapter.Item, Recycle
     public static final int VIEW_TYPE_HEADER = 0;
     public static final int VIEW_TYPE_KEY_VALUE = 1;
     public static final int VIEW_TYPE_PASSCODE = 2;
-    public MyProfileAdapter(Context ctx) {
-        super(ctx);
 
+    final Runnable passcodeClicked;
+    public MyProfileAdapter(Context ctx, Runnable passcodeClicked) {
+        super(ctx);
+        this.passcodeClicked = passcodeClicked;
     }
 
     @Override
@@ -100,6 +102,12 @@ public class MyProfileAdapter extends BaseAdapter<MyProfileAdapter.Item, Recycle
 
         public PassCodeVH(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    passcodeClicked.run();
+                }
+            });
             data = ((TextView) itemView.findViewById(R.id.pass_code_status));
         }
     }
@@ -127,16 +135,7 @@ public class MyProfileAdapter extends BaseAdapter<MyProfileAdapter.Item, Recycle
         public PasscodeItem(boolean enabled) {
             this.enabled = enabled;
         }
-        //        final int icon;
-//        final String data;
-//        final String localizedDataType;
 
-//        public KeyValueVerticalItem(int icon, String data, String localizedDataType, @Nullable List<ListChoicePopup.Item> bottomSheetActions) {
-//            this.icon = icon;
-//            this.data = data;
-//            this.localizedDataType = localizedDataType;
-//
-//        }
     }
 
 

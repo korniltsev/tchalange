@@ -8,4 +8,8 @@
     <string name="passcode_disabled">Выключена</string>
     <string name="passcode_enabled">Включена</string>
     <string name="edit_name">Редактировать имя</string>
+    <string name="passcode_howto">When you set up an additional passcode</string>
+    <string name="change_pass">Change Passcode</string>
+    <string name="auto_lock">Auto-Lock</string>
+
 </resources>

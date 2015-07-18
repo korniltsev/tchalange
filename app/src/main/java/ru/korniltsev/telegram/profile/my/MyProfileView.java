@@ -50,7 +50,12 @@ public class MyProfileView extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        adapter = new MyProfileAdapter(getContext());
+        adapter = new MyProfileAdapter(getContext(), new Runnable() {
+            @Override
+            public void run() {
+                presenter.passcodeClicked();
+            }
+        });
         adapter.addFirst(new MyProfileAdapter.KeyValueItem(0, "", "", null));
         listLayout = new LinearLayoutManager(getContext());
         list = ((RecyclerView) findViewById(R.id.list));
