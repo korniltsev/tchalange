@@ -104,17 +104,22 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
             Countries.Entry country = null;//todo save selected to pref
 
             Locale locale = Locale.getDefault();
+            boolean autoSelectedRu = false;
             if (path.loadCounter == 1){
                 if (locale != null && locale.getLanguage().equals("ru")){
                     country = countries.getForCode(Countries.RU_CODE);
+                    autoSelectedRu = true;
                 }
             } else {
                 if (f.c != null) {
                     country = f.c;
                     f.c = null;
+                    autoSelectedRu = true;
                 }
             }
             getView().countrySelected(country, true);
+            getView().focusOn(autoSelectedRu);
+
 
         }
 

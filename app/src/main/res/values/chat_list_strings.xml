@@ -13,4 +13,5 @@
     <string name="geo">Geo Point</string>
     <string name="contact">Contact</string>
     <string name="contacts">Contacts</string>
+    <string name="settings">Settings</string>
 </resources>

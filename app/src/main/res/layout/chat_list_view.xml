@@ -94,6 +94,11 @@
                     android:drawableLeft="@drawable/menu_contacts"
                     style="@style/DrawerButton"/>
 
+            <TextView
+                    android:id="@+id/btn_settings"
+                    android:text="@string/settings"
+                    android:drawableLeft="@drawable/ic_settings"
+                    style="@style/DrawerButton"/>
 
             <TextView
                     android:id="@+id/btn_logout"

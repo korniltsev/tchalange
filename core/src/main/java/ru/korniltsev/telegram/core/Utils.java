@@ -128,6 +128,17 @@ public class Utils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             a.getWindow().setStatusBarColor(color);
         }
+    }
 
+    public static void hideKeyboard(View anchor) {
+        Context c = anchor.getContext();
+        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(anchor.getWindowToken(), 0);
+    }
+
+    public static void showKeyboard(View anchor) {
+        Context c = anchor.getContext();
+        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(anchor, InputMethodManager.SHOW_IMPLICIT);
     }
 }

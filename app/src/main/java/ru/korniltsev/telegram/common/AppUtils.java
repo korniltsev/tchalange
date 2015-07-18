@@ -136,6 +136,9 @@ public class AppUtils {
 
     @NonNull
     public static String phoneNumberWithPlus(@NonNull TdApi.User user) {
+        if (user.phoneNumber == null){
+            return "";
+        }
         final String phoneNumber = user.phoneNumber;
         if (phoneNumber.startsWith("+")){
             return phoneNumber;

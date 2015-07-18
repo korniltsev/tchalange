@@ -16,6 +16,7 @@ import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.profile.my.MyProfilePath;
 import rx.Observable;
 import rx.android.content.ContentObservable;
 import rx.functions.Action1;
@@ -189,5 +190,13 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     public void openContacts() {
         Flow.get(getView())
                 .set(new ContactList());
+    }
+
+    public void openSettings() {
+        final TdApi.User user = me.user;
+        if (user != null){
+            Flow.get(getView())
+                    .set(new MyProfilePath(user));
+        }
     }
 }

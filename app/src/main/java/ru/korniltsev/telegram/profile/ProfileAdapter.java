@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
@@ -31,11 +30,11 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_HEADER) {
-            View view = getViewFactory().inflate(R.layout.profile_header, parent, false);
+            View view = getViewFactory().inflate(R.layout.profile_item_header, parent, false);
             return new RecyclerView.ViewHolder(view) {
             };
         } else {
-            View view = getViewFactory().inflate(R.layout.profile_data, parent, false);
+            View view = getViewFactory().inflate(R.layout.profile_item_data, parent, false);
             return new VH(view);
         }
     }

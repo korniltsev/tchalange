@@ -41,7 +41,7 @@
                         android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/btn_select_country"
-                        style="@style/Widget.AppCompat.EditText"
+
                         android:layout_marginLeft="16dp"
                         android:inputType="phone"
                         android:imeOptions="actionNext"
@@ -54,7 +54,7 @@
                         android:layout_below="@id/btn_select_country"
                         android:layout_toRightOf="@id/country_phone_code"
                         android:inputType="phone"
-                        style="@style/Widget.AppCompat.EditText"
+
                         android:layout_marginRight="16dp"
                         android:hint="@string/phone_number_hint"
                         android:layout_marginLeft="16dp"

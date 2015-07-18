@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
@@ -71,7 +72,7 @@ public class EnterPhoneView extends LinearLayout {
             }
         });
 
-        userPhone.requestFocus();
+
         userPhone.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -227,6 +228,14 @@ public class EnterPhoneView extends LinearLayout {
                     userPhone.setError(message);
                 }
             }
+        }
+    }
+
+    public void focusOn(boolean secondField) {
+        if (secondField){
+            userPhone.requestFocus();
+        } else {
+            phoneCode.requestFocus();
         }
     }
 }

@@ -1,10 +1,12 @@
-package ru.korniltsev.telegram.profile;
+package ru.korniltsev.telegram.profile.my;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -13,14 +15,14 @@ import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.DividerItemDecorator;
+import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
 import ru.korniltsev.telegram.profile.decorators.MyWhiteRectTopPaddingDecorator;
+import ru.korniltsev.telegram.profile.decorators.TopShadow;
 
 import javax.inject.Inject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,20 +30,19 @@ import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.copy;
 import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
-import static ru.korniltsev.telegram.common.AppUtils.uiName;
 
-public class ProfileView extends FrameLayout implements HandlesBack {
-    @Inject ProfilePresenter presenter;
+public class MyProfileView extends FrameLayout {
+    @Inject MyProfilePresenter presenter;
     @Inject DpCalculator calc;
     @Inject PhoneFormat phoneFormat;
 
     private RecyclerView list;
     private LinearLayoutManager listLayout;
     private FakeToolbar fakeToolbar;
-    private ProfileAdapter adapter;
+    private MyProfileAdapter adapter;
     private ToolbarUtils toolbar;
 
-    public ProfileView(Context context, AttributeSet attrs) {
+    public MyProfileView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
     }
@@ -49,17 +50,31 @@ public class ProfileView extends FrameLayout implements HandlesBack {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        adapter = new ProfileAdapter(getContext(), presenter);
-        adapter.addFirst(new ProfileAdapter.Item(0, "", "", null));//header
+        adapter = new MyProfileAdapter(getContext());
+        adapter.addFirst(new MyProfileAdapter.KeyValueItem(0, "", "", null));
         listLayout = new LinearLayoutManager(getContext());
         list = ((RecyclerView) findViewById(R.id.list));
         list.setLayoutManager(listLayout);
         list.setAdapter(adapter);
 
         toolbar = ToolbarUtils.initToolbar(this)
-
+                .inflate(R.menu.profile_my)
                 .pop();
+        toolbar.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() ==R.id.menu_logout){
+                    presenter.logout();
+                    return true;
+                } else if (item.getItemId() == R.id.menu_edit_name){
+                    presenter.editName();
+                    return true;
+                }
+                return false;
+            }
+        });
         fakeToolbar = (FakeToolbar) findViewById(R.id.fake_toolbar);
+
     }
 
     @Override
@@ -81,41 +96,46 @@ public class ProfileView extends FrameLayout implements HandlesBack {
 
     public void bindUser(@NonNull TdApi.User user) {
         fakeToolbar.bindUser(user);
-        List<ProfileAdapter.Item> items = new ArrayList<>();
+        List<MyProfileAdapter.Item> items = new ArrayList<>();
         final boolean hasUserName = !isEmpty(user.username);
-        final boolean hasPhoneNumber = !isEmpty(user.phoneNumber);
         if (hasUserName) {
-            items.add(new ProfileAdapter.Item(
-                    0,
+            items.add(new MyProfileAdapter.KeyValueItem(
+                    R.drawable.ic_user,
                     "@" + user.username,
                     getContext().getString(R.string.item_type_username),
                     null));
         }
 
-        if (hasPhoneNumber) {
-            final String phone = phoneFormat.format(
-                    phoneNumberWithPlus(user));
-            items.add(new ProfileAdapter.Item(
-                    R.drawable.phone_grey,
-                    phone,
-                    getContext().getString(R.string.item_type_mobile),
-                    createPhoneActions(phone)));
-        }
+        final String phone = phoneFormat.format(
+                phoneNumberWithPlus(user));
+        items.add(new MyProfileAdapter.KeyValueItem(
+                R.drawable.phone_grey,
+                phone,
+                getContext().getString(R.string.item_type_mobile),
+                createPhoneActions(phone)));
+
+        items.add(new MyProfileAdapter.PasscodeItem(true));
 
         adapter.addAll(items);
-        if (hasPhoneNumber || hasUserName){
-            list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(25)));
-            if (hasPhoneNumber && hasUserName) {
-                list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, 1));
-                list.addItemDecoration(new BottomShadow(getContext(), calc, 2));
-            } else {
-                list.addItemDecoration(new BottomShadow(getContext(), calc, 1));
-            }
+
+        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(25)));
+        int passCodePosition;
+        if (hasUserName) {
+            list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, 1));
+            list.addItemDecoration(new BottomShadow(getContext(), calc, 2));
+
+            passCodePosition = 3;
+        } else {
+            list.addItemDecoration(new BottomShadow(getContext(), calc, 1));
+            passCodePosition = 2;
         }
+
+        list.addItemDecoration(new TopShadow(getContext(), calc, passCodePosition));
+        list.addItemDecoration(new BottomShadow(getContext(), calc, passCodePosition));
+        list.addItemDecoration(new InsetDecorator(passCodePosition, calc.dp(6)));
     }
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {
-
         final ArrayList<ListChoicePopup.Item> data = new ArrayList<>();
         data.add(new ListChoicePopup.Item(getContext().getString(R.string.call_phone), new Runnable() {
             @Override
@@ -130,10 +150,5 @@ public class ProfileView extends FrameLayout implements HandlesBack {
             }
         }));
         return data;
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        return presenter.hidePopup();
     }
 }

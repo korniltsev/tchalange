@@ -35,15 +35,18 @@ public class ChatListView extends DrawerLayout {
     @Inject PhoneFormat phoneFormat;
 
     private RecyclerView list;
+    private ChatListAdapter adapter;
+    private ToolbarUtils toolbar;
+    private LinearLayoutManager layout;
+
+    //drawer
     private AvatarView drawerAvatar;
     private TextView drawerName;
     private TextView drawerPhone;
     private View btnLogout;
     private View btnContacts;
+    private View btnSettings;
 
-    private ChatListAdapter adapter;
-    private ToolbarUtils toolbar;
-    private LinearLayoutManager layout;
 
     public ChatListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -88,7 +91,7 @@ public class ChatListView extends DrawerLayout {
         toolbar = initToolbar(this)
                 .setDrawer(this, R.string.navigation_drawer_open, R.string.navigation_drawer_close);//todo what is open and clos?
 
-        //logout
+
         btnLogout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,6 +108,15 @@ public class ChatListView extends DrawerLayout {
             }
         });
 
+        btnSettings.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.openSettings();
+                closeDrawer(Gravity.LEFT);
+            }
+        });
+
+
 
     }
 
@@ -115,6 +127,7 @@ public class ChatListView extends DrawerLayout {
         drawerPhone = ((TextView) this.findViewById(R.id.drawer_phone));
         btnLogout = this.findViewById(R.id.btn_logout);
         btnContacts = this.findViewById(R.id.btn_contacts);
+        btnSettings = this.findViewById(R.id.btn_settings);
     }
 
 
