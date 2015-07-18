@@ -145,7 +145,7 @@ public class AppUtils {
     }
 
     public static void clear(Rect outRect) {
-        outRect.top = outRect.bottom = outRect.left = outRect.right = 0;
+        outRect.set(0,0,0,0);
     }
 
     @Nullable

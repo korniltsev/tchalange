@@ -39,10 +39,12 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
 
 
     public boolean hidePopup() {
-        if (popup != null){
+        if (popup != null && popup.isShowing()){
             popup.dismiss();
+            popup = null;
             return true;
         }
+        popup = null;
         return false;
     }
 }

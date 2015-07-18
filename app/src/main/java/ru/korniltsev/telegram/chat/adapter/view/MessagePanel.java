@@ -209,11 +209,12 @@ public class MessagePanel extends LinearLayout {
     }
 
     public boolean onBackPressed() {
-        if (attachPanelPopup != null){
+        if (attachPanelPopup != null && attachPanelPopup.isShowing()){
             attachPanelPopup.dismiss();
             attachPanelPopup = null;
             return true;
         }
+        attachPanelPopup = null;
         if (emojiPopup != null) {
             emojiPopup.dismiss();
             emojiPopup = null;
