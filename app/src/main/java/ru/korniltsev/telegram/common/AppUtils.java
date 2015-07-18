@@ -5,8 +5,12 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -138,5 +142,22 @@ public class AppUtils {
         } else {
             return "+" + user.phoneNumber;
         }
+    }
+
+    public static void clear(Rect outRect) {
+        outRect.top = outRect.bottom = outRect.left = outRect.right = 0;
+    }
+
+    @Nullable
+    public static View getChildWithAdapterPosition(RecyclerView list, int position){
+        for (int i = 0; i < list.getChildCount(); ++i){
+            final View child = list.getChildAt(i);
+            final RecyclerView.ViewHolder vh = list.getChildViewHolder(child);
+            if (vh.getAdapterPosition() == position) {
+                return child;
+
+            }
+        }
+        return null;
     }
 }

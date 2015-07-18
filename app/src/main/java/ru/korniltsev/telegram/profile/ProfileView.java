@@ -1,6 +1,9 @@
 package ru.korniltsev.telegram.profile;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
@@ -78,15 +81,8 @@ public class ProfileView extends FrameLayout implements HandlesBack{
 
     private void offsetFirstItem() {
         //looks better
-        list.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(Rect outRect, View child, RecyclerView parent, RecyclerView.State state) {
-                final RecyclerView.ViewHolder vh = parent.getChildViewHolder(child);
-                if (vh.getAdapterPosition() == 1){
-                    outRect.top = calc.dp(16);
-                }
-            }
-        });
+        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(16)));
+        list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, 1));
     }
 
     @Override
@@ -100,6 +96,13 @@ public class ProfileView extends FrameLayout implements HandlesBack{
     public void bindUser(@NonNull TdApi.User user) {
         fakeToolbar.bindUser(user);
         List<ProfileAdapter.Item> items = new ArrayList<>();
+        if (!TextUtils.isEmpty(user.username)) {
+            items.add(new ProfileAdapter.Item(
+                    0,
+                    "@" + user.username,
+                    getContext().getString(R.string.item_type_username),
+                    null));
+        }
         if (!TextUtils.isEmpty(user.phoneNumber)) {
             final String phone = phoneFormat.format(
                     phoneNumberWithPlus(user));
@@ -108,13 +111,6 @@ public class ProfileView extends FrameLayout implements HandlesBack{
                     phone,
                     getContext().getString(R.string.item_type_mobile),
                     createPhoneActions(phone)));
-        }
-        if (!TextUtils.isEmpty(user.username)) {
-            items.add(new ProfileAdapter.Item(
-                    0,
-                    "@" + user.username,
-                    getContext().getString(R.string.item_type_username),
-                    null));
         }
         adapter.addAll(items);
     }
@@ -142,5 +138,69 @@ public class ProfileView extends FrameLayout implements HandlesBack{
         return presenter.hidePopup();
     }
 
+    public static  class DividerItemDecorator extends RecyclerView.ItemDecoration{
+        final int paddingLeft;
+        final int color;
+        final int itemPosition;
+        Paint paint ;
+        public DividerItemDecorator(int paddingLeft, int color, int itemPosition) {
+            this.paddingLeft = paddingLeft;
+            this.color = color;
+            this.itemPosition = itemPosition;
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(color);
+        }
 
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+
+            AppUtils.clear(outRect);
+            if (parent.getChildViewHolder(view).getAdapterPosition() == itemPosition){
+                outRect.bottom = 1;
+            }
+        }
+
+        @Override
+        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            final View targetView = AppUtils.getChildWithAdapterPosition(parent, itemPosition);
+            if (targetView != null) {
+                drawDivider(c, targetView);
+            }
+        }
+
+        private void drawDivider(Canvas c, View child) {
+            c.drawLine(child.getLeft() + paddingLeft, child.getBottom(), child.getRight(), child.getBottom(), paint);
+        }
+    }
+
+    private static class MyWhiteRectTopPaddingDecorator extends RecyclerView.ItemDecoration {
+        final int position;
+        final int height;
+        final Paint paint;
+
+        public MyWhiteRectTopPaddingDecorator(int position, int height) {
+            this.position = position;
+            this.height = height;
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(Color.WHITE);
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View child, RecyclerView parent, RecyclerView.State state) {
+            AppUtils.clear(outRect);
+            if (parent.getChildViewHolder(child).getAdapterPosition() == position){
+                outRect.top = height;
+            }
+        }
+
+        @Override
+        public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            final View targetView = AppUtils.getChildWithAdapterPosition(parent, position);
+            if (targetView != null){
+                c.drawRect(targetView.getLeft(), targetView.getTop() - height,
+                        targetView.getRight(), targetView.getTop(),
+                        paint);
+            }
+        }
+    }
 }

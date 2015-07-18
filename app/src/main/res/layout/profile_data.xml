@@ -3,7 +3,7 @@
               android:layout_width="match_parent"
               android:layout_height="64dp"
               android:orientation="horizontal"
-            android:background="@drawable/bg_keyboard_tab">
+              android:background="@drawable/bg_profile_data">
     <ImageView
             android:id="@+id/icon"
             android:layout_width="24dp"

@@ -11,6 +11,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 
 import javax.inject.Inject;
 
+@Deprecated//todo remove with itemDecorator
 public class DividerRelativeLayout extends RelativeLayout {
     private final int from;
     private final Paint p;
