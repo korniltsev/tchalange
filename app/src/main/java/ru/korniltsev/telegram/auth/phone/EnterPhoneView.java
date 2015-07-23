@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ru.korniltsev.telegram.core.Utils.event;
 import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
@@ -61,6 +62,7 @@ public class EnterPhoneView extends LinearLayout {
                         new Runnable() {
                             @Override
                             public void run() {
+                                event("EnterPhoneVIew: sendCode from toolbar");
                                 sendCode();
                             }
                         }
@@ -77,6 +79,7 @@ public class EnterPhoneView extends LinearLayout {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    event("action done");
                     sendCode();
                     return true;
                 }
@@ -134,7 +137,7 @@ public class EnterPhoneView extends LinearLayout {
                         if (ignorePhoneNumberChanges) {
                             return;
                         }
-                        if (selectedCountry == null){
+                        if (selectedCountry == null) {
                             return;
                         }
                         formatPhone(s, phoneCode.getText());
@@ -159,6 +162,7 @@ public class EnterPhoneView extends LinearLayout {
     }
 
     private void sendCode() {
+
         presenter.sendCode(EnterPhoneView.this.getPhoneNumber());
     }
 
