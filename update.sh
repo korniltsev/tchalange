@@ -6,19 +6,17 @@ function bumpVersion(){
 	rm tmp
 }
 
-
-
 bumpVersion
 
-./gradlew publishRelease --stacktrace|| exit
+./gradlew publishRelease --stacktrace || exit
 
-bumpVersion # again
-#git
+bumpVersion # again for development purposes
+
 git add .
 git ci -m "bump version"
 git push
 
-
-
+VERSION=$(grep -o  "versionName.*" app/build.gradle| cut -d" " -f2 | sed 's/"//g')
+git tag -a "release/$VERSION" -m "release/$VERSION"
 
 
