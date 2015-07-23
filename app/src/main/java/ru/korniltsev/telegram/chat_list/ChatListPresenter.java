@@ -132,19 +132,24 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
                 networkState.subscribe(new ObserverAdapter<TdApi.UpdateOption>() {
                     @Override
                     public void onNext(TdApi.UpdateOption o) {
-                        TdApi.OptionString b = (TdApi.OptionString) o.value;
-                        boolean connected ;
-                        switch (b.value){
-                            case "Waiting for network":
-                            case "Connecting":
-                                connected = false;
-                                break;
-                            default:
-                                connected = true;
-                                break;
+                        if (o.value instanceof TdApi.OptionString){
+                            TdApi.OptionString b = (TdApi.OptionString) o.value;
+                            boolean connected;
+                            switch (b.value) {
+                                case "Waiting for network":
+                                case "Connecting":
+                                    connected = false;
+                                    break;
+                                default:
+                                    connected = true;
+                                    break;
+                            }
+                            ChatListPresenter.this.getView()
+                                    .updateNetworkStatus(connected);
+                        } else {
+                            CrashlyticsCore.getInstance().logException(new IllegalStateException(o.name + " = " + o.value));
                         }
-                        ChatListPresenter.this.getView()
-                                .updateNetworkStatus(connected);
+
                     }
                 }));
         subscription.add(emoji.pageLoaded()
