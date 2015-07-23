@@ -409,7 +409,7 @@ public class RxChat implements UserHolder {
     }
 
     private Observable<TdApi.Messages> requestUntilLastUnreadRecursive(int messageId, final int untilId) {
-        return client.getMessages(id, messageId, 0, holder.getMessageLimit())
+        return client.getMessages(id, messageId, 0, 100)
                 .flatMap(new Func1<TdApi.Messages, Observable<TdApi.Messages>>() {
                     @Override
                     public Observable<TdApi.Messages> call(TdApi.Messages messages) {
