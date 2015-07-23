@@ -170,15 +170,23 @@ public class ChatListView extends DrawerLayout {
         });
     }
 
-    public void bindLockButton(boolean locked) {
+    public void bindLockButton(boolean locked, boolean enabled) {
         final MenuItem menu = toolbar.toolbar.getMenu().findItem(R.id.menu_lock_unlock);
-        if (locked) {
-            menu.setIcon(R.drawable.ic_lock_close);
-            menu.setTitle(R.string.action_unlock);
+        if (enabled){
+            if (locked) {
+                menu.setIcon(R.drawable.ic_lock_close);
+                menu.setTitle(R.string.action_unlock);
+            } else {
+                menu.setIcon(R.drawable.ic_lock_open);
+                menu.setTitle(R.string.action_lock);
+            }
+            menu.setVisible(true);
         } else {
-            menu.setIcon(R.drawable.ic_lock_open);
-            menu.setTitle(R.string.action_lock);
+            menu.setVisible(false);
         }
+
+
+
 
     }
 }

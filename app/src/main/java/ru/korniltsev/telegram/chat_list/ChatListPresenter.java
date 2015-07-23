@@ -1,10 +1,7 @@
 package ru.korniltsev.telegram.chat_list;
 
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
@@ -19,8 +16,6 @@ import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.my.MyProfilePath;
 import rx.Observable;
-import rx.android.content.ContentObservable;
-import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -94,7 +89,8 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
 
     private void bindLockButton() {
         final boolean locked = passcodeManager.isLocked();
-        getView().bindLockButton(locked);
+        final boolean enabled = passcodeManager.passCodeEnabled();
+        getView().bindLockButton(locked, enabled);
 
 
     }
@@ -220,6 +216,6 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
         boolean locked = passcodeManager.isLocked();
         passcodeManager.setLocked(!locked);
         getView()
-                .bindLockButton(!locked);
+                .bindLockButton(!locked, passcodeManager.passCodeEnabled());
     }
 }
