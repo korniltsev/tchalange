@@ -3,9 +3,7 @@ package ru.korniltsev.telegram.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.*;
-import android.os.Process;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -19,17 +17,17 @@ import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.auth.phone.EnterPhoneFragment;
 import ru.korniltsev.telegram.chat_list.ChatList;
+import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.flow.SerializableParceler;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.mortar.core.MortarScreenSwitcherFrame;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
+import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import rx.Observable;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
-
-import java.util.Map;
 
 import static mortar.bundler.BundleServiceRunner.getBundleServiceRunner;
 import static ru.korniltsev.telegram.core.Utils.event;
@@ -46,6 +44,7 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
     private static boolean firstRun = true;
     private BundleServiceRunner bundleServiceRunner;
     private View statusBarBg;
+    private PasscodeManager passCodeManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +78,7 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
                 (FlowDelegate.NonConfigurationInstance) getLastNonConfigurationInstance();
 
         ObjectGraph objectGraph = ObjectGraphService.getObjectGraph(this);
+        passCodeManager = objectGraph.get(PasscodeManager.class);
         authState = objectGraph.get(RXAuthState.class);
         activityOwner = objectGraph.get(ActivityOwner.class);
         activityOwner.takeView(this);
@@ -135,6 +135,16 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
                                 .setHistory(history, Flow.Direction.REPLACE);
                     }
                 });
+        passCodeManager.onResume(new PasscodeManager.Callback() {
+            @Override
+            public void lockUI() {
+                final Flow flow1 = Flow.get(MainActivity.this);
+                final History history = flow1.getHistory();
+                if (!(history.top() instanceof PasscodePath)) {
+                    flow1.set(new PasscodePath(PasscodePath.TYPE_LOCK));
+                }
+            }
+        });
     }
 
     @Override
@@ -142,7 +152,10 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
         event("onPause " + this);
         super.onPause();
         flow.onPause();
+        //todo здесь ошибка и отписываться надо не в onDestroy
         subscription.unsubscribe();
+        boolean locked = Flow.get(this).getHistory().top() instanceof PasscodePath;
+        passCodeManager.onPause(locked);
     }
 
     @Override

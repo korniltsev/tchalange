@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="passcode_password">Password</string>
+    <string name="action_unlock">Unlock</string>
+    <string name="action_lock">Lock</string>
+</resources>

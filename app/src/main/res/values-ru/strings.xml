@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="passcode_password">Пароль</string>
+    <string name="action_unlock">Разблокировать</string>
+    <string name="action_lock">Заблокировать</string>
+</resources>

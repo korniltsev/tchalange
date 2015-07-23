@@ -53,7 +53,7 @@ public class AnimatedCheckbox extends View {
     }
 
     public void check(boolean checked, boolean animated) {
-        if (!animated) {
+//        if (!animated) {
             this.checked = checked;
             this.color = colorFor(checked);
             this.colorForOval = colorForOval(checked);
@@ -63,7 +63,7 @@ public class AnimatedCheckbox extends View {
             mOvalShadowPaint.setColor(colorForShadow);
             pos = checked ? 1f : 0f;
             invalidate();
-        }
+//        } todo animate
     }
     float [] tmpRect = new float[3];
     private int darken(int colorForOval) {
@@ -112,5 +112,9 @@ public class AnimatedCheckbox extends View {
 
     public void toggle() {
         check(!checked, false);
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
     }
 }

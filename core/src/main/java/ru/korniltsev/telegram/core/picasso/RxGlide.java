@@ -120,7 +120,7 @@ public class RxGlide {
             }
         }
         loadPhoto(file, false)
-                .resize(size, size)
+//                .resize(size, size)
                 .transform(ROUND)
                 .placeholder(getStubDrawable(u, size))
                 .into(avatarView);
@@ -190,7 +190,7 @@ public class RxGlide {
             }
         }
         loadPhoto(file, false)
-                .resize(size, size)
+//                .resize(size, size)
                 .transform(ROUND)
                 .placeholder(getStubDrawable(info, size))
                 .into(avatarView);

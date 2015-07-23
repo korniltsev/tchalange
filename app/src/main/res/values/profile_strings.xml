@@ -12,4 +12,21 @@
     <string name="passcode_timing_how_to">Require passcode if you away for a time</string>
     <string name="change_pass">Change Passcode</string>
     <string name="auto_lock">Auto-Lock</string>
+    <string name="enter_passcode_menu">Enter passcode</string>
+    <string name="password_cannot_be_empty">Password cannot be empty</string>
+    <string name="wrong_password">Wrong password</string>
+    <string name="autolock_disabled">Disabled</string>
+    <plurals name="auto_lock_n_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <plurals name="auto_lock_n_hour">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+
+    <!--<plurals name="user_status_last_seen_n_minutes_ago">-->
+        <!--<item quantity="one">last seen %1$d minute ago</item>-->
+        <!--<item quantity="other">last seen %1$d minutes ago</item>-->
+    <!--</plurals>-->
 </resources>

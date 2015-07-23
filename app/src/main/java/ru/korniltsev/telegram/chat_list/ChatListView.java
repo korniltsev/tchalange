@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import mortar.dagger1support.ObjectGraphService;
@@ -89,6 +90,12 @@ public class ChatListView extends DrawerLayout {
 
         //toolbar
         toolbar = initToolbar(this)
+                .addMenuItem(R.menu.chat_list, R.id.menu_lock_unlock, new Runnable() {
+                    @Override
+                    public void run() {
+                        presenter.lockUnlock();
+                    }
+                })
                 .setDrawer(this, R.string.navigation_drawer_open, R.string.navigation_drawer_close);//todo what is open and clos?
 
 
@@ -161,5 +168,17 @@ public class ChatListView extends DrawerLayout {
                 presenter.listScrolledToEnd();
             }
         });
+    }
+
+    public void bindLockButton(boolean locked) {
+        final MenuItem menu = toolbar.toolbar.getMenu().findItem(R.id.menu_lock_unlock);
+        if (locked) {
+            menu.setIcon(R.drawable.ic_lock_close);
+            menu.setTitle(R.string.action_unlock);
+        } else {
+            menu.setIcon(R.drawable.ic_lock_open);
+            menu.setTitle(R.string.action_lock);
+        }
+
     }
 }

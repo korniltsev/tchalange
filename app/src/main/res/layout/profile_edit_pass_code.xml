@@ -72,24 +72,53 @@
                         android:paddingBottom="16dp"
 
                         />
-                <View android:layout_width="match_parent"
+                <View
+                        android:id="@+id/timing_shadow_top"
+                        android:layout_width="match_parent"
                       android:layout_height="4dp"
                       android:background="@drawable/shadow_top"/>
 
-                <TextView
+                <LinearLayout
                         android:id="@+id/btn_passcode_timing"
                         android:layout_width="match_parent"
                         android:layout_height="55dp"
-                        android:gravity="center_vertical"
-                        android:text="@string/auto_lock"
                         android:background="@drawable/bg_keyboard_tab_white"
-                        style="@style/EditPassCodeMainLabel"
-                        />
-                <View android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        >
+                    <TextView
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:text="@string/auto_lock"
+                            style="@style/EditPassCodeMainLabel"/>
+
+                    <TextView
+                            android:id="@+id/btn_passcode_timing_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:paddingLeft="16dp"
+                            android:paddingRight="16dp"
+                            android:textColor="#8A8A8A"
+                            />
+                </LinearLayout>
+                <!--<TextView-->
+                        <!--android:id="@+id/btn_passcode_timing"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="55dp"-->
+                        <!--android:gravity="center_vertical"-->
+                        <!--android:text="@string/auto_lock"-->
+                        <!--android:background="@drawable/bg_keyboard_tab_white"-->
+                        <!--style="@style/EditPassCodeMainLabel"-->
+                        <!--/>-->
+                <View
+                        android:id="@+id/timing_shadow"
+                        android:layout_width="match_parent"
                       android:layout_height="4dp"
                       android:background="@drawable/shadow_bottom"/>
 
                 <TextView
+                        android:id="@+id/timing_howto"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="#6d6d6d"

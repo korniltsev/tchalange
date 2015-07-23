@@ -53,6 +53,7 @@ public class MyProfileView extends FrameLayout {
         adapter = new MyProfileAdapter(getContext(), new Runnable() {
             @Override
             public void run() {
+
                 presenter.passcodeClicked();
             }
         });
@@ -99,7 +100,7 @@ public class MyProfileView extends FrameLayout {
         presenter.dropView(this);
     }
 
-    public void bindUser(@NonNull TdApi.User user) {
+    public void bindUser(@NonNull TdApi.User user, boolean passcodeEnabled) {
         fakeToolbar.bindUser(user);
         List<MyProfileAdapter.Item> items = new ArrayList<>();
         final boolean hasUserName = !isEmpty(user.username);
@@ -119,7 +120,7 @@ public class MyProfileView extends FrameLayout {
                 getContext().getString(R.string.item_type_mobile),
                 createPhoneActions(phone)));
 
-        items.add(new MyProfileAdapter.PasscodeItem(true));
+        items.add(new MyProfileAdapter.PasscodeItem(passcodeEnabled));
 
         adapter.addAll(items);
 

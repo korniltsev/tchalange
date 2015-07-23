@@ -139,6 +139,6 @@ public class Utils {
     public static void showKeyboard(View anchor) {
         Context c = anchor.getContext();
         InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(anchor, InputMethodManager.SHOW_IMPLICIT);
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 }

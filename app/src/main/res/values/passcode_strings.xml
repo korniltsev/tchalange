@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="enter_your_password">Enter your password to unlock</string>
+    <string name="choose_your_password">Choose your password</string>
+    <string name="choose_your_password_2">Re-enter your new password</string>
+</resources>

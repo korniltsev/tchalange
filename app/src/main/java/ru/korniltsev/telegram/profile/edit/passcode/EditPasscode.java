@@ -13,10 +13,8 @@ import java.io.Serializable;
 
 @WithModule(EditPasscode.Module.class)
 public class EditPasscode extends BasePath implements Serializable{
-    public final TdApi.User user;
 
-    public EditPasscode(TdApi.User user) {
-        this.user = user;
+    public EditPasscode() {
     }
 
     @Override

@@ -13,6 +13,7 @@ import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.Emoji;
+import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -38,6 +39,7 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     private final RXClient client;
     private final Emoji emoji;
     private final RXAuthState authState;
+    private final PasscodeManager passcodeManager;
     private final ChatDB chatDB;
     private Observable<RXAuthState.StateAuthorized> meRequest;
 
@@ -47,11 +49,12 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     private RXAuthState.StateAuthorized me;
 
     @Inject
-    public ChatListPresenter(ChatList cl, RXClient client, Emoji emoji, RXAuthState authState, ChatDB chatDB) {
+    public ChatListPresenter(ChatList cl, RXClient client, Emoji emoji, RXAuthState authState, PasscodeManager passcodeManager, ChatDB chatDB) {
         this.cl = cl;
         this.client = client;
         this.emoji = emoji;
         this.authState = authState;
+        this.passcodeManager = passcodeManager;
         this.chatDB = chatDB;
         checkTlObjectIsSerializable();
 
@@ -86,6 +89,14 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
         }
 
         subscribe();
+        bindLockButton();
+    }
+
+    private void bindLockButton() {
+        final boolean locked = passcodeManager.isLocked();
+        getView().bindLockButton(locked);
+
+
     }
 
     private void requestChats() {
@@ -198,5 +209,12 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
             Flow.get(getView())
                     .set(new MyProfilePath(user));
         }
+    }
+
+    public void lockUnlock() {
+        boolean locked = passcodeManager.isLocked();
+        passcodeManager.setLocked(!locked);
+        getView()
+                .bindLockButton(!locked);
     }
 }
