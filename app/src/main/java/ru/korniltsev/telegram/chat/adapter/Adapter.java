@@ -88,7 +88,7 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
                 return VIEW_TYPE_STICKER;
             } else if (message instanceof TdApi.MessageAudio) {
                 return VIEW_TYPE_AUDIO;
-            } else if (message instanceof TdApi.MessageGeoPoint) {
+            } else if (message instanceof TdApi.MessageLocation) {
                 return VIEW_TYPE_GEO;
             } else if (message instanceof TdApi.MessageVideo) {
                 return VIEW_TYPE_VIDEO;

@@ -20,8 +20,6 @@
 
 package org.drinkless.td.libcore.telegram;
 
-import android.os.*;
-import android.os.Process;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -114,7 +112,6 @@ public class Client implements Runnable {
      */
     @Override
     public void run() {
-        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
         while (true) {
             if (stopFlag) {
                 doStop();
@@ -130,14 +127,15 @@ public class Client implements Runnable {
      *
      * @param updatesHandler Handler for incoming updates.
      * @param dir            Directory for persistent database.
+     * @param filesDir       Directory for files.
      * @throws NullPointerException if dir is null.
      */
-    static Client create(ResultHandler updatesHandler, String dir) {
-        if (dir == null) {
+    static Client create(ResultHandler updatesHandler, String dir, String filesDir) {
+        if (dir == null || filesDir == null) {
             throw new NullPointerException();
         }
 
-        return new Client(updatesHandler, dir);
+        return new Client(updatesHandler, dir, filesDir);
     }
 
     /**
@@ -169,9 +167,9 @@ public class Client implements Runnable {
         }
     }
 
-    private Client(ResultHandler updatesHandler, String dir) {
+    private Client(ResultHandler updatesHandler, String dir, String filesDir) {
         long nativeClientId = NativeClient.createClient();
-        NativeClient.clientInit(nativeClientId, dir);
+        NativeClient.clientInit(nativeClientId, dir, filesDir);
 
         stopFlag = false;
         this.nativeClientId = nativeClientId;

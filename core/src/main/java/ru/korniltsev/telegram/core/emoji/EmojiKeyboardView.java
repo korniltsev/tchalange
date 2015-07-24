@@ -329,9 +329,9 @@ public class EmojiKeyboardView extends LinearLayout {
     private void stickerClicked(final TdApi.Sticker sticker) {
         downloader.downloadWithoutProgress(sticker.sticker)
                 .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.FileLocal>() {
+                .subscribe(new ObserverAdapter<TdApi.File>() {
                     @Override
-                    public void onNext(TdApi.FileLocal fileLocal) {
+                    public void onNext(TdApi.File fileLocal) {
                         callback.stickerCLicked(fileLocal.path, sticker);
                     }
                 });

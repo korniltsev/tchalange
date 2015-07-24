@@ -39,7 +39,7 @@ final class NativeClient {
 
     public static native void destroyClient(long clientId);
 
-    public static native void clientInit(long clientId, String dir);
+    public static native void clientInit(long clientId, String safeDir, String sdcar);
 
     public static native int clientRun(long clientId, long[] eventIds, TdApi.TLObject[] events, int changesCount, double timeout);
 

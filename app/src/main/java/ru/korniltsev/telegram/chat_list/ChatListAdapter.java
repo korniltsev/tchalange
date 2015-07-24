@@ -164,7 +164,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             return ctx.getString(R.string.photo);
         } else if (m instanceof TdApi.MessageVideo) {
             return ctx.getString(R.string.video);
-        } else if (m instanceof TdApi.MessageGeoPoint) {
+        } else if (m instanceof TdApi.MessageLocation) {
             return ctx.getString(R.string.geo);
         } else if (m instanceof TdApi.MessageContact) {
             return ctx.getString(R.string.contact);

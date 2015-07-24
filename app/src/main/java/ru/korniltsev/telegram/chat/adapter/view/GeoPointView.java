@@ -20,10 +20,10 @@ public class GeoPointView extends ImageView {
         ObjectGraphService.inject(context, this);
     }
 
-    public void set(TdApi.MessageGeoPoint msg) {
+    public void set(TdApi.MessageLocation msg) {
         String url = urlFor(
-                msg.geoPoint.latitude,
-                msg.geoPoint.longitude
+                msg.location.latitude,
+                msg.location.longitude
         );
         picasso.getPicasso()
                 .load(url)

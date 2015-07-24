@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -38,7 +39,7 @@ public class RxDownloadManager {
     //guarded by lock
     private final Map<Integer, BehaviorSubject<FileState>> allRequests = new HashMap<>();
     //guarded by lock
-    private Map<Integer, TdApi.FileLocal> allDownloadedFiles = new HashMap<>();
+    private Map<Integer, TdApi.File> allDownloadedFiles = new HashMap<>();
 
     final Object lock = new Object();
 
@@ -95,7 +96,7 @@ public class RxDownloadManager {
     }
 
     private void updateFile(TdApi.UpdateFile upd) {
-        Action1<TdApi.UpdateFile> hook = fileIdToHook.get(upd.fileId);
+        Action1<TdApi.UpdateFile> hook = fileIdToHook.get(upd.file.id);
         if (hook != null) {
             try {
                 hook.call(upd);
@@ -106,11 +107,11 @@ public class RxDownloadManager {
         }
 
         synchronized (lock) {
-            TdApi.FileLocal f = new TdApi.FileLocal(upd.fileId, upd.size, upd.path);
-            allDownloadedFiles.put(upd.fileId, f);
-            BehaviorSubject<FileState> s = allRequests.get(upd.fileId);
+//            TdApi.FileLocal f = new TdApi.FileLocal(upd.fileId, upd.size, upd.path);
+            allDownloadedFiles.put(upd.file.id, upd.file);
+            BehaviorSubject<FileState> s = allRequests.get(upd.file.id);
             if (s != null){
-                s.onNext(new FileDownloaded(f));
+                s.onNext(new FileDownloaded(upd.file));
             }
         }
     }
@@ -121,15 +122,15 @@ public class RxDownloadManager {
 
 
     public Observable<FileState> download(final TdApi.File f){
-        if (f instanceof TdApi.FileEmpty) {
-            return download(((TdApi.FileEmpty) f));
+        if (f.isEmpty()) {
+            return download(f.id);
         } else {
-            TdApi.FileLocal f1 = (TdApi.FileLocal) f;
-            return Observable.<FileState>just(new FileDownloaded(f1));
+
+            return Observable.<FileState>just(new FileDownloaded(f));
         }
     }
 
-    public Observable<TdApi.FileLocal> downloadWithoutProgress(TdApi.File f) {
+    public Observable<TdApi.File> downloadWithoutProgress(TdApi.File f) {
         return download(f)
                 .compose(ONLY_RESULT);
 
@@ -137,10 +138,10 @@ public class RxDownloadManager {
 
 
 
-    public Observable<FileState> download(final TdApi.FileEmpty file) {
-        int id = file.id;
-        return download(id);
-    }
+//    public Observable<FileState> download(final TdApi.File file) {
+//        int id = file.id;
+//        return download(id);
+//    }
 
     /**
      *
@@ -157,7 +158,7 @@ public class RxDownloadManager {
 //                log("return prev request" + RXClient.coolTagForFileId(id));
                 return prevRequest;
             }
-            TdApi.FileLocal fileLocal = allDownloadedFiles.get(id);
+            TdApi.File fileLocal = allDownloadedFiles.get(id);
             if (fileLocal != null) {
 //                log("already downloaded " + RXClient.coolTagForFileId(id));
                 //                BehaviorSubject<FileState> newRequest = BehaviorSubject.create(fileLocal);
@@ -173,39 +174,41 @@ public class RxDownloadManager {
     }
 
     public boolean isDownloaded(TdApi.File file) {
-        if (file instanceof TdApi.FileLocal) {
+        if (!file.isEmpty()){
             return true;
         }
-        TdApi.FileEmpty e = (TdApi.FileEmpty) file;
-        return getDownloadedFile(e.id) != null;
+//        if (file instanceof TdApi.FileLocal) {
+//            return true;
+//        }
+//        TdApi.FileEmpty e = (TdApi.FileEmpty) file;
+        return getDownloadedFile(file.id) != null;
     }
 
 
 
-    public boolean isDownloading(TdApi.FileEmpty file) {
+    public boolean isDownloading(TdApi.File file) {
         return nonMainThreadObservableFor(file) != null;
     }
 
     @Nullable
-    public Observable<FileState> nonMainThreadObservableFor(TdApi.FileEmpty file) {
+    public Observable<FileState> nonMainThreadObservableFor(TdApi.File file) {
         synchronized (lock) {
             return allRequests.get(file.id);
         }
     }
 
     @Nullable
-    public TdApi.FileLocal getDownloadedFile(Integer id) {
+    public TdApi.File getDownloadedFile(Integer id) {
         synchronized (lock) {
             return allDownloadedFiles.get(id);
         }
     }
 
-    public TdApi.FileLocal getDownloadedFile(TdApi.File f){
-        if (f instanceof TdApi.FileLocal){
-            return (TdApi.FileLocal) f;
+    public TdApi.File getDownloadedFile(TdApi.File f){
+        if (!f.isEmpty()){
+            return f;
         } else {
-            TdApi.FileEmpty e = (TdApi.FileEmpty) f;
-            return getDownloadedFile(e.id);
+            return getDownloadedFile(f.id);
         }
     }
 
@@ -229,14 +232,14 @@ public class RxDownloadManager {
 
     }
 
-    public class FileState {
+    public class FileState {//todo delete this class
 
     }
 
     public class FileDownloaded extends FileState {
-        public final TdApi.FileLocal f;
+        public final TdApi.File f;
 
-        public FileDownloaded(TdApi.FileLocal f) {
+        public FileDownloaded(TdApi.File f) {
             this.f = f;
         }
     }
@@ -249,17 +252,17 @@ public class RxDownloadManager {
         }
     }
 
-    public static class OnlyResult implements Observable.Transformer<FileState, TdApi.FileLocal> {
+    public static class OnlyResult implements Observable.Transformer<FileState, TdApi.File> {
         @Override
-        public Observable<TdApi.FileLocal> call(Observable<FileState> fileStateObservable) {
+        public Observable<TdApi.File> call(Observable<FileState> fileStateObservable) {
             return fileStateObservable.filter(new Func1<FileState, Boolean>() {
                 @Override
                 public Boolean call(FileState fileState) {
                     return fileState instanceof FileDownloaded;
                 }
-            }).map(new Func1<FileState, TdApi.FileLocal>() {
+            }).map(new Func1<FileState, TdApi.File>() {
                 @Override
-                public TdApi.FileLocal call(FileState fileState) {
+                public TdApi.File call(FileState fileState) {
                     return ((FileDownloaded) fileState).f;
                 }
             });
@@ -270,6 +273,6 @@ public class RxDownloadManager {
     private Map<Integer, Action1<TdApi.UpdateFile>> fileIdToHook = new ConcurrentHashMap<>();
 
     public void hook(TdApi.File fileId, Action1<TdApi.UpdateFile> a) {
-        fileIdToHook.put(fileId.getId(), a);
+        fileIdToHook.put(fileId.id, a);
     }
 }

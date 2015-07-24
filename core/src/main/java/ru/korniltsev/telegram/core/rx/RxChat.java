@@ -245,7 +245,7 @@ public class RxChat implements UserHolder {
     }
 
     //hack to prevent reloading of newly added image
-    final SparseArray<TdApi.FileLocal> sentMessageIdToImageLink = new SparseArray<>();
+    final SparseArray<TdApi.File> sentMessageIdToImageLink = new SparseArray<>();
 
     private void sentPhotoHack(TdApi.Message msg) {
         if (msg.message instanceof TdApi.MessagePhoto
@@ -253,14 +253,14 @@ public class RxChat implements UserHolder {
             final TdApi.Photo p = ((TdApi.MessagePhoto) msg.message).photo;
             if (p.photos.length == 1) {
                 final TdApi.PhotoSize photo = p.photos[0];
-                if (photo.type.equals("i") && photo.photo instanceof TdApi.FileLocal) {
-                    sentMessageIdToImageLink.put(msg.id, (TdApi.FileLocal) photo.photo);
+                if (photo.type.equals("i") && photo.photo.isLocal()) {
+                    sentMessageIdToImageLink.put(msg.id, photo.photo);
                 }
             }
         }
     }
 
-    @Nullable public TdApi.FileLocal getSentImage(TdApi.Message msg) {
+    @Nullable public TdApi.File getSentImage(TdApi.Message msg) {
         return sentMessageIdToImageLink.get(msg.id);
     }
 
@@ -327,8 +327,8 @@ public class RxChat implements UserHolder {
         deletedMessagesSubject.onNext(new DeletedMessages(deletedMessages));
     }
 
-    public void sendSticker(String stickerFilePath) {
-        TdApi.InputMessageSticker content = new TdApi.InputMessageSticker(stickerFilePath);
+    public void sendSticker(TdApi.File f) {
+        TdApi.InputMessageSticker content = new TdApi.InputMessageSticker(new TdApi.InputFileId(f.id));
         sendMessageImpl(content);
     }
 
@@ -338,7 +338,7 @@ public class RxChat implements UserHolder {
     }
 
     private void sendMessageImpl(TdApi.InputMessageContent content) {
-        client.sendRx(new TdApi.SendMessage(id, content))
+        client.sendRx(new TdApi.SendMessage(id, 0, true, null, content))
                 .map(CAST_TO_MESSAGE_AND_PARSE_EMOJI)
                 .observeOn(mainThread())
                 .subscribe(HANDLE_NEW_MESSAGE);
@@ -350,8 +350,7 @@ public class RxChat implements UserHolder {
     }
 
     public void sendImage(String imageFilePath) {
-
-        sendMessageImpl(new TdApi.InputMessagePhoto(imageFilePath));
+        sendMessageImpl(new TdApi.InputMessagePhoto(new TdApi.InputFileLocal(imageFilePath), ""));
     }
 
     public void clear() {

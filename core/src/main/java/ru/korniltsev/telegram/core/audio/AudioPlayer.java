@@ -87,7 +87,7 @@ public class AudioPlayer {
         return decodeCacheDir;
     }
 
-    public Observable<TrackState> play(TdApi.FileLocal file){
+    public Observable<TrackState> play(TdApi.File file){
 
         if (OpusSupport.nativeIsOpusFile(file.path)){
             return playOpus(file.path);
@@ -114,7 +114,7 @@ public class AudioPlayer {
     }
 
     public void decode(TdApi.UpdateFile updateFile) {
-        DecodeOpusFile(updateFile.path);
+        DecodeOpusFile(updateFile.file.path);
     }
 
     class Track {

@@ -59,7 +59,8 @@ public class VideoView extends FrameLayout {
         downloadView = ((DownloadView) findViewById(R.id.download_view));
     }
 
-    private void playVideo(TdApi.FileLocal f) {
+    private void playVideo(TdApi.File f) {
+        assertTrue(f.isLocal());
         File src = new File(f.path);
 
 
@@ -116,14 +117,16 @@ public class VideoView extends FrameLayout {
         downloadView.setVisibility(View.VISIBLE);
         downloadView.bind(file, cfg, new DownloadView.CallBack() {
             @Override
-            public void onFinished(TdApi.FileLocal e, boolean justDownloaded) {
+            public void onFinished(TdApi.File e, boolean justDownloaded) {
+                assertTrue(e.isLocal());
                 if (gif && justDownloaded) {
                     setAndPlayGif(e);
                 }
             }
 
             @Override
-            public void play(TdApi.FileLocal e) {
+            public void play(TdApi.File e) {
+                assertTrue(e.isLocal());
                 if (gif) {
                     Drawable drawable = preview.getDrawable();
                     if (drawable instanceof GifDrawable){
@@ -141,7 +144,8 @@ public class VideoView extends FrameLayout {
         }, this);
     }
 
-    private void setAndPlayGif(TdApi.FileLocal e) {
+    private void setAndPlayGif(TdApi.File e) {
+        assertTrue(e.isLocal());
         try {
             preview.setImageDrawable(new GifDrawable(e.path));
             downloadView.setVisibility(View.GONE);
@@ -152,7 +156,7 @@ public class VideoView extends FrameLayout {
 
 
     private void showLowQualityThumb(TdApi.PhotoSize thumb) {
-        if (thumb.photo.getId() == 0) {
+        if (thumb.photo.id == 0) {
             picasso.getPicasso()
                     .cancelRequest(preview);
         } else {

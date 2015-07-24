@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
@@ -90,19 +91,20 @@ public class DocumentView extends LinearLayout{
             }
 
             @Override
-            public void onFinished(TdApi.FileLocal e, boolean b) {
+            public void onFinished(TdApi.File e, boolean b) {
                 documentProgress.setText(getResources().getString(R.string.downloaded_kb, kb(e.size)));
             }
 
             @Override
-            public void play(TdApi.FileLocal e) {
+            public void play(TdApi.File e) {
                 openDocument(e);
             }
         }, this);
 
     }
 
-    private void openDocument(TdApi.FileLocal e) {
+    private void openDocument(TdApi.File e) {
+        Assert.assertTrue(e.isLocal());
         File f = new File(e.path);
         String name = document.fileName;
         if (name != null && name.equals("")) {

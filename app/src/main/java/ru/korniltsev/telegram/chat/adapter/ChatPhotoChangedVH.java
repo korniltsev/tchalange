@@ -56,7 +56,7 @@ public class ChatPhotoChangedVH extends RealBaseVH {
         TdApi.GroupChatInfo groupChatInfo = new TdApi.GroupChatInfo();
         groupChatInfo.groupChat = new TdApi.GroupChat();
         groupChatInfo.groupChat.title = "";//todo !!
-        groupChatInfo.groupChat.photoSmall = smallSize.photo;
+        groupChatInfo.groupChat.photo.small = smallSize.photo;
         o.type = groupChatInfo;
         image.loadAvatarFor(o);
 

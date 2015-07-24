@@ -36,6 +36,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
@@ -210,7 +211,7 @@ public class Presenter extends ViewPresenter<ChatView>
                             public void onNext(TdApi.UpdateChatReadOutbox response) {
                                 getView()
                                         .getAdapter()
-                                        .setLastReadOutbox(response.lastRead);
+                                        .setLastReadOutbox(response.lastReadOutboxMessageId);
                             }
                         }));
 
@@ -313,6 +314,7 @@ public class Presenter extends ViewPresenter<ChatView>
                                 @Override
                                 public void onNext(TdApi.GroupChatFull groupChatFull) {
                                     mGroupChatFull = groupChatFull;
+                                    assertNotNull(mGroupChatFull);
                                     showMessagePanel(mGroupChatFull.groupChat);
                                     updateGroupChatOnlineStatus(groupChatFull);
                                 }
@@ -426,13 +428,13 @@ public class Presenter extends ViewPresenter<ChatView>
         }, 32);
     }
 
-    public void sendSticker(final String stickerFilePath, TdApi.Sticker sticker) {
+    public void sendSticker(final String stickerFilePath, final TdApi.Sticker sticker) {
         stickers.map(stickerFilePath, sticker);
         getView().scrollToBottom();
         getView().postDelayed(new Runnable() {
             @Override
             public void run() {
-                rxChat.sendSticker(stickerFilePath);
+                rxChat.sendSticker(sticker.sticker);
             }
         }, 32);
     }

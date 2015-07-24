@@ -155,7 +155,7 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
                 public Observable<? extends TdApi.TLObject> call(Throwable throwable) {
                     String message = throwable.getMessage();
                     if (message.contains("Cannot change phone number after authorization or entered code")) {
-                        return client.sendRx(new TdApi.AuthReset())
+                        return client.sendRx(new TdApi.ResetAuth())
                                 .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
                                     @Override
                                     public Observable<TdApi.TLObject> call(TdApi.TLObject tlObject) {
@@ -178,13 +178,13 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
                     .filter(new Func1<TdApi.AuthState, Boolean>() {
                         @Override
                         public Boolean call(TdApi.AuthState authState) {
-                            return authState instanceof TdApi.AuthStateWaitSetPhoneNumber;
+                            return authState instanceof TdApi.AuthStateWaitPhoneNumber;
                         }
                     })
                     .flatMap(new Func1<TdApi.AuthState, Observable<TdApi.TLObject>>() {
                         @Override
                         public Observable<TdApi.TLObject> call(TdApi.AuthState authState) {
-                            return client.sendCachedRXUI(new TdApi.AuthSetPhoneNumber(phoneNumber));
+                            return client.sendCachedRXUI(new TdApi.SetAuthPhoneNumber(phoneNumber));
                         }
                     });
         }
@@ -195,9 +195,9 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
                 @Override
                 public void onNext(TdApi.TLObject response) {
                     Flow flow = Flow.get(getView().getContext());
-                    if (response instanceof TdApi.AuthStateWaitSetCode) {
+                    if (response instanceof TdApi.AuthStateWaitCode) {
                         flow.set(new EnterCode(sentPhonenumber));
-                    } else if (response instanceof TdApi.AuthStateWaitSetName){
+                    } else if (response instanceof TdApi.AuthStateWaitName){
                         flow.set(new EnterName(sentPhonenumber));
                     }
                     sendPhoneRequest = null;

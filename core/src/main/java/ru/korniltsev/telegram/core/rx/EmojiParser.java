@@ -42,11 +42,11 @@ public class EmojiParser {
     private void pareImageSizes(TdApi.MessagePhoto message) {
         //todo rename the class
         for (TdApi.PhotoSize photo : message.photo.photos) {
-            if (photo.photo instanceof TdApi.FileLocal){
+            if (photo.photo.isLocal()){
                 if (photo.width == 0 || photo.height == 0) {
                     BitmapFactory.Options o = new BitmapFactory.Options();
                     o.inJustDecodeBounds = true;
-                    BitmapFactory.decodeFile(((TdApi.FileLocal) photo.photo).path, o);
+                    BitmapFactory.decodeFile(photo.photo.path, o);
                     photo.width = o.outWidth;
                     photo.height= o.outHeight;
 

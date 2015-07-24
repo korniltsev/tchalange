@@ -28,20 +28,19 @@ public class TDFileRequestHandler extends RequestHandler {
     private static final long TIMEOUT = 25000;
 
     public static Uri load(TdApi.File f, boolean webp) {
-        if (f instanceof TdApi.FileLocal) {
-            TdApi.FileLocal local = (TdApi.FileLocal) f;
+        if (f.isLocal()) {
             return new Uri.Builder()
                     .scheme(TD_FILE)
-                    .appendQueryParameter(FILE_PATH, local.path)
+                    .appendQueryParameter(FILE_PATH, f.path)
                     .appendQueryParameter(WEBP, String.valueOf(webp))
                     .build();
         } else {
-            TdApi.FileEmpty e = (TdApi.FileEmpty) f;
+
 //            Log.e("SomeCrazyTag", "create uri for id " + e.id, new Throwable());
-            assertTrue(e.id != 0);
+            assertTrue(f.id != 0);
             return new Uri.Builder()
                     .scheme(TD_FILE)
-                    .appendQueryParameter(ID, String.valueOf(e.id))
+                    .appendQueryParameter(ID, String.valueOf(f.id))
                     .appendQueryParameter(WEBP, String.valueOf(webp))
                     .build();
         }
@@ -98,7 +97,7 @@ public class TDFileRequestHandler extends RequestHandler {
     private String downloadAndGetPath(int id) throws IOException {
         try {
 //            Log.e("TdFileRequestHandler", "begin id: " + RXClient.coolTagForFileId(id));
-            TdApi.FileLocal first = downloader.download(id)
+            TdApi.File first = downloader.download(id)
                     .compose(RxDownloadManager.ONLY_RESULT)
                     .first()
                     .toBlocking()

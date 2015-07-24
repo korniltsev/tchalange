@@ -190,7 +190,7 @@ public class RXClient {
 
     @Inject
     public RXClient(Context ctx, RXAuthState auth) {
-        TdApi.AuthState state = new TdApi.AuthStateWaitSetPhoneNumber();
+        TdApi.AuthState state = new TdApi.AuthStateWaitPhoneNumber();
         authStateLogut = BehaviorSubject.<TdApi.AuthState>create(state);
         this.ctx = ctx;
         this.auth = auth;
@@ -345,7 +345,7 @@ public class RXClient {
         Log.e("RxClient", "logout");
         Preconditions.checkMainThread();
         authStateLogut.onNext(new TdApi.AuthStateOk());
-        sendRx(new TdApi.AuthReset())
+        sendRx(new TdApi.ResetAuth())
                 .subscribe(new ObserverAdapter<TLObject>() {
                     @Override
                     public void onNext(TLObject tlObject) {

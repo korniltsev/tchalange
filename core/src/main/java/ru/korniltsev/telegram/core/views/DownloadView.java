@@ -27,6 +27,7 @@ import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.utils.R;
+import com.crashlytics.android.core.CrashlyticsCore;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Action1;
@@ -114,7 +115,7 @@ public class DownloadView extends FrameLayout {
             public void onClick(View v) {
                 if (downloader.isDownloaded(file)) {
                     cb.play(downloader.getDownloadedFile(file));
-                } else if (downloader.isDownloading((TdApi.FileEmpty) file)){
+                } else if (downloader.isDownloading(file)){
                     //do nothing
                 } else {
                     download();
@@ -186,8 +187,12 @@ public class DownloadView extends FrameLayout {
         }
     }
 
-    private void subscribeForFileDownload(final TdApi.FileEmpty file) {
+    private void subscribeForFileDownload(final TdApi.File file) {
         Observable<RxDownloadManager.FileState> request = downloader.nonMainThreadObservableFor(file);
+        if (request == null) {
+            CrashlyticsCore.getInstance().logException(new NullPointerException("npe"));
+            return;
+        }
         subscription = request
                 .observeOn(mainThread())
                 .subscribe(new ObserverAdapter<RxDownloadManager.FileState>() {
@@ -317,7 +322,7 @@ public class DownloadView extends FrameLayout {
             cb.onFinished(
                     downloader.getDownloadedFile(f), false);
         } else {
-            TdApi.FileEmpty e = (TdApi.FileEmpty) f;
+            TdApi.File e =  f;
             if (downloader.isDownloading(e)) {
                 setLevel(LEVEL_DOWNLOAD_PAUSE, animateIcons);
                 setEnabled(false);
@@ -492,7 +497,7 @@ public class DownloadView extends FrameLayout {
 
     public static abstract class  CallBack {
         public void onProgress(TdApi.UpdateFileProgress p){}
-        public void onFinished(TdApi.FileLocal e, boolean justDownloaded){}
-        public void play(TdApi.FileLocal e){}
+        public void onFinished(TdApi.File fileLocal, boolean justDownloaded){}
+        public void play(TdApi.File fileLocal){}
     }
 }

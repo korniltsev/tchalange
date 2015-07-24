@@ -111,16 +111,14 @@ public class RxGlide {
     };
 
     public void loadAvatarForUser(TdApi.User u, int size, AvatarView avatarView) {
-        TdApi.File file = u.photoSmall;
-        if (file instanceof TdApi.FileEmpty) {
-            boolean stub = ((TdApi.FileEmpty) file).id == 0;
-            if (stub) {
+        TdApi.File file = u.profilePhoto.small;
+        if (file.isEmpty()) {
+            if (file.id == 0) {
                 loadStub(u, size, avatarView);
                 return;
             }
         }
         loadPhoto(file, false)
-//                .resize(size, size)
                 .transform(ROUND)
                 .placeholder(getStubDrawable(u, size))
                 .into(avatarView);
@@ -181,10 +179,9 @@ public class RxGlide {
 
     private void loadAvatarForGroup(TdApi.Chat chat, int size, AvatarView avatarView) {
         TdApi.GroupChatInfo info = (TdApi.GroupChatInfo) chat.type;
-        TdApi.File file = info.groupChat.photoSmall;
-        if (file instanceof TdApi.FileEmpty) {
-            boolean stub = ((TdApi.FileEmpty) file).id == 0;
-            if (stub) {
+        TdApi.File file = info.groupChat.photo.small;
+        if (file.isEmpty()) {
+            if (file.id == 0) {
                 loadStub(info, size, avatarView);
                 return;
             }
@@ -199,7 +196,7 @@ public class RxGlide {
     private final Map<StubKey, StubDrawable> stubs = new HashMap<>();
 
     public void fetch(TdApi.File sticker) {
-        if (sticker instanceof TdApi.FileLocal) {
+        if (!sticker.isEmpty()) {
             return;
         }
 //        TdApi.FileEmpty sticker1 = (TdApi.FileEmpty) sticker;
@@ -248,29 +245,24 @@ public class RxGlide {
     }
 
     public RequestCreator loadPhoto(TdApi.File f, boolean webp) {
-        if (f instanceof TdApi.FileEmpty) {
-            TdApi.FileEmpty e = (TdApi.FileEmpty) f;
-            assertTrue(e.id != 0);
-        }
+        assertTrue(f.id != 0);
         return picasso.load(TDFileRequestHandler.load(f, webp))
                 .stableKey(stableKeyForTdApiFile(f, webp));
     }
 
     private String stableKeyForTdApiFile(TdApi.File f, boolean webp) {
-        return String.format("id=%d&webp=%b", f.getId(), webp);
+        return String.format("id=%d&webp=%b", f.id, webp);
     }
 
     public interface StubAware<T> {
         String needStub(T o);
     }
 
-    public static String id(TdApi.FileLocal f) {
+    public static String id(TdApi.File f) {
         return TELEGRAM_FILE + f.id;
     }
 
-    public static String id(TdApi.FileEmpty f) {
-        return TELEGRAM_FILE + f.id;
-    }
+
 
     //user only to load not td related stuff
     public Picasso getPicasso() {

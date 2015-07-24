@@ -137,7 +137,7 @@ public class EnterCode extends BasePath implements Serializable {
         public void checkCode(String code) {
             assertNull(request);
             atLeastOneRequestSent = true;
-            TdApi.AuthSetCode f = new TdApi.AuthSetCode(code);
+            TdApi.SetAuthCode f = new TdApi.SetAuthCode(code);
             request = authorizeAndGetMe(f);
             subscribe();
         }
@@ -174,7 +174,7 @@ public class EnterCode extends BasePath implements Serializable {
             pd.show();
         }
 
-        private Observable<TdApi.User> authorizeAndGetMe(TdApi.AuthSetCode f) {
+        private Observable<TdApi.User> authorizeAndGetMe(TdApi.SetAuthCode f) {
             return client.sendRx(f)
                     .map(new Func1<TdApi.TLObject, TdApi.AuthStateOk>() {
                         @Override

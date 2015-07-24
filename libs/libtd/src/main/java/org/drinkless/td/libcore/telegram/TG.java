@@ -27,6 +27,7 @@ public final class TG {
     private static volatile Client.ResultHandler updatesHandler;
     private static volatile Client instance;
     private static volatile String dir;
+    private static volatile String filesDir;
 
     /**
      * Sets handler which will be invoked for every incoming update from TDLib of type TdApi.Update.
@@ -54,6 +55,19 @@ public final class TG {
             TG.dir = dir;
         }
     }
+
+    /**
+     * Sets directory for storing files of TDLib.
+     * Must be called before getClientInstance().
+     *
+     * @param dir Directory to store files.
+     */
+    public static void setFilesDir(String dir) {
+        synchronized (TG.class) {
+            TG.filesDir = dir;
+        }
+    }
+
 
     /**
      * This function stops and destroys Client.
@@ -84,7 +98,10 @@ public final class TG {
                     if (dir == null) {
                         return null;
                     }
-                    Client local = Client.create(updatesHandler, dir);
+                    if (filesDir == null) {
+                      filesDir = dir;
+                    }
+                    Client local = Client.create(updatesHandler, dir, filesDir);
                     new Thread(local).start();
                     instance = local;
                 }

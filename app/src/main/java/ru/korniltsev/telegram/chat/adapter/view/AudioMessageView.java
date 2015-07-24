@@ -25,6 +25,8 @@ import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
 
+import static junit.framework.Assert.assertTrue;
+
 public class AudioMessageView extends LinearLayout {
 
     public static final Subscription EMPTY_SUBSCRIPTION = Subscriptions.empty();
@@ -100,7 +102,8 @@ public class AudioMessageView extends LinearLayout {
             }
 
             @Override
-            public void onFinished(TdApi.FileLocal e, boolean b) {
+            public void onFinished(TdApi.File e, boolean b) {
+                assertTrue(e.isLocal());
                 if (player.isPLaying(e.path)) {
                     download_view.setLevel(DownloadView.LEVEL_PAUSE, false);
                     //show pause
@@ -111,7 +114,8 @@ public class AudioMessageView extends LinearLayout {
             }
 
             @Override
-            public void play(TdApi.FileLocal e) {
+            public void play(TdApi.File e) {
+                assertTrue(e.isLocal());
                 if (player.isPLaying(e.path)) {
                     player.pause(e.path);
                     download_view.setLevel(DownloadView.LEVEL_PLAY, true);

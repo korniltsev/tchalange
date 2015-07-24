@@ -58,9 +58,9 @@ public class GalleryService {
         return downloader.download(biggestSize.photo)
                 .compose(RxDownloadManager.ONLY_RESULT)
                 .observeOn(io())
-                .flatMap(new Func1<TdApi.FileLocal, Observable<File>>() {
+                .flatMap(new Func1<TdApi.File, Observable<File>>() {
                     @Override
-                    public Observable<File> call(TdApi.FileLocal fileLocal) {
+                    public Observable<File> call(TdApi.File fileLocal) {
                         checkNotMainThread();
 
                         return Observable.just(
@@ -85,7 +85,7 @@ public class GalleryService {
         ctx.sendBroadcast(mediaScanIntent);
     }
 
-    private File copyFileToGallery(TdApi.FileLocal fileLocal) {
+    private File copyFileToGallery(TdApi.File fileLocal) {
         File picturesDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 appName);

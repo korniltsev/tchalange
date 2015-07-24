@@ -79,11 +79,11 @@ public class EnterName extends BasePath implements Serializable {
             if (setNameRequest != null) {
                 subscribe();
             }
-            currentStateSubscription = client.sendCachedRXUI(new TdApi.AuthGetState())
+            currentStateSubscription = client.sendCachedRXUI(new TdApi.GetAuthState())
                     .subscribe(new ObserverAdapter<TdApi.TLObject>() {
                         @Override
                         public void onNext(TdApi.TLObject response) {
-                            if (response instanceof TdApi.AuthStateWaitSetCode) {
+                            if (response instanceof TdApi.AuthStateWaitCode) {
                                 Flow.get(getView())
                                         .goBack();
                             }
@@ -93,7 +93,7 @@ public class EnterName extends BasePath implements Serializable {
 
         public void setName(final String name, String strLastName) {
             assertNull(setNameRequest);
-            setNameRequest = client.sendCachedRXUI(new TdApi.AuthSetName(name, strLastName));
+            setNameRequest = client.sendCachedRXUI(new TdApi.SetAuthName(name, strLastName));
 
             subscribe();
         }
@@ -105,7 +105,7 @@ public class EnterName extends BasePath implements Serializable {
                 public void onNext(TdApi.TLObject response) {
                     setNameRequest = null;
                     pd.dismiss();
-                    if (response instanceof TdApi.AuthStateWaitSetCode) {
+                    if (response instanceof TdApi.AuthStateWaitCode) {
                         Flow flow = Flow.get(getView().getContext());
                         flow.set(new EnterCode(Presenter.this.flow.phoneNumber));
                     }

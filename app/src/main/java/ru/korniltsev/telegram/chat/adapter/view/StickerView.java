@@ -40,9 +40,8 @@ public class StickerView extends ImageView {
 //        height = MAX_HEIGHT;
         float ratio;
         if (s.width == 0 || s.height == 0){
-            if (s.sticker instanceof TdApi.FileLocal){
-                String path = ((TdApi.FileLocal) s.sticker).path;
-                TdApi.Sticker mapped = stickersInfo.getMappedSticker(path);
+            if (s.sticker .isLocal()){
+                TdApi.Sticker mapped = stickersInfo.getMappedSticker(s.sticker.path);
                 if (mapped != null){
                     if (mapped.width == 0 || mapped.height == 0) {
                         ratio = 1f;
@@ -96,15 +95,7 @@ public class StickerView extends ImageView {
     }
 
     private boolean isValidThumb(TdApi.Sticker s) {
-        TdApi.File photo = s.thumb.photo;
-        int id;
-        if (photo instanceof TdApi.FileLocal) {
-            id = ((TdApi.FileLocal) photo).id;
-            return id != 0;
-        } else {
-            id = ((TdApi.FileEmpty) photo).id;
-        }
-        return id != 0;
+        return s.thumb.photo.id != 0;
     }
 
 

@@ -40,7 +40,7 @@
     <string name="sticker">Sticker</string>
     <string name="photo">Photo</string>
     <string name="video">Video</string>
-    <string name="geo">Geo Point</string>
+    <string name="geo">Location</string>
     <string name="contact">Contact</string>
     <string name="contacts">Contacts</string>
     <string name="settings">Settings</string>
