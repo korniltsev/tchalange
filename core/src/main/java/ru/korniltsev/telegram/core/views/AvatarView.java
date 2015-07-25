@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import com.crashlytics.android.core.CrashlyticsCore;
 import junit.framework.Assert;
@@ -17,8 +18,6 @@ import static junit.framework.Assert.assertNotNull;
 
 public class AvatarView extends ImageView {
 
-
-    private final int spec;
     private int size;
 
     public final RxGlide picasso2;
@@ -33,7 +32,8 @@ public class AvatarView extends ImageView {
         a.recycle();
         Assert.assertTrue(size != -1 && size > 0);
 
-        spec = MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY);
+
+        setScaleType(ScaleType.CENTER_CROP);
     }
 
     @Override

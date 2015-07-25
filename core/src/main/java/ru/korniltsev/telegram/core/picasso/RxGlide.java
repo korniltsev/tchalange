@@ -141,11 +141,6 @@ public class RxGlide {
         return getStubDrawable(chars, u.id, size);
     }
 
-    private void stubDrawable(String chars, int id, int size, ImageView target) {
-        StubDrawable stub = getStubDrawable(chars, id, size);
-        target.setImageDrawable(stub);
-        picasso.cancelRequest(target);
-    }
 
     private StubDrawable getStubDrawable(String chars, int id, int size) {
         StubKey key = new StubKey(id, chars, size);

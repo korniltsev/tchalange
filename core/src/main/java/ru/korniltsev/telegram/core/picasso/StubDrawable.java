@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
@@ -49,10 +50,15 @@ public class StubDrawable extends Drawable {
     //    }
 
     @Override
+    protected void onBoundsChange(Rect bounds) {
+        rectF.set(bounds);
+    }
+
+    @Override
     public void draw(Canvas canvas) {
         canvas.drawOval(rectF, colorPaint);
-        int height = staticLayout.getHeight();
-        int p = (key.size - height) / 2;
+        int textHeight = staticLayout.getHeight();
+        int p = ((int)rectF.height() - textHeight) / 2;
         canvas.save();
         canvas.translate(0, p);
         staticLayout.draw(canvas);
