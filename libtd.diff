@@ -1,0 +1,25 @@
+3,5d2
+< import android.text.TextUtils;
+< 
+< import java.io.Serializable;
+11c8
+<     public abstract static class TLObject implements Serializable {
+---
+>     public abstract static class TLObject {
+465,473d461
+<         public boolean isEmpty() {
+<             return TextUtils.isEmpty(path);
+<         }
+< 
+<         public boolean isLocal(){
+<             return !isEmpty();
+< 
+<         }
+< 
+1121d1108
+<         public transient CharSequence textWithSmilesAndUserRefs;
+1681,1684d1667
+< 
+<         public long muteForElapsedRealtime
+<                 ;
+< 
