@@ -1118,7 +1118,7 @@ public class TdApi {
 
     public static class MessageText extends MessageContent {
         public String text;
-        public CharSequence textWithSmilesAndUserRefs;
+        public transient CharSequence textWithSmilesAndUserRefs;
 
         public MessageText() {
         }

@@ -45,7 +45,7 @@ public class SerializableParceler implements StateParceler {
                 dest.writeInt(bs.length);
                 dest.writeByteArray(bs);
             } catch (IOException e) {
-                throw new RuntimeException("ftw", e);
+                throw new RuntimeException("failed to serialize " + s, e);
             }
         }
         public static final Parcelable.Creator<Wrapper> CREATOR = new Parcelable.Creator<Wrapper>() {
