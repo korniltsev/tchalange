@@ -102,7 +102,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
         layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         myId = presenter.getPath().me.id;
-        adapter = new Adapter(getContext(), picasso, presenter.getPath().chat.lastReadOutboxMessageId, myId);
+        adapter = new Adapter(getContext(), picasso, presenter.getPath().chat.lastReadOutboxMessageId, myId, presenter.getPath());
         list.setLayoutManager(layout);
         list.setAdapter(adapter);
         btnScrollDown.setAlpha(0f);

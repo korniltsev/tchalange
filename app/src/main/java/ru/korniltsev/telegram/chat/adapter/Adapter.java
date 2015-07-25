@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.RxChat;
@@ -35,17 +36,19 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
 
 //    final Map<Integer, TdApi.User> users = new HashMap<>();
     final RxGlide picasso;
+    private final Chat chatPath;
     private long lastReadOutbox;
 
     RxChat chat;
     public final int myId;
 
-    public Adapter(Context ctx, RxGlide picasso, long lastReadOutbox, int myId) {
+    public Adapter(Context ctx, RxGlide picasso, long lastReadOutbox, int myId, Chat chat) {
         super(ctx);
         this.picasso = picasso;
         this.lastReadOutbox = lastReadOutbox;
         this.myId = myId;
         setHasStableIds(true);
+        this.chatPath = chat;
     }
 
     public void setLastReadOutbox(long lastReadOutbox) {
@@ -274,4 +277,8 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
 //            this.us = Collections.emptyMap();
 //        }
 //    }
+
+    public Chat getChatPath() {
+        return chatPath;
+    }
 }

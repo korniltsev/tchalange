@@ -1,12 +1,15 @@
 package ru.korniltsev.telegram.chat.adapter;
 
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.TextView;
+import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.UserHolder;
@@ -41,25 +44,70 @@ public class ChatPhotoChangedVH extends RealBaseVH {
     public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
         TdApi.Message msg = ((RxChat.MessageItem) item).msg;
         SpannableStringBuilder sb = getTextFor(res, msg, adapter.getUserHolder());
-//        String text =  this.text.getResources().getString(R.string.message_changed_group_photo, userName);
+        //        String text =  this.text.getResources().getString(R.string.message_changed_group_photo, userName);
         this.text.setText(sb);
         TdApi.MessageChatChangePhoto changed = (TdApi.MessageChatChangePhoto) msg.message;
-        TdApi.PhotoSize smallSize = changed.photo.photos[0];
-        for (TdApi.PhotoSize photo : changed.photo.photos) {
-            if (photo.type.equals("a")){
-                smallSize = photo;
+//        TdApi.PhotoSize smallSize = changed.photo.photos[0];
+//        for (TdApi.PhotoSize photo : changed.photo.photos) {
+//            if (photo.type.equals("a")) {
+//                smallSize = photo;
+//            }
+//        }
+
+        final Chat path = adapter.getChatPath();
+        final TdApi.Chat orig = path.chat;
+        //        final TdApi.Chat o = path.chat;// new TdApi.Chat();
+        //сделать копию o
+        if (!(orig.type instanceof TdApi.GroupChatInfo)) {
+            logError("inconsistent state: trying to bind chat photo changed on private chat");
+            return;
+        }
+        final TdApi.GroupChat origGroupChat = ((TdApi.GroupChatInfo) orig.type).groupChat;
+        final TdApi.ProfilePhoto profilePhotoCopy = new TdApi.ProfilePhoto(origGroupChat.id, null, null);
+        if (!match(profilePhotoCopy, changed.photo)){
+            logError("could not match photo sizes");
+            return;
+        }
+        final TdApi.GroupChat groupChatCopy = new TdApi.GroupChat(origGroupChat.id, origGroupChat.title, origGroupChat.participantsCount, profilePhotoCopy,origGroupChat.left);
+        TdApi.GroupChatInfo chatInfoCopy = new TdApi.GroupChatInfo(groupChatCopy);
+
+        final TdApi.Chat chatCopy = new TdApi.Chat(orig.id, orig.topMessage, orig.unreadCount, orig.lastReadInboxMessageId, orig.lastReadOutboxMessageId ,
+                orig.notificationSettings, chatInfoCopy);
+
+        image.loadAvatarFor(chatCopy);
+
+
+    }
+
+    private void logError(String msg) {
+        CrashlyticsCore.getInstance()
+                .logException(new IllegalStateException(msg));
+    }
+
+    private boolean match(TdApi.ProfilePhoto to, TdApi.Photo fromChange) {
+        //        GroupChat.photoSmall это "s" тип ?
+        //                LikeMay 4, 2015 at 6:39 pm|Edit|Delete
+        //
+        //        Telegram Challenge
+        final TdApi.PhotoSize small = get(fromChange, "a");
+        final TdApi.PhotoSize big = get(fromChange, "c");
+
+        if (small == null || big == null){
+            return false;
+        }
+        to.small = small.photo;
+        to.big = big.photo;
+        return true;
+    }
+
+    @Nullable
+    private TdApi.PhotoSize get(TdApi.Photo from, String type) {
+        for (TdApi.PhotoSize photo : from.photos) {
+            if (photo.type.equals(type)) {
+                return photo;
             }
         }
-
-        TdApi.Chat o = new TdApi.Chat();
-
-        TdApi.GroupChatInfo groupChatInfo = new TdApi.GroupChatInfo();
-        groupChatInfo.groupChat = new TdApi.GroupChat();
-        groupChatInfo.groupChat.title = "";//todo !!
-        groupChatInfo.groupChat.photo.small = smallSize.photo;
-        o.type = groupChatInfo;
-        image.loadAvatarFor(o);
-
+        return null;
     }
 
     public static SpannableStringBuilder getTextFor(Resources res, TdApi.Message msg, UserHolder uh) {
