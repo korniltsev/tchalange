@@ -95,6 +95,9 @@ public class RxGlide {
         @Override
         public String needStub(TdApi.User o) {
             TdApi.User user = o;
+            if ("DELETED".equals(o.phoneNumber)) {
+                return "D";
+            }
             StringBuilder sb = new StringBuilder();
             if (user.firstName.length() > 0) {
                 sb.append(
