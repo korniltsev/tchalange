@@ -124,7 +124,7 @@ public class MyProfileView extends FrameLayout {
 
         adapter.addAll(items);
 
-        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(25)));
+        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(15)));
         int passCodePosition;
         if (hasUserName) {
             list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, 1));

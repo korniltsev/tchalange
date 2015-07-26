@@ -130,7 +130,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
         adapter.addAll(data);
 
         final Context ctx = getContext();
-        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(25)));
+        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(15)));
         list.addItemDecoration(new BottomShadow(ctx, calc, 1));
 
         if (participants.length >0){

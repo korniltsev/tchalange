@@ -4,7 +4,7 @@
              xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
-             android:layout_height="@dimen/profile_header_height"
+             android:layout_height="174dp"
              tools:showIn="@layout/profile_view">
     <ru.korniltsev.telegram.core.views.AvatarView
             android:id="@+id/avatar"
@@ -43,4 +43,15 @@
                 android:ellipsize="end"
                 />
     </LinearLayout>
+    <ImageView
+            android:id="@+id/fab"
+            android:layout_width="60dp"
+               android:layout_height="60dp"
+            android:src="@drawable/ic_message"
+            android:layout_gravity="right|bottom"
+            android:scaleType="center"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/bg_fab_white"
+            android:clickable="true"
+            />
 </ru.korniltsev.telegram.common.toolbar.FakeToolbar>

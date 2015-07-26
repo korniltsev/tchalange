@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -40,6 +41,8 @@ public class FakeToolbar extends FrameLayout {
     private ViewGroup titleParent;
     private int headerHeight;
     private int toolbarHeight;
+    private int realHeaderHeight;
+    private View fab;
 
     public FakeToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,9 +56,11 @@ public class FakeToolbar extends FrameLayout {
         title = ((TextView) findViewById(R.id.title));
         subTitle = ((TextView) findViewById(R.id.subtitle));
         titleParent = ((ViewGroup) title.getParent());
+        fab = findViewById(R.id.fab);
 
-        headerHeight = getContext().getResources().getDimensionPixelSize(R.dimen.profile_header_height);
-
+        headerHeight = getLayoutParams().height;
+        realHeaderHeight = getResources().getDimensionPixelSize(R.dimen.profile_header_height);
+        //        fakeToolbarHeight = getResources().getDP
     }
 
     private void positionAvatar(float res) {
@@ -70,12 +75,13 @@ public class FakeToolbar extends FrameLayout {
 
         int dp16 = dp4 * 4;
         int avatarMargin = dp16;
-        int ty = headerHeight - initialAvatarSize/2 - toolbarHeight /2 - avatarMargin;
-        image.setTranslationY(-avatarMargin - ty * res);
+        int avatarMargin2 = dp16 + calc.dp(27);
+        int ty = headerHeight - initialAvatarSize/2 - toolbarHeight /2 - avatarMargin2;
+        image.setTranslationY(-avatarMargin2 - ty * res);
 
 
 
-        image.setTranslationX(dp16 + res * dp4 * 7);
+        image.setTranslationX(calc.dp(17) + res * dp4 * 7);
 
 
         //text
@@ -84,7 +90,7 @@ public class FakeToolbar extends FrameLayout {
         int maxWidth = getContext().getResources().getDisplayMetrics().widthPixels;
         int initialTextX = initialAvatarSize + 2 * avatarMargin;
         int initialWidth = maxWidth - initialTextX;
-        int targetWidth = initialWidth - dp4 * 14;
+        int targetWidth = initialWidth - dp4 * 24;
         int diff = initialWidth - targetWidth;
         int finalWidth = (int) (initialWidth - res * diff);
         final ViewGroup.LayoutParams lp = title.getLayoutParams();
@@ -95,7 +101,7 @@ public class FakeToolbar extends FrameLayout {
 
         //text ypos
         final int titleParentHeight = titleParent.getLayoutParams().height;
-        final int initialTranslationY = -avatarMargin + (initialAvatarSize - titleParentHeight) / 2;
+        final int initialTranslationY = -avatarMargin2 + (initialAvatarSize - titleParentHeight) / 2;
         final int targetTranslationY = - (headerHeight - titleParentHeight);
         final int diff2 = targetTranslationY - initialTranslationY;
         final int absDiff2 = (int) (diff2 * res);
@@ -107,7 +113,33 @@ public class FakeToolbar extends FrameLayout {
         titleParent.setTranslationX(initialTextX + res * diff3);
 
 
+        //fab
+
+        int targetY = -(realHeaderHeight - toolbarHeight);
+        fab.setTranslationY(res * targetY);
+        Log.e("FakeToolbar", "res " + res);
+        if (res >= 0.65 && fabVisible) {
+            fabVisible = false;
+            fab.clearAnimation();
+            fab.animate()
+//                    .alpha(0f)
+                    .scaleX(0f)
+                    .scaleY(0f)
+            .setDuration(128);
+        }
+        if (res < 0.65 && !fabVisible) {
+            fabVisible = true;
+            fab.clearAnimation();
+            fab.animate()
+//                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(128);
+        }
+
     }
+
+    boolean fabVisible = true;
 
     public RecyclerView.OnScrollListener createScrollListener(LinearLayoutManager layout, RecyclerView list) {
         return new MyOnScrollListener(layout, list);
@@ -163,7 +195,7 @@ public class FakeToolbar extends FrameLayout {
                 if (bottom <= toolbarHeight){
                     res = 1f;
                 } else {
-                    res = 1f - (float) (bottom- toolbarHeight) / (headerHeight - toolbarHeight);
+                    res = 1f - (float) (bottom- toolbarHeight) / (realHeaderHeight - toolbarHeight);
                 }
             } else {
                 res = 1f;

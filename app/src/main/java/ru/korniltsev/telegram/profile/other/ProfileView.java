@@ -142,7 +142,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
 
         adapter.addAll(items);
         if (hasPhoneNumber || hasUserName){
-            list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(25)));
+            list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(15)));
             if (hasPhoneNumber && hasUserName) {
                 list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, 1));
                 list.addItemDecoration(new BottomShadow(getContext(), calc, 2));
