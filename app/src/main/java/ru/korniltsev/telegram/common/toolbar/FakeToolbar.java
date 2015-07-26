@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.common.toolbar;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +16,7 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.views.AvatarView;
+import ru.korniltsev.telegram.profile.chat.ChatInfo;
 
 import javax.inject.Inject;
 
@@ -122,6 +124,24 @@ public class FakeToolbar extends FrameLayout {
         image.loadAvatarFor(user);
         subTitle.setText(
                 uiUserStatus(getContext(), chats.getUserStatus(user)));
+    }
+
+    public void bindChat(ChatInfo chat) {
+        title.setText(chat.chatFull.groupChat.title);
+        image.loadAvatarFor(chat.chat);
+
+        int online = 0;
+        for (TdApi.ChatParticipant p : chat.chatFull.participants) {
+            if (p.user.status instanceof TdApi.UserStatusOnline) {
+                online++;
+            }
+        }
+        Resources res = getResources();
+        String totalStr = res.getQuantityString(R.plurals.group_chat_members, chat.chatFull.groupChat.participantsCount, chat.chatFull.groupChat.participantsCount);
+        String onlineStr = res.getQuantityString(R.plurals.group_chat_members_online, online, online);
+        subTitle.setText(
+                totalStr + ", " + onlineStr);
+//        subTitle.setText();
     }
 
     private class MyOnScrollListener extends RecyclerView.OnScrollListener {

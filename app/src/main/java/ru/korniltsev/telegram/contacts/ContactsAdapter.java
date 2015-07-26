@@ -9,6 +9,7 @@ import com.tonicartos.superslim.LayoutManager;
 import com.tonicartos.superslim.LinearSLM;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.recycler.sections.Item;
 import ru.korniltsev.telegram.common.recycler.sections.Section;
 import ru.korniltsev.telegram.common.recycler.sections.SectionVH;
@@ -89,12 +90,12 @@ public class ContactsAdapter extends BaseAdapter<Item<Contact>, RecyclerView.Vie
             avatar.loadAvatarFor(u.user);
             userName.setText(u.uiName);
             userStatus.setText(u.uiStatus);
-            if (u.user.status instanceof TdApi.UserStatusOnline){
-                userStatus.setTextColor(0xff2f6fb3);
-            } else {
-                userStatus.setTextColor(0xff979797);
-            }
+            final int color;
+            final TdApi.UserStatus status = u.user.status;
+            color = AppUtils.uiStatusColor(status);
+            userStatus.setTextColor(color);
         }
-    }
 
+
+    }
 }

@@ -130,6 +130,7 @@
     <string name="password_cannot_be_empty">Password cannot be empty</string>
     <string name="wrong_password">Wrong password</string>
     <string name="autolock_disabled">Disabled</string>
+    <string name="add_member">Add member</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

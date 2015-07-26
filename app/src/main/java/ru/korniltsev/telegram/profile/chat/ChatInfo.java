@@ -1,7 +1,5 @@
-package ru.korniltsev.telegram.profile;
+package ru.korniltsev.telegram.profile.chat;
 
-import android.support.annotation.Nullable;
-import dagger.Module;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
@@ -12,42 +10,39 @@ import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(ProfilePath.Module.class)
-public class ProfilePath extends BasePath implements Serializable{
-    public final TdApi.User user;
-//    @Nullable public final TdApi.Chat groupChat;
+@WithModule(ChatInfo.Module.class)
+public class ChatInfo extends BasePath implements Serializable{
+    public final TdApi.GroupChatFull chatFull;
+    public final TdApi.Chat chat;
 
-    public ProfilePath(TdApi.User user) {
-        this.user = user;
-
+    public ChatInfo(TdApi.GroupChatFull chatFull, TdApi.Chat chat) {
+        this.chatFull = chatFull;
+        this.chat = chat;
     }
 
-//    public ProfilePath(TdApi.Chat groupChat) {
-//        user = null;
-//        this.groupChat = groupChat;
-//    }
 
     @Override
     public int getRootLayout() {
-        return R.layout.profile_view;
+        return R.layout.chat_info_view;
     }
 
 
     @dagger.Module(
             addsTo = RootModule.class,
             injects = {
-                    ProfileView.class,
+                    ChatInfoView.class,
                     FakeToolbar.class,
             }
     )
     public static final class Module {
-        final ProfilePath path;
+        final ChatInfo path;
 
-        public Module(ProfilePath path) {
+        public Module(ChatInfo path) {
             this.path = path;
         }
 
-        @Provides ProfilePath providePath() {
+        @Provides
+        ChatInfo providePath() {
             return path;
         }
     }

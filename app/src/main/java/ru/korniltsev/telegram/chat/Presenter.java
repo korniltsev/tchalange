@@ -25,7 +25,8 @@ import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.ChatDB;
-import ru.korniltsev.telegram.profile.ProfilePath;
+import ru.korniltsev.telegram.profile.chat.ChatInfo;
+import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
@@ -503,8 +504,14 @@ public class Presenter extends ViewPresenter<ChatView>
                 .set(new ProfilePath(user));
     }
 
-    public void open(TdApi.Chat groupChat) {
-//        Flow.get(getView())
-//                .set(new ProfilePath(groupChat));
+    public void open(final TdApi.Chat groupChat) {
+        fullChatInfoRequest.subscribe(new ObserverAdapter<TdApi.GroupChatFull>() {
+            @Override
+            public void onNext(TdApi.GroupChatFull response) {
+                        Flow.get(getView())
+                                .set(new ChatInfo(response, groupChat));
+            }
+        });
+
     }
 }

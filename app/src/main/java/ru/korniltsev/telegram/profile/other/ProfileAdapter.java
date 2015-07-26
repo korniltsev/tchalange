@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.profile;
+package ru.korniltsev.telegram.profile.other;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

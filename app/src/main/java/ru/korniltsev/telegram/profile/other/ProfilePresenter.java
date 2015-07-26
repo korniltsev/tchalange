@@ -1,10 +1,9 @@
-package ru.korniltsev.telegram.profile;
+package ru.korniltsev.telegram.profile.other;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import mortar.ViewPresenter;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
-import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 
 import javax.inject.Inject;

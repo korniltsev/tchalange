@@ -163,4 +163,12 @@ public class AppUtils {
         }
         return null;
     }
+
+    public static int uiStatusColor(TdApi.UserStatus status) {
+        if (status instanceof TdApi.UserStatusOnline){
+            return 0xff2f6fb3;
+        } else {
+            return 0xff979797;
+        }
+    }
 }
