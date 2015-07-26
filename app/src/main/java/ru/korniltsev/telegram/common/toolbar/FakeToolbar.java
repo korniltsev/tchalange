@@ -180,7 +180,7 @@ public class FakeToolbar extends FrameLayout {
 
     public void bindFAB(int icon, final Runnable runnable) {
         fabIcon.setImageResource(icon);
-        fab.setOnClickListener(new OnClickListener() {
+        fabIcon.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (fabVisible){

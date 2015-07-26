@@ -9,6 +9,7 @@ import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.flow.utils.Utils;
 import ru.korniltsev.telegram.core.rx.ChatDB;
@@ -157,10 +158,19 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
                 requestOpen.subscribe(new ObserverAdapter<MeAndChat>() {
                     @Override
                     public void onNext(MeAndChat response) {
-                        Flow.get(getView())
-                                .set(new Chat(response.tlObject2, response.tlObject));
+                        final Chat newTop = new Chat(response.tlObject2, response.tlObject);
+                        openChat(newTop);
                     }
                 }));
+    }
+
+    private void openChat(Chat newTop) {
+        AppUtils.flowPushAndRemove(getView(), newTop, new FlowHistoryStripper() {
+            @Override
+            public boolean shouldRemovePath(Object path) {
+                return path instanceof ContactList;
+            }
+        });
     }
 
     class MeAndChat {

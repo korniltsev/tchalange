@@ -3,13 +3,13 @@ package ru.korniltsev.telegram.profile.other;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import mortar.ViewPresenter;
-import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
-import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.chat.Chat;
+import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
-import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -85,7 +85,16 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void startChat() {
-        //todo delete all before chat_list in history
+        AppUtils.flowPushAndRemove(getView(), new Chat(path.chat, path.me),
+                new FlowHistoryStripper() {
+                    @Override
+                    public boolean shouldRemovePath(Object o) {
+                        return o instanceof Chat && ((Chat) o).chat.id == path.chat.id
+                                || o instanceof ProfilePath && ((ProfilePath) o).chat.id == path.chat.id;
+                    }
+                }
+        );
+
 
     }
 }

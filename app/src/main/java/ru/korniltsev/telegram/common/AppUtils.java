@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import flow.Flow;
+import flow.History;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -21,6 +23,10 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.ChatView;
 import ru.korniltsev.telegram.chat.R;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class AppUtils {
     private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
@@ -170,5 +176,26 @@ public class AppUtils {
         } else {
             return 0xff979797;
         }
+    }
+
+    public static void flowPushAndRemove(View ctx, Object newTopPath, FlowHistoryStripper f) {
+
+        final Flow flow = Flow.get(ctx);
+        final History history = flow
+                .getHistory();
+        List<Object> paths = new ArrayList<>();
+        final Iterator<Object> it = history.reverseIterator();
+        while (it.hasNext()) {
+            final Object next = it.next();
+            if (f.shouldRemovePath(next)) {
+                continue;
+            }
+            paths.add(next);
+        }
+        paths.add(newTopPath);
+        final History.Builder builder = history.buildUpon();
+        builder.clear();
+        builder.addAll(paths);
+        flow.setHistory(builder.build(), Flow.Direction.FORWARD);
     }
 }
