@@ -82,11 +82,11 @@ public class Stickers {
     }
 
     public void map(String filePath, TdApi.Sticker sticker) {
-        filePathToStickerInfo.put(filePath, sticker);
+        filePathToStickerInfo.put(sticker.sticker.persistentId, sticker);
     }
 
-    public TdApi.Sticker getMappedSticker(String key) {
-        return filePathToStickerInfo.get(key);
+    public TdApi.Sticker getMappedSticker(String persistentId) {
+        return filePathToStickerInfo.get(persistentId);
     }
 }
 

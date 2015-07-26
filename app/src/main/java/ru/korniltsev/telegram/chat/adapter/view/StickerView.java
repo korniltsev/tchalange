@@ -41,7 +41,7 @@ public class StickerView extends ImageView {
         float ratio;
         if (s.width == 0 || s.height == 0){
             if (s.sticker .isLocal()){
-                TdApi.Sticker mapped = stickersInfo.getMappedSticker(s.sticker.path);
+                TdApi.Sticker mapped = stickersInfo.getMappedSticker(s.sticker.persistentId);
                 if (mapped != null){
                     if (mapped.width == 0 || mapped.height == 0) {
                         ratio = 1f;
