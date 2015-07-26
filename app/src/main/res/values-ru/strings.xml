@@ -135,4 +135,19 @@
     <string name="choose_your_password_2">Введите Ваш пароль повторно</string>
     <string name="passcode_timing_how_to">Запрашивать пароль, в случае если приложение свернуто некоторое время</string>
     <string name="add_member">Add member</string>
+    <string name="delete_and_leave">Delete and leave</string>
+    <string name="notifications_enabled">Включить</string>
+    <string name="notifications_disabled">Выключить</string>
+
+    <plurals name="mute_for_n_hours">
+        <item quantity="one">Отключить уведомления на %1$d час</item>
+        <item quantity="few">Отключить уведомления на %1$d часа</item>
+        <item quantity="many">Отключить уведомления на %1$d часов</item>
+    </plurals>
+
+    <plurals name="mute_for_n_days">
+        <item quantity="one">Отключить уведомления на %1$d день</item>
+        <item quantity="few">Отключить уведомления на %1$d дня</item>
+        <item quantity="many">Отключить уведомления на %1$d дней</item>
+    </plurals>
 </resources>

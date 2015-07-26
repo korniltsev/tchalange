@@ -387,12 +387,9 @@ public class Presenter extends ViewPresenter<ChatView>
         } else if (R.id.menu_clear_history == id) {
             clearHistory();
             return true;
-        } else if (R.id.menu_mute == id) {
-            nm.mute(chat);
-            getView().initMenu(isGroupChat, true);
-        } else if (R.id.menu_unmute == id) {
-            nm.unmute(chat);
-            getView().initMenu(isGroupChat, false);
+        } else if (R.id.menu_mute_unmute == id) {
+            getView().showMutePopup();
+
         }
         return false;
     }
@@ -508,10 +505,15 @@ public class Presenter extends ViewPresenter<ChatView>
         fullChatInfoRequest.subscribe(new ObserverAdapter<TdApi.GroupChatFull>() {
             @Override
             public void onNext(TdApi.GroupChatFull response) {
-                        Flow.get(getView())
-                                .set(new ChatInfo(response, groupChat));
+                Flow.get(getView())
+                        .set(new ChatInfo(response, groupChat));
             }
         });
 
+    }
+
+    public void muteFor(int duration) {
+        nm.muteChat(chat, duration);
+        getView().initMenu(isGroupChat, nm.isMuted(this.chat));
     }
 }

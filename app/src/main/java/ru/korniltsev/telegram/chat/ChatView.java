@@ -5,18 +5,13 @@ import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.adapter.Adapter;
@@ -31,6 +26,7 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.MuteForPopupFactory;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -68,6 +64,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private View emptyView;
     private int myId;
     private View customToolbarView;
+    private ListChoicePopup mutePopup;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -170,12 +167,11 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         if (!groupChat) {
             toolbar.hideMenu(R.id.menu_leave_group);
         }
+        final MenuItem muteMenu = toolbar.toolbar.getMenu().findItem(R.id.menu_mute_unmute);
         if (muted) {
-            toolbar.hideMenu(R.id.menu_mute);
-            toolbar.showMenu(R.id.menu_unmute);
+            muteMenu.setTitle(R.string.unmute);
         } else {
-            toolbar.showMenu(R.id.menu_mute);
-            toolbar.hideMenu(R.id.menu_unmute);
+            muteMenu.setTitle(R.string.mute);
         }
     }
 
@@ -248,6 +244,12 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     @Override
     public boolean onBackPressed() {
+        if (mutePopup != null && mutePopup.isShowing()){
+            mutePopup.dismiss();
+            mutePopup = null;
+            return true;
+        }
+        mutePopup = null;
         return messagePanel.onBackPressed();
     }
 
@@ -380,6 +382,15 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     public void setPrivateChatSubtitle(String text) {
         toolbarSubtitle.setText(text);
+    }
+
+    public void showMutePopup() {
+        mutePopup = MuteForPopupFactory.create(activity.expose(), new MuteForPopupFactory.Callback() {
+            @Override
+            public void muteFor(int duration) {
+                presenter.muteFor(duration);
+            }
+        });
     }
 
     private class EmptyViewHelper extends RecyclerView.AdapterDataObserver {

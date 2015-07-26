@@ -15,15 +15,15 @@
             />
 
     <item
-            android:id="@+id/menu_mute"
+            android:id="@+id/menu_mute_unmute"
             app:showAsAction="never"
             android:title="@string/mute"
             />
 
-    <item
-            android:id="@+id/menu_unmute"
-            app:showAsAction="never"
-            android:title="@string/unmute"
-            />
+    <!--<item-->
+            <!--android:id="@+id/menu_unmute"-->
+            <!--app:showAsAction="never"-->
+            <!--android:title="@string/unmute"-->
+            <!--/>-->
 
 </menu>

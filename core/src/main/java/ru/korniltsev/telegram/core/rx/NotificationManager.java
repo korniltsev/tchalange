@@ -6,9 +6,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.util.Log;
+import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.utils.Preconditions;
 import rx.Observable;
+import rx.android.internal.Assertions;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -124,38 +127,52 @@ public class NotificationManager {
     }
 
     public boolean isMuted(TdApi.NotificationSettings s) {
+        if (s.muteFor == 0){
+            return false;
+        }
         return time() <= s.muteForElapsedRealtime;
     }
 
-    private void notifyNewMessageImpl() {
-        try {
-            ringtone.play();
-        } catch (Exception e) {
-            Log.e("NotificationManager", "err", e);
-        }
-    }
+
 
     public boolean isMuted(TdApi.Chat chat) {
         TdApi.NotificationSettings s = this.settings.get(chat.id);
         return s != null && isMuted(s);
     }
 
-    public void mute(TdApi.Chat chat) {
-        chat.notificationSettings.muteFor = 8 * 60 * 60;
-        setSettings(chat);
-    }
+//    public void mute(TdApi.Chat chat) {
+//        chat.notificationSettings.muteFor = 8 * 60 * 60;
+//        setSettings(chat);
+//    }
+//
+//
+//
+//    public void unmute(TdApi.Chat chat) {
+//        chat.notificationSettings.muteFor = 0;
+//        setSettings(chat);
+//    }
 
+//    private void setSettings(TdApi.Chat chat) {
+//        TdApi.NotificationSettingsForChat scope = new TdApi.NotificationSettingsForChat(chat.id);
+//        calculate(chat.notificationSettings);
+//        settings.put(chat.id, chat.notificationSettings);
+//        client.sendSilently(new TdApi.SetNotificationSettings(scope, chat.notificationSettings));
+//    }
 
-
-    public void unmute(TdApi.Chat chat) {
-        chat.notificationSettings.muteFor = 0;
-        setSettings(chat);
-    }
-
-    private void setSettings(TdApi.Chat chat) {
+    public void muteChat(TdApi.Chat chat, int durationMillis) {
+        Preconditions.checkMainThread();
         TdApi.NotificationSettingsForChat scope = new TdApi.NotificationSettingsForChat(chat.id);
+        chat.notificationSettings.muteFor = durationMillis;
         calculate(chat.notificationSettings);
         settings.put(chat.id, chat.notificationSettings);
         client.sendSilently(new TdApi.SetNotificationSettings(scope, chat.notificationSettings));
+    }
+
+    private void notifyNewMessageImpl() {
+        try {
+            ringtone.play();
+        } catch (Exception e) {
+            CrashlyticsCore.getInstance().logException(e);
+        }
     }
 }

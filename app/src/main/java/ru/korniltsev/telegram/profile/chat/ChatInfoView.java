@@ -2,16 +2,23 @@ package ru.korniltsev.telegram.profile.chat;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
@@ -22,16 +29,18 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatInfoView extends FrameLayout {
+public class ChatInfoView extends FrameLayout implements HandlesBack {
     @Inject ChatInfoPresenter presenter;
     @Inject DpCalculator calc;
     @Inject PhoneFormat phoneFormat;
+    @Inject ActivityOwner owner;
 
     private RecyclerView list;
     private LinearLayoutManager listLayout;
     private FakeToolbar fakeToolbar;
     private ChatInfoAdapter adapter;
     private ToolbarUtils toolbar;
+    @Nullable private ListChoicePopup mutePopup;
 
     public ChatInfoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -49,9 +58,40 @@ public class ChatInfoView extends FrameLayout {
         list.setAdapter(adapter);
 
         toolbar = ToolbarUtils.initToolbar(this)
-
+                .inflate(R.menu.chat_info)
                 .pop();
+        toolbar.setMenuClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                final int itemId = item.getItemId();
+                switch (itemId) {
+                    case R.id.menu_mute:
+                        changeNotificationSettings();
+                        return true;
+                    case R.id.menu_add_member:
+                        presenter.btnAddMemberClicked();
+                        return true;
+                    case R.id.menu_delete_and_leave:
+                        presenter.deleteAndLeave();
+                        return true;
+                    case R.id.menu_edit_name:
+                        presenter.editChatName();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
         fakeToolbar = (FakeToolbar) findViewById(R.id.fake_toolbar);
+    }
+
+    private void changeNotificationSettings() {
+        mutePopup = MuteForPopupFactory.create(owner.expose(), new MuteForPopupFactory.Callback() {
+            @Override
+            public void muteFor(int duration) {
+                presenter.muteFor(duration);
+            }
+        });
     }
 
     @Override
@@ -69,6 +109,9 @@ public class ChatInfoView extends FrameLayout {
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         presenter.dropView(this);
+        if (mutePopup != null){
+            mutePopup.dismiss();
+        }
     }
 
     public void bindUser(@NonNull ChatInfo chat) {
@@ -101,5 +144,20 @@ public class ChatInfoView extends FrameLayout {
 
     }
 
+    public void bindMuteMenu(boolean muted) {
+        final MenuItem muteMenu = toolbar.toolbar.getMenu().findItem(R.id.menu_mute);
+        muteMenu.setIcon(muted ? R.drawable.ic_notifications_off : R.drawable.ic_notifications_on);
+        muteMenu.setTitle(muted ? R.string.unmute : R.string.mute);
+    }
 
+    @Override
+    public boolean onBackPressed() {
+        if (mutePopup != null && mutePopup.isShowing()){
+            mutePopup.dismiss();
+            mutePopup = null;
+            return true;
+        }
+        mutePopup = null;
+        return false;
+    }
 }
