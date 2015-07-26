@@ -163,10 +163,18 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         return adapter;
     }
 
-    public void initMenu(boolean groupChat, boolean muted) {
-        if (!groupChat) {
+    public void initMenu(TdApi.Chat groupChat, boolean muted) {
+        boolean isGroupChat = groupChat.type instanceof TdApi.GroupChatInfo;
+        if (isGroupChat) {
+            final TdApi.GroupChatInfo group = (TdApi.GroupChatInfo) groupChat.type;
+            if (group.groupChat.left){
+                toolbar.hideMenu(R.id.menu_mute_unmute);
+                toolbar.hideMenu(R.id.menu_leave_group);
+            }
+        } else {
             toolbar.hideMenu(R.id.menu_leave_group);
         }
+
         final MenuItem muteMenu = toolbar.toolbar.getMenu().findItem(R.id.menu_mute_unmute);
         if (muted) {
             muteMenu.setTitle(R.string.unmute);
@@ -182,6 +190,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     public void setGroupChatTitle(final TdApi.GroupChat groupChat, final TdApi.Chat chat) {
         toolbarTitle.setText(
                 groupChat.title);
+        if (groupChat.left){
+            return;
+        }
         customToolbarView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

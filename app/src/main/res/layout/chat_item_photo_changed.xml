@@ -15,7 +15,7 @@
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
             android:paddingTop="4dp"
-
+            android:gravity="center"
             />
     <ru.korniltsev.telegram.core.views.AvatarView
             android:id="@+id/image"

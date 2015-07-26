@@ -89,7 +89,7 @@ public class Presenter extends ViewPresenter<ChatView>
             isGroupChat = false;
         }
 
-        //todo if has unread messages load from it
+
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Presenter extends ViewPresenter<ChatView>
         ChatView view = getView();
 
         view.loadToolBarImage(this.chat);
-        view.initMenu(isGroupChat, nm.isMuted(this.chat));
+        view.initMenu(chat, nm.isMuted(this.chat));
         setViewSubtitle();
 
         getView().initList(rxChat);
@@ -200,7 +200,7 @@ public class Presenter extends ViewPresenter<ChatView>
                         .subscribe(new ObserverAdapter<TdApi.NotificationSettings>() {
                                        @Override
                                        public void onNext(TdApi.NotificationSettings s) {
-                                           getView().initMenu(isGroupChat, nm.isMuted(s));
+                                           getView().initMenu(chat, nm.isMuted(s));
                                        }
                                    }
                         ));
@@ -514,6 +514,6 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void muteFor(int duration) {
         nm.muteChat(chat, duration);
-        getView().initMenu(isGroupChat, nm.isMuted(this.chat));
+        getView().initMenu(chat, nm.isMuted(this.chat));
     }
 }
