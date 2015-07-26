@@ -29,7 +29,7 @@ public class AppUtils {
         if (user == null) {
             return "";
         }
-        if ("DELETED".equals(user.phoneNumber)) {
+        if (user.type instanceof TdApi.UserTypeDeleted) {
             return ctx.getString(R.string.deleted_account);
         }
         String firstName = user.firstName;
