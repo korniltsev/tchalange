@@ -22,7 +22,8 @@ public class TopShadow extends RecyclerView.ItemDecoration {
         this.calc = calc;
         this.position = position;
         drawable = ctx.getResources()
-                .getDrawable(R.drawable.shadow_top);
+                .getDrawable(R.drawable.shadow_top
+                );
         dp4 = calc.dp(4);
     }
 
@@ -39,8 +40,10 @@ public class TopShadow extends RecyclerView.ItemDecoration {
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
         final View targetView = AppUtils.getChildWithAdapterPosition(parent, position);
         if (targetView != null) {
-            drawable.setBounds(targetView.getLeft(), targetView.getTop() + dp4,
-                    targetView.getRight(), targetView.getTop());
+            drawable.setBounds(targetView.getLeft(),
+                    targetView.getTop() - dp4,
+                    targetView.getRight(),
+                    targetView.getTop());
             drawable.draw(c);
         }
     }
