@@ -3,10 +3,10 @@ package ru.korniltsev.telegram.contacts;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 public class Contact {
-    final TdApi.User user;
-    final String uiName;
-    final String section;
-    final String uiStatus;
+    public final TdApi.User user;
+    public final String uiName;
+    public final String section;
+    public final String uiStatus;
 
     public Contact(TdApi.User user, String uiName, String uiStatus) {
         this.user = user;

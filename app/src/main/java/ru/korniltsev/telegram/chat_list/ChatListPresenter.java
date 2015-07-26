@@ -21,6 +21,7 @@ import rx.subscriptions.CompositeSubscription;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertTrue;

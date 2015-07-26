@@ -29,6 +29,7 @@ import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.BootReceiver;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
+import ru.korniltsev.telegram.core.rx.ContactsHelper;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -57,6 +58,7 @@ import java.util.concurrent.Executors;
                 EmojiParser.class,
                 ActivityOwner.class,
                 Stickers.class,
+                ContactsHelper.class,
 
 
                 EmojiKeyboardView.class,

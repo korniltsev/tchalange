@@ -65,13 +65,13 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
             } else if (item instanceof ParticipantItem) {
                 ParticipantItem p = (ParticipantItem) item;
                 final PariticpantVH pVH = (PariticpantVH) holder;
-                pVH.avatar.loadAvatarFor(p.user.user);
+                pVH.avatar.loadAvatarFor(p.user);
                 pVH.nick.setText(
-                        uiName(p.user.user, getCtx()));
+                        uiName(p.user, getCtx()));
                 pVH.status.setText(
-                        uiUserStatus(getCtx(), p.user.user.status));
+                        uiUserStatus(getCtx(), p.user.status));
                 pVH.status.setTextColor(
-                        uiStatusColor(p.user.user.status));
+                        uiStatusColor(p.user.status));
                 if (p.showIcon){
                     pVH.icon.setVisibility(View.VISIBLE);
                 } else {
@@ -142,9 +142,9 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
 
     public static class ParticipantItem extends Item {
         final boolean showIcon;
-        final TdApi.ChatParticipant user;
+        final TdApi.User user;
 
-        public ParticipantItem(boolean showIcon, TdApi.ChatParticipant user) {
+        public ParticipantItem(boolean showIcon, TdApi.User user) {
             this.showIcon = showIcon;
             this.user = user;
         }

@@ -20,10 +20,14 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import flow.Flow;
 
+import java.util.Iterator;
+
 public final class Utils {
   public static <T>T getPreviousPath(View view) {
     //noinspection unchecked
-    return (T) Flow.get(view.getContext()).getHistory().reverseIterator().next();
+    final Iterator<Object> it = Flow.get(view).getHistory().iterator();
+    it.next();//skip current
+    return (T) it.next();
   }
   //  public static void inject(Context context, Object thing) {
 //    ((DemoApp) context.getApplicationContext()).getGlobalGraph().inject(thing);

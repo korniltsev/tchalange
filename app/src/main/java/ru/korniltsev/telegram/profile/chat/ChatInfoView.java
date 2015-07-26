@@ -79,9 +79,11 @@ public class ChatInfoView extends FrameLayout {
         TdApi.ChatParticipant[] participants = chat.chatFull.participants;
         for (int i = 0, participantsLength = participants.length; i < participantsLength; i++) {
             TdApi.ChatParticipant participant = participants[i];
-            data.add(new ChatInfoAdapter.ParticipantItem(i == 0, participant));
+            data.add(new ChatInfoAdapter.ParticipantItem(i == 0, participant.user));
         }
-
+        for (TdApi.User it : chat.addedUsers) {
+            data.add(new ChatInfoAdapter.ParticipantItem(false, it));
+        }
         adapter.addAll(data);
 
         final Context ctx = getContext();
@@ -90,7 +92,11 @@ public class ChatInfoView extends FrameLayout {
 
         if (participants.length >0){
             list.addItemDecoration(new InsetDecorator(2, calc.dp(6)));
-            list.addItemDecoration(new TopShadow(ctx, calc, 2));
+            list.addItemDecoration(new TopShadow(ctx, calc, 2));//todo fix when shared media added
+
+
+
+            list.addItemDecoration(new BottomShadow(ctx, calc, adapter.getItemCount() -1 ));
         }
 
     }
