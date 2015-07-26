@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat_list;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -104,14 +105,14 @@ public class ChatListView extends DrawerLayout {
             public void onClick(View view) {
                 event("btnLogout.Click");
                 presenter.logout();
-                closeDrawer(Gravity.LEFT);
+//                closeDrawer(Gravity.LEFT);
             }
         });
         btnContacts.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 presenter.openContacts();
-                closeDrawer(Gravity.LEFT);
+//                closeDrawer(Gravity.LEFT);
             }
         });
 
@@ -119,7 +120,7 @@ public class ChatListView extends DrawerLayout {
             @Override
             public void onClick(View v) {
                 presenter.openSettings();
-                closeDrawer(Gravity.LEFT);
+//                closeDrawer(Gravity.LEFT);
             }
         });
 
@@ -188,5 +189,11 @@ public class ChatListView extends DrawerLayout {
 
 
 
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        super.onSaveInstanceState();
+        return  new SavedState(BaseSavedState.EMPTY_STATE);//do not save state at all
     }
 }
