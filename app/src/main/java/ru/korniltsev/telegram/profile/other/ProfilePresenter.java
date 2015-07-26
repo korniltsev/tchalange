@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.profile.other;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import flow.Flow;
 import mortar.ViewPresenter;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.Chat;
@@ -92,7 +93,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
                         return o instanceof Chat && ((Chat) o).chat.id == path.chat.id
                                 || o instanceof ProfilePath && ((ProfilePath) o).chat.id == path.chat.id;
                     }
-                }
+                }, Flow.Direction.FORWARD
         );
 
 

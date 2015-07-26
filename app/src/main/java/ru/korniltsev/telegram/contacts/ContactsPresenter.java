@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import flow.Flow;
-import flow.History;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
@@ -170,7 +169,7 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
             public boolean shouldRemovePath(Object path) {
                 return path instanceof ContactList;
             }
-        });
+        }, Flow.Direction.FORWARD);
     }
 
     class MeAndChat {

@@ -1,18 +1,18 @@
 package ru.korniltsev.telegram.profile.chat;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
+import ru.korniltsev.telegram.chat.Chat;
+import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import rx.Observable;
-import rx.Subscription;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -99,9 +98,14 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     }
 
     private void goBackTwice() {
-        final Flow flow = Flow.get(getView());
-        flow.goBack();
-        flow.goBack();
+        AppUtils.flowPushAndRemove(getView(), null, new FlowHistoryStripper() {
+            @Override
+            public boolean shouldRemovePath(Object path) {
+                return path instanceof ChatInfo && ((ChatInfo) path).chat.id == ((ChatInfo) path).chat.id
+                        || path instanceof Chat && ((Chat) path).chat.id == ((Chat) path).chat.id;
+            }
+        }, Flow.Direction.BACKWARD);
+
     }
 
     public void editChatName() {

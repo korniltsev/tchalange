@@ -21,7 +21,6 @@ import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import ru.korniltsev.telegram.chat.ChatView;
 import ru.korniltsev.telegram.chat.R;
 
 import java.util.ArrayList;
@@ -178,7 +177,7 @@ public class AppUtils {
         }
     }
 
-    public static void flowPushAndRemove(View ctx, Object newTopPath, FlowHistoryStripper f) {
+    public static void flowPushAndRemove(View ctx, @Nullable Object newTopPath, FlowHistoryStripper f, Flow.Direction forward) {
 
         final Flow flow = Flow.get(ctx);
         final History history = flow
@@ -192,10 +191,12 @@ public class AppUtils {
             }
             paths.add(next);
         }
-        paths.add(newTopPath);
+        if (newTopPath != null){
+            paths.add(newTopPath);
+        }
         final History.Builder builder = history.buildUpon();
         builder.clear();
         builder.addAll(paths);
-        flow.setHistory(builder.build(), Flow.Direction.FORWARD);
+        flow.setHistory(builder.build(), forward);
     }
 }
