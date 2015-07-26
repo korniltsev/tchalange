@@ -498,7 +498,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void open(TdApi.User user) {
         Flow.get(getView())
-                .set(new ProfilePath(user));
+                .set(new ProfilePath(user, chat));
     }
 
     public void open(final TdApi.Chat groupChat) {

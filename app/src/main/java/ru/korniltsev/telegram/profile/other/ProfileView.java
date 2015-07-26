@@ -4,16 +4,20 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.widget.FrameLayout;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.DividerItemDecorator;
@@ -33,6 +37,7 @@ import static ru.korniltsev.telegram.common.AppUtils.uiName;
 public class ProfileView extends FrameLayout implements HandlesBack {
     @Inject ProfilePresenter presenter;
     @Inject DpCalculator calc;
+    @Inject ActivityOwner activity;
     @Inject PhoneFormat phoneFormat;
 
     private RecyclerView list;
@@ -40,6 +45,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
     private FakeToolbar fakeToolbar;
     private ProfileAdapter adapter;
     private ToolbarUtils toolbar;
+    private ListChoicePopup mutePopup;
 
     public ProfileView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,9 +63,41 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         list.setAdapter(adapter);
 
         toolbar = ToolbarUtils.initToolbar(this)
-
+                .inflate(R.menu.profile)
+                .setMenuClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.menu_mute_unmute:
+                                mute();
+                                return true;
+                            case R.id.menu_share:
+                                presenter.share();
+                                return true;
+                            case R.id.menu_block:
+                                presenter.block();
+                                return true;
+                            case R.id.menu_edit:
+                                presenter.edit();
+                                return true;
+                            case R.id.menu_delete:
+                                presenter.delete();
+                                return true;
+                        }
+                        return false;
+                    }
+                })
                 .pop();
         fakeToolbar = (FakeToolbar) findViewById(R.id.fake_toolbar);
+    }
+
+    private void mute() {
+        mutePopup = MuteForPopupFactory.create(activity.expose(), new MuteForPopupFactory.Callback() {
+            @Override
+            public void muteFor(int duration) {
+                presenter.muteFor(duration);
+            }
+        });
     }
 
     @Override
@@ -86,7 +124,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         final boolean hasPhoneNumber = !isEmpty(user.phoneNumber);
         if (hasUserName) {
             items.add(new ProfileAdapter.Item(
-                    0,
+                    R.drawable.ic_user,
                     "@" + user.username,
                     getContext().getString(R.string.item_type_username),
                     null));
@@ -134,6 +172,18 @@ public class ProfileView extends FrameLayout implements HandlesBack {
 
     @Override
     public boolean onBackPressed() {
+        if (mutePopup != null && mutePopup.isShowing()){
+            mutePopup.dismiss();
+            mutePopup = null;
+            return true;
+        }
+        mutePopup = null;
         return presenter.hidePopup();
+    }
+
+    public void bindMuteMenu(boolean muted) {
+        final MenuItem item = toolbar.toolbar.getMenu().findItem(R.id.menu_mute_unmute);
+        item.setIcon(muted ? R.drawable.ic_notifications_off : R.drawable.ic_notifications_on);
+        item.setTitle(muted ? R.string.unmute : R.string.mute);
     }
 }
