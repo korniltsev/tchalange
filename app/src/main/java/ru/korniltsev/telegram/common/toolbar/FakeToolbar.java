@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -43,6 +44,7 @@ public class FakeToolbar extends FrameLayout {
     private int toolbarHeight;
     private int realHeaderHeight;
     private View fab;
+    private ImageView fabIcon;
 
     public FakeToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,6 +59,7 @@ public class FakeToolbar extends FrameLayout {
         subTitle = ((TextView) findViewById(R.id.subtitle));
         titleParent = ((ViewGroup) title.getParent());
         fab = findViewById(R.id.fab);
+        fabIcon = ((ImageView) findViewById(R.id.fab_icon));
 
         headerHeight = getLayoutParams().height;
         realHeaderHeight = getResources().getDimensionPixelSize(R.dimen.profile_header_height);
@@ -117,7 +120,6 @@ public class FakeToolbar extends FrameLayout {
 
         int targetY = -(realHeaderHeight - toolbarHeight);
         fab.setTranslationY(res * targetY);
-        Log.e("FakeToolbar", "res " + res);
         if (res >= 0.65 && fabVisible) {
             fabVisible = false;
             fab.clearAnimation();
@@ -174,6 +176,18 @@ public class FakeToolbar extends FrameLayout {
         subTitle.setText(
                 totalStr + ", " + onlineStr);
 //        subTitle.setText();
+    }
+
+    public void bindFAB(int icon, final Runnable runnable) {
+        fabIcon.setImageResource(icon);
+        fab.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fabVisible){
+                    runnable.run();
+                }
+            }
+        });
     }
 
     private class MyOnScrollListener extends RecyclerView.OnScrollListener {

@@ -4,14 +4,14 @@
         <layer-list>
             <item>
                 <shape android:shape="oval">
-                    <solid android:color="#ef0"/>
+                    <solid android:color="?colorControlHighlight"/>
                 </shape>
             </item>
         </layer-list>
     </item>
     <item android:state_pressed="false">
         <shape android:shape="oval">
-            <solid android:color="#0fe"/>
+            <solid android:color="#fff"/>
         </shape>
     </item>
 </selector>

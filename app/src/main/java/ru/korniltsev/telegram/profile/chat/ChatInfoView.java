@@ -83,6 +83,12 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
             }
         });
         fakeToolbar = (FakeToolbar) findViewById(R.id.fake_toolbar);
+        fakeToolbar.bindFAB(R.drawable.ic_camera, new Runnable() {
+            @Override
+            public void run() {
+                presenter.changePhoto();
+            }
+        });
     }
 
     private void changeNotificationSettings() {

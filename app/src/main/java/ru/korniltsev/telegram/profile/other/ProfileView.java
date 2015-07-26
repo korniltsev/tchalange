@@ -89,6 +89,12 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 })
                 .pop();
         fakeToolbar = (FakeToolbar) findViewById(R.id.fake_toolbar);
+        fakeToolbar.bindFAB(R.drawable.ic_message, new Runnable() {
+            @Override
+            public void run() {
+                presenter.startChat();
+            }
+        });
     }
 
     private void mute() {

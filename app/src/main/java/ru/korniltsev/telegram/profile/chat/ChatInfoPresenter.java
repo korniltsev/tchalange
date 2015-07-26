@@ -112,4 +112,8 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         notifications.muteChat(path.chat, durationSeconds);
         getView().bindMuteMenu(notifications.isMuted(path.chat));
     }
+
+    public void changePhoto() {
+
+    }
 }

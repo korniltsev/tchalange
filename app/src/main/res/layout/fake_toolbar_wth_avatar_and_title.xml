@@ -43,15 +43,38 @@
                 android:ellipsize="end"
                 />
     </LinearLayout>
-    <ImageView
+    <FrameLayout
             android:id="@+id/fab"
             android:layout_width="60dp"
-               android:layout_height="60dp"
+                 android:layout_height="60dp"
+                 android:layout_marginRight="16dp"
+                 android:layout_gravity="right|bottom">
+    <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:src="@drawable/ic_message"
-            android:layout_gravity="right|bottom"
             android:scaleType="center"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/bg_fab_white"
+            android:background="@drawable/bg_fab_white_shadow"
             android:clickable="true"
+            android:layout_marginTop="0.5dp"
+            android:layout_marginLeft="0.5dp"
+            android:layout_marginRight="0.5dp"
+            android:layout_marginBottom="0dp"
             />
+        <ImageView
+
+                android:id="@+id/fab_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_message"
+                android:scaleType="center"
+                android:background="@drawable/bg_fab_white"
+                android:clickable="true"
+
+                android:layout_marginTop="1dp"
+                android:layout_marginLeft="1dp"
+                android:layout_marginRight="1dp"
+                android:layout_marginBottom="1dp"
+                />
+    </FrameLayout>
 </ru.korniltsev.telegram.common.toolbar.FakeToolbar>

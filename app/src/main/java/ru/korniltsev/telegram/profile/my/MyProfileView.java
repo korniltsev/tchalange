@@ -80,6 +80,12 @@ public class MyProfileView extends FrameLayout {
             }
         });
         fakeToolbar = (FakeToolbar) findViewById(R.id.fake_toolbar);
+        fakeToolbar.bindFAB(R.drawable.ic_camera, new Runnable() {
+            @Override
+            public void run() {
+                presenter.changePhoto();
+            }
+        });
 
     }
 

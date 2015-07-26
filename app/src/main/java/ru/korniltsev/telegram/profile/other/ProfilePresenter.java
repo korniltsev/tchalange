@@ -83,4 +83,9 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
         nm.muteChat(path.chat, duration);
         getView().bindMuteMenu(nm.isMuted(path.chat));
     }
+
+    public void startChat() {
+        //todo delete all before chat_list in history
+
+    }
 }

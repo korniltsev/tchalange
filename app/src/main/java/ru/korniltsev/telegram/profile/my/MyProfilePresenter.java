@@ -56,4 +56,8 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> {
                     .set(new EditPasscode());
         }
     }
+
+    public void changePhoto() {
+
+    }
 }
