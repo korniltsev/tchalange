@@ -72,7 +72,7 @@ public class ChatPhotoChangedVH extends RealBaseVH {
         TdApi.GroupChatInfo chatInfoCopy = new TdApi.GroupChatInfo(groupChatCopy);
 
         final TdApi.Chat chatCopy = new TdApi.Chat(orig.id, orig.topMessage, orig.unreadCount, orig.lastReadInboxMessageId, orig.lastReadOutboxMessageId ,
-                orig.notificationSettings, chatInfoCopy);
+                orig.notificationSettings, 0, chatInfoCopy);
 
         image.loadAvatarFor(chatCopy);
 

@@ -198,6 +198,93 @@ public class TdApi {
         }
     }
 
+    public static class BotCommand extends TLObject {
+        public String command;
+        public String description;
+
+        public BotCommand() {
+        }
+
+        public BotCommand(String command, String description) {
+            this.command = command;
+            this.description = description;
+        }
+
+        public static final int CONSTRUCTOR = -1032140601;
+
+        @Override
+        public int getConstructor() {
+            return -1032140601;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("BotCommand").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("command").append(" = ").append(command).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public abstract static class BotInfo extends TLObject {
+    }
+
+    public static class BotInfoEmpty extends BotInfo {
+
+        public BotInfoEmpty() {
+        }
+
+        public static final int CONSTRUCTOR = -1154598962;
+
+        @Override
+        public int getConstructor() {
+            return -1154598962;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("BotInfoEmpty").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class BotInfoGeneral extends BotInfo {
+        public String shareText;
+        public String description;
+        public BotCommand[] commands;
+
+        public BotInfoGeneral() {
+        }
+
+        public BotInfoGeneral(String shareText, String description, BotCommand[] commands) {
+            this.shareText = shareText;
+            this.description = description;
+            this.commands = commands;
+        }
+
+        public static final int CONSTRUCTOR = 1269773691;
+
+        @Override
+        public int getConstructor() {
+            return 1269773691;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("BotInfoGeneral").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("shareText").append(" = ").append(shareText).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("description").append(" = ").append(description).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("commands").append(" = ").append("BotCommand[]").append(" {").append(Arrays.toString(commands));
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public static class Chat extends TLObject {
         public long id;
         public Message topMessage;
@@ -205,26 +292,28 @@ public class TdApi {
         public int lastReadInboxMessageId;
         public int lastReadOutboxMessageId;
         public NotificationSettings notificationSettings;
+        public int replyMarkupMessageId;
         public ChatInfo type;
 
         public Chat() {
         }
 
-        public Chat(long id, Message topMessage, int unreadCount, int lastReadInboxMessageId, int lastReadOutboxMessageId, NotificationSettings notificationSettings, ChatInfo type) {
+        public Chat(long id, Message topMessage, int unreadCount, int lastReadInboxMessageId, int lastReadOutboxMessageId, NotificationSettings notificationSettings, int replyMarkupMessageId, ChatInfo type) {
             this.id = id;
             this.topMessage = topMessage;
             this.unreadCount = unreadCount;
             this.lastReadInboxMessageId = lastReadInboxMessageId;
             this.lastReadOutboxMessageId = lastReadOutboxMessageId;
             this.notificationSettings = notificationSettings;
+            this.replyMarkupMessageId = replyMarkupMessageId;
             this.type = type;
         }
 
-        public static final int CONSTRUCTOR = -437749334;
+        public static final int CONSTRUCTOR = -149531729;
 
         @Override
         public int getConstructor() {
-            return -437749334;
+            return -149531729;
         }
 
         @Override
@@ -237,6 +326,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastReadInboxMessageId").append(" = ").append(lastReadInboxMessageId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastReadOutboxMessageId").append(" = ").append(lastReadOutboxMessageId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("notificationSettings").append(" = "); notificationSettings.toStringBuilder(shift, s);
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkupMessageId").append(" = ").append(replyMarkupMessageId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("type").append(" = "); type.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
@@ -304,21 +394,23 @@ public class TdApi {
         public User user;
         public int inviterId;
         public int joinDate;
+        public BotInfo botInfo;
 
         public ChatParticipant() {
         }
 
-        public ChatParticipant(User user, int inviterId, int joinDate) {
+        public ChatParticipant(User user, int inviterId, int joinDate, BotInfo botInfo) {
             this.user = user;
             this.inviterId = inviterId;
             this.joinDate = joinDate;
+            this.botInfo = botInfo;
         }
 
-        public static final int CONSTRUCTOR = 395682475;
+        public static final int CONSTRUCTOR = -1270928779;
 
         @Override
         public int getConstructor() {
-            return 395682475;
+            return -1270928779;
         }
 
         @Override
@@ -328,6 +420,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inviterId").append(" = ").append(inviterId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("joinDate").append(" = ").append(joinDate).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("botInfo").append(" = "); botInfo.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -462,15 +555,6 @@ public class TdApi {
         public File() {
         }
 
-        public boolean isEmpty() {
-            return TextUtils.isEmpty(path);
-        }
-
-        public boolean isLocal(){
-            return !isEmpty();
-
-        }
-
         public File(int id, String persistentId, int size, String path) {
             this.id = id;
             this.persistentId = persistentId;
@@ -483,6 +567,14 @@ public class TdApi {
         @Override
         public int getConstructor() {
             return -1956331593;
+        }
+
+        public boolean isEmpty() {
+            return TextUtils.isEmpty(path);
+        }
+
+        public boolean isLocal(){
+            return !isEmpty();
         }
 
         @Override
@@ -1074,11 +1166,12 @@ public class TdApi {
         public int forwardDate;
         public int replyToMessageId;
         public MessageContent message;
+        public ReplyMarkup replyMarkup;
 
         public Message() {
         }
 
-        public Message(int id, int fromId, long chatId, int date, int forwardFromId, int forwardDate, int replyToMessageId, MessageContent message) {
+        public Message(int id, int fromId, long chatId, int date, int forwardFromId, int forwardDate, int replyToMessageId, MessageContent message, ReplyMarkup replyMarkup) {
             this.id = id;
             this.fromId = fromId;
             this.chatId = chatId;
@@ -1087,13 +1180,14 @@ public class TdApi {
             this.forwardDate = forwardDate;
             this.replyToMessageId = replyToMessageId;
             this.message = message;
+            this.replyMarkup = replyMarkup;
         }
 
-        public static final int CONSTRUCTOR = -818144677;
+        public static final int CONSTRUCTOR = -974303888;
 
         @Override
         public int getConstructor() {
-            return -818144677;
+            return -974303888;
         }
 
         @Override
@@ -1108,6 +1202,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("forwardDate").append(" = ").append(forwardDate).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyToMessageId").append(" = ").append(replyToMessageId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("message").append(" = "); message.toStringBuilder(shift, s);
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkup").append(" = "); replyMarkup.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -1674,13 +1769,10 @@ public class TdApi {
 
     public static class NotificationSettings extends TLObject {
         public int muteFor;
+        public long muteForElapsedRealtime;
         public String sound;
         public boolean showPreviews;
         public int eventsMask;
-
-
-        public long muteForElapsedRealtime
-                ;
 
         public NotificationSettings() {
         }
@@ -2031,6 +2123,27 @@ public class TdApi {
     }
 
     public abstract static class ReplyMarkup extends TLObject {
+    }
+
+    public static class ReplyMarkupNone extends ReplyMarkup {
+
+        public ReplyMarkupNone() {
+        }
+
+        public static final int CONSTRUCTOR = -1623666456;
+
+        @Override
+        public int getConstructor() {
+            return -1623666456;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ReplyMarkupNone").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
     }
 
     public static class ReplyMarkupHideKeyboard extends ReplyMarkup {
@@ -2654,6 +2767,36 @@ public class TdApi {
         }
     }
 
+    public static class UpdateChatReplyMarkup extends Update {
+        public long chatId;
+        public int replyMarkupMessageId;
+
+        public UpdateChatReplyMarkup() {
+        }
+
+        public UpdateChatReplyMarkup(long chatId, int replyMarkupMessageId) {
+            this.chatId = chatId;
+            this.replyMarkupMessageId = replyMarkupMessageId;
+        }
+
+        public static final int CONSTRUCTOR = 301018472;
+
+        @Override
+        public int getConstructor() {
+            return 301018472;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatReplyMarkup").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("replyMarkupMessageId").append(" = ").append(replyMarkupMessageId).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public static class UpdateNotificationSettings extends Update {
         public NotificationSettingsScope scope;
         public NotificationSettings notificationSettings;
@@ -2777,130 +2920,28 @@ public class TdApi {
         }
     }
 
-    public static class UpdateUserName extends Update {
-        public int userId;
-        public String firstName;
-        public String lastName;
-        public String username;
+    public static class UpdateUser extends Update {
+        public User user;
 
-        public UpdateUserName() {
+        public UpdateUser() {
         }
 
-        public UpdateUserName(int userId, String firstName, String lastName, String username) {
-            this.userId = userId;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.username = username;
+        public UpdateUser(User user) {
+            this.user = user;
         }
 
-        public static final int CONSTRUCTOR = -1489818765;
+        public static final int CONSTRUCTOR = 1183394041;
 
         @Override
         public int getConstructor() {
-            return -1489818765;
+            return 1183394041;
         }
 
         @Override
         protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserName").append(" {\n");
+            s.append("UpdateUser").append(" {\n");
             shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class UpdateUserPhoneNumber extends Update {
-        public int userId;
-        public String phoneNumber;
-
-        public UpdateUserPhoneNumber() {
-        }
-
-        public UpdateUserPhoneNumber(int userId, String phoneNumber) {
-            this.userId = userId;
-            this.phoneNumber = phoneNumber;
-        }
-
-        public static final int CONSTRUCTOR = 1973399777;
-
-        @Override
-        public int getConstructor() {
-            return 1973399777;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserPhoneNumber").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class UpdateUserProfilePhoto extends Update {
-        public int userId;
-        public ProfilePhoto profilePhoto;
-
-        public UpdateUserProfilePhoto() {
-        }
-
-        public UpdateUserProfilePhoto(int userId, ProfilePhoto profilePhoto) {
-            this.userId = userId;
-            this.profilePhoto = profilePhoto;
-        }
-
-        public static final int CONSTRUCTOR = -1996167678;
-
-        @Override
-        public int getConstructor() {
-            return -1996167678;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserProfilePhoto").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("profilePhoto").append(" = "); profilePhoto.toStringBuilder(shift, s);
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class UpdateUserLinks extends Update {
-        public int userId;
-        public LinkState myLink;
-        public LinkState foreignLink;
-
-        public UpdateUserLinks() {
-        }
-
-        public UpdateUserLinks(int userId, LinkState myLink, LinkState foreignLink) {
-            this.userId = userId;
-            this.myLink = myLink;
-            this.foreignLink = foreignLink;
-        }
-
-        public static final int CONSTRUCTOR = -993224878;
-
-        @Override
-        public int getConstructor() {
-            return -993224878;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("UpdateUserLinks").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("myLink").append(" = "); myLink.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("foreignLink").append(" = "); foreignLink.toStringBuilder(shift, s);
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -3150,11 +3191,12 @@ public class TdApi {
         public ProfilePhoto profilePhoto;
         public LinkState myLink;
         public LinkState foreignLink;
+        public UserType type;
 
         public User() {
         }
 
-        public User(int id, String firstName, String lastName, String username, String phoneNumber, UserStatus status, ProfilePhoto profilePhoto, LinkState myLink, LinkState foreignLink) {
+        public User(int id, String firstName, String lastName, String username, String phoneNumber, UserStatus status, ProfilePhoto profilePhoto, LinkState myLink, LinkState foreignLink, UserType type) {
             this.id = id;
             this.firstName = firstName;
             this.lastName = lastName;
@@ -3164,13 +3206,14 @@ public class TdApi {
             this.profilePhoto = profilePhoto;
             this.myLink = myLink;
             this.foreignLink = foreignLink;
+            this.type = type;
         }
 
-        public static final int CONSTRUCTOR = 992307343;
+        public static final int CONSTRUCTOR = -1747251981;
 
         @Override
         public int getConstructor() {
-            return 992307343;
+            return -1747251981;
         }
 
         @Override
@@ -3186,6 +3229,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("profilePhoto").append(" = "); profilePhoto.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("myLink").append(" = "); myLink.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("foreignLink").append(" = "); foreignLink.toStringBuilder(shift, s);
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("type").append(" = "); type.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -3194,24 +3238,22 @@ public class TdApi {
     public static class UserFull extends TLObject {
         public User user;
         public boolean isBlocked;
-        public String realFirstName;
-        public String realLastName;
+        public BotInfo botInfo;
 
         public UserFull() {
         }
 
-        public UserFull(User user, boolean isBlocked, String realFirstName, String realLastName) {
+        public UserFull(User user, boolean isBlocked, BotInfo botInfo) {
             this.user = user;
             this.isBlocked = isBlocked;
-            this.realFirstName = realFirstName;
-            this.realLastName = realLastName;
+            this.botInfo = botInfo;
         }
 
-        public static final int CONSTRUCTOR = -295122843;
+        public static final int CONSTRUCTOR = -1158674134;
 
         @Override
         public int getConstructor() {
-            return -295122843;
+            return -1158674134;
         }
 
         @Override
@@ -3220,8 +3262,7 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("user").append(" = "); user.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isBlocked").append(" = ").append(isBlocked).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("realFirstName").append(" = ").append(realFirstName).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("realLastName").append(" = ").append(realLastName).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("botInfo").append(" = "); botInfo.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -3392,6 +3433,102 @@ public class TdApi {
         @Override
         protected void toStringBuilder(int shift, StringBuilder s) {
             s.append("UserStatusLastMonth").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public abstract static class UserType extends TLObject {
+    }
+
+    public static class UserTypeGeneral extends UserType {
+
+        public UserTypeGeneral() {
+        }
+
+        public static final int CONSTRUCTOR = -955149573;
+
+        @Override
+        public int getConstructor() {
+            return -955149573;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeGeneral").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class UserTypeDeleted extends UserType {
+
+        public UserTypeDeleted() {
+        }
+
+        public static final int CONSTRUCTOR = -1807729372;
+
+        @Override
+        public int getConstructor() {
+            return -1807729372;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeDeleted").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class UserTypeBot extends UserType {
+        public boolean canJoinGroupChats;
+        public boolean canReadAllGroupChatMessages;
+
+        public UserTypeBot() {
+        }
+
+        public UserTypeBot(boolean canJoinGroupChats, boolean canReadAllGroupChatMessages) {
+            this.canJoinGroupChats = canJoinGroupChats;
+            this.canReadAllGroupChatMessages = canReadAllGroupChatMessages;
+        }
+
+        public static final int CONSTRUCTOR = -1312994781;
+
+        @Override
+        public int getConstructor() {
+            return -1312994781;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeBot").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("canJoinGroupChats").append(" = ").append(canJoinGroupChats).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("canReadAllGroupChatMessages").append(" = ").append(canReadAllGroupChatMessages).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class UserTypeUnknown extends UserType {
+
+        public UserTypeUnknown() {
+        }
+
+        public static final int CONSTRUCTOR = -724541123;
+
+        @Override
+        public int getConstructor() {
+            return -724541123;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UserTypeUnknown").append(" {\n");
             shift += 2;
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
@@ -3963,6 +4100,36 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class DeleteChatReplyMarkup extends TLFunction {
+        public long chatId;
+        public int messageId;
+
+        public DeleteChatReplyMarkup() {
+        }
+
+        public DeleteChatReplyMarkup(long chatId, int messageId) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+        }
+
+        public static final int CONSTRUCTOR = 959624272;
+
+        @Override
+        public int getConstructor() {
+            return 959624272;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteChatReplyMarkup").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageId").append(" = ").append(messageId).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
