@@ -134,6 +134,11 @@
     <string name="delete_and_leave">Delete and leave</string>
     <string name="notifications_enabled">Enabled</string>
     <string name="notifications_disabled">Disabled</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_block">Block</string>
+    <string name="menu_unblock">Unblock</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_delete_contact">Delete</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

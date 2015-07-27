@@ -444,6 +444,23 @@ public class RXClient {
         sendSilently(new TdApi.SetOption("network_unreachable", new TdApi.OptionBoolean(unreachable)));
     }
 
+    public Observable<Boolean> updateUserBlocked(final int userId) {
+        return globalObservableWithBackPressure
+                .compose(new FilterAndCastToClass<>(TdApi.UpdateUserBlocked.class))
+                .filter(new Func1<TdApi.UpdateUserBlocked, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateUserBlocked updateUserBlocked) {
+                        return updateUserBlocked.userId == userId;
+                    }
+                }).map(new Func1<TdApi.UpdateUserBlocked, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateUserBlocked updateUserBlocked) {
+                        return updateUserBlocked.isBlocked;
+                    }
+                });
+
+    }
+
     static class RxClientException extends Exception {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;

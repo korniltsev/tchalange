@@ -14,24 +14,24 @@
     <item
             android:id="@+id/menu_share"
             app:showAsAction="never"
-            android:title="Share"
+            android:title="@string/menu_share"
             />
 
     <item
             android:id="@+id/menu_block"
             app:showAsAction="never"
-            android:title="Block"
+            android:title="@string/menu_block"
             />
 
     <item
             android:id="@+id/menu_edit"
             app:showAsAction="never"
-            android:title="Edit"
+            android:title="@string/menu_edit"
             />
     <item
             android:id="@+id/menu_delete"
             app:showAsAction="never"
-            android:title="Delete"
+            android:title="@string/menu_delete_contact"
             />
 
 

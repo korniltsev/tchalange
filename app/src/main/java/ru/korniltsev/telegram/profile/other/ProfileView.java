@@ -192,4 +192,9 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         item.setIcon(muted ? R.drawable.ic_notifications_off : R.drawable.ic_notifications_on);
         item.setTitle(muted ? R.string.unmute : R.string.mute);
     }
+
+    public void bindBlockMenu(boolean blocked) {
+        final MenuItem block = toolbar.toolbar.getMenu().findItem(R.id.menu_block);
+        block.setTitle(blocked ? R.string.menu_unblock : R.string.menu_block);
+    }
 }
