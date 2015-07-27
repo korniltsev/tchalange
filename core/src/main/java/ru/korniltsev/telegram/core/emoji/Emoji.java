@@ -18,10 +18,12 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import com.crashlytics.android.core.CrashlyticsCore;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
@@ -394,10 +396,12 @@ public class Emoji {
     //    }
     public static final Object DUMB = new Object();
     private final WeakHashMap<EmojiDrawable, Object> weakness = new WeakHashMap<>();
+
+    @Nullable
     public EmojiDrawable getEmojiDrawable(long code) {
         DrawableInfo info = rects.get(code);
         if (info == null) {
-            throw new NullPointerException("no info for code " + code);
+            return null;
         }
         EmojiDrawable ed = new EmojiDrawable(info);
         ed.setBounds(0, 0, drawImgSize, drawImgSize);
@@ -407,6 +411,7 @@ public class Emoji {
         return ed;
     }
 
+    @Nullable
     public Drawable getEmojiBigDrawable(long code) {
         EmojiDrawable ed = getEmojiDrawable(code);
         if (ed == null) {
@@ -559,7 +564,7 @@ public class Emoji {
                 }
             }
         } catch (Exception e) {
-            Log.e("tmessages", "error loading emoji page", e);
+            CrashlyticsCore.getInstance().logException(e);
             return cs;
         }
         return s;
