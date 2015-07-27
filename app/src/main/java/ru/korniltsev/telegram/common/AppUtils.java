@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 import flow.Flow;
 import flow.History;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -198,5 +199,9 @@ public class AppUtils {
         builder.clear();
         builder.addAll(paths);
         flow.setHistory(builder.build(), forward);
+    }
+
+    public static void toastUnsupported(Context context) {
+        Toast.makeText(context, R.string.feature_unsupported, Toast.LENGTH_LONG).show();
     }
 }

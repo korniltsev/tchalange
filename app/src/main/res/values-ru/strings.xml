@@ -144,6 +144,8 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_delete_contact">Delete</string>
 
+    <string name="feature_unsupported">Эта функция будет доступна в следующей версии</string>
+
     <plurals name="mute_for_n_hours">
         <item quantity="one">Отключить уведомления на %1$d час</item>
         <item quantity="few">Отключить уведомления на %1$d часа</item>

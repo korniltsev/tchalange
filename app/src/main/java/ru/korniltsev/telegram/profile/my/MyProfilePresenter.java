@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.profile.my;
 import android.os.Bundle;
 import flow.Flow;
 import mortar.ViewPresenter;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.main.passcode.PasscodePath;
@@ -58,6 +59,6 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> {
     }
 
     public void changePhoto() {
-
+        AppUtils.toastUnsupported(getView().getContext());
     }
 }

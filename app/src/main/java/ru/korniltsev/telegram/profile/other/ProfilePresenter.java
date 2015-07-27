@@ -115,11 +115,11 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void edit() {
-
+        AppUtils.toastUnsupported(getView().getContext());
     }
 
     public void delete() {
-
+        AppUtils.toastUnsupported(getView().getContext());
     }
 
     public void muteFor(final int duration) {

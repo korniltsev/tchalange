@@ -109,7 +109,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     }
 
     public void editChatName() {
-
+        AppUtils.toastUnsupported(getView().getContext());
     }
 
     public void muteFor(int durationSeconds) {
@@ -118,6 +118,6 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     }
 
     public void changePhoto() {
-
+        AppUtils.toastUnsupported(getView().getContext());
     }
 }
