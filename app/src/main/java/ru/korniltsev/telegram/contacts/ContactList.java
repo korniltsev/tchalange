@@ -18,23 +18,34 @@ import java.util.List;
 public class ContactList extends BasePath implements Serializable {
     public static final int TYPE_LIST = 0;
     public static final int TYPE_ADD_MEMBER = 1;
+    public static final int TYPE_SHARE_USER = 2;
 
     final int type;
 
     //add
     @Nullable final List<TdApi.User> filter;
     @Nullable final TdApi.Chat chat;
+    @Nullable final TdApi.User sharedUser;
 
     public ContactList( @NonNull List<TdApi.User> filter, @NonNull TdApi.Chat chat) {
         this.type = TYPE_ADD_MEMBER;
         this.filter = filter;
         this.chat = chat;
+        sharedUser = null;
     }
 
     public ContactList() {
         this.type = TYPE_LIST;
         this.filter = null;
         this.chat = null;
+        sharedUser = null;
+    }
+
+    public ContactList(@NonNull TdApi.User user) {
+        this.type = TYPE_SHARE_USER;
+        this.sharedUser = user;
+        filter = null;
+        chat = null;
     }
 
     @Override

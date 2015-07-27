@@ -157,19 +157,29 @@ public class RxChat implements UserHolder {
     }
 
     private void getUIDs(TdApi.Message message, Set<Integer> set) {
-        assertTrue(message.fromId != 0);
-        if (!hasUserWith(message.fromId)) {
-            set.add(message.fromId);
+        final int fromId = message.fromId;
+        assertTrue(fromId != 0);
+        if (!hasUserWith(fromId)) {
+            add(set, fromId);
         }
         if (message.forwardFromId != 0) {
             if (!hasUserWith(message.forwardFromId)) {
-                set.add(message.forwardFromId);
+                add(set, message.forwardFromId);
             }
         }
         if (message.message instanceof TdApi.MessageContact) {
             TdApi.MessageContact c = (TdApi.MessageContact) message.message;
-            set.add(c.userId);
+            if (c.userId != 0){
+                add(set, c.userId);
+            }
         }
+    }
+
+    private boolean add(Set<Integer> set, int fromId) {
+        if (fromId == 0) {
+            throw new IllegalStateException("fromId === 0");
+        }
+        return set.add(fromId);
     }
 
     //    public Observable<List<TdApi.Message>> messageList() {
@@ -460,6 +470,11 @@ public class RxChat implements UserHolder {
                 return;
             }
         }
+    }
+
+    public void sendMessage(TdApi.User sharedContact) {
+        TdApi.InputMessageContact content = new TdApi.InputMessageContact(sharedContact.phoneNumber, sharedContact.firstName, sharedContact.lastName);
+        sendMessageImpl(content);
     }
 
     public static abstract class ChatListItem {

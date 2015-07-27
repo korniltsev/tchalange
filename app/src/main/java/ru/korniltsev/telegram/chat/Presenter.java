@@ -105,6 +105,9 @@ public class Presenter extends ViewPresenter<ChatView>
 
         }
 
+        shareContact();
+
+
 
         ChatView view = getView();
 
@@ -118,6 +121,14 @@ public class Presenter extends ViewPresenter<ChatView>
             TdApi.GroupChatInfo g = (TdApi.GroupChatInfo) this.chat.type;
             showMessagePanel(g.groupChat);
         }
+    }
+
+    private void shareContact() {
+        if (path.sharedContact != null) {
+            rxChat.sendMessage(path.sharedContact);
+            path.sharedContact = null;
+        }
+
     }
 
     private void setViewSubtitle() {

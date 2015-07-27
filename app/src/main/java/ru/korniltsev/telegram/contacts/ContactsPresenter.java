@@ -7,6 +7,7 @@ import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
+import ru.korniltsev.telegram.chat_list.ChatList;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
@@ -15,6 +16,7 @@ import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.ContactsHelper;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
+import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -66,7 +68,8 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
                                     res.add(newContact(user));
                                 }
                             }
-                        } else if (path.type == ContactList.TYPE_LIST) {
+                        } else if (path.type == ContactList.TYPE_LIST
+                                || path.type == ContactList.TYPE_SHARE_USER) {
                             for (TdApi.User user : contacts.users) {
                                 res.add(newContact(user));
                             }
@@ -119,7 +122,37 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
             openConversation(user);//todo modify history
         } else if (path.type == ContactList.TYPE_ADD_MEMBER) {
             addChatMember(path.chat, user);
+        } else if (path.type == ContactList.TYPE_SHARE_USER) {
+            shareUser(user, path.sharedUser);
         }
+    }
+
+    private void shareUser(TdApi.User target, final TdApi.User sharedUser) {
+        final Observable<TdApi.TLObject> me = client.sendRx(new TdApi.GetMe());
+        final Observable<TdApi.TLObject> chat = client.sendRx(new TdApi.CreatePrivateChat(target.id));
+        subscription.add(
+                Observable.zip(me, chat, new Func2<TdApi.TLObject, TdApi.TLObject, Chat>() {
+                    @Override
+                    public Chat call(TdApi.TLObject me, TdApi.TLObject chat) {
+                        return new Chat((TdApi.Chat) chat, (TdApi.User) me);
+                    }
+                }).observeOn(mainThread())
+                        .subscribe(new ObserverAdapter<Chat>() {
+                            @Override
+                            public void onNext(Chat chat) {
+                                shareUserImpl(sharedUser, chat);
+                            }
+                        }));
+    }
+
+    private void shareUserImpl(final TdApi.User sharedUser, Chat chat) {
+        chat.sharedContact = sharedUser;
+        AppUtils.flowPushAndRemove(getView(), chat, new FlowHistoryStripper() {
+            @Override
+            public boolean shouldRemovePath(Object path) {
+                return !(path instanceof ChatList);
+            }
+        }, Flow.Direction.FORWARD);
     }
 
     private void addChatMember(TdApi.Chat chat, final TdApi.User user) {
@@ -134,7 +167,6 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
                                 previousPath.addedUsers.add(user);
 
                                 flow.goBack();
-
                             }
                         }));
     }

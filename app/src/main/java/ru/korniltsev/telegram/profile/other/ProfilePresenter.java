@@ -8,6 +8,7 @@ import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
+import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -65,6 +66,8 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void share() {
+        Flow.get(getView())
+                .set(new ContactList(path.user));
 
     }
 

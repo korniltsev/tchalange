@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.chat;
 
+import android.support.annotation.Nullable;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.adapter.view.AudioMessageView;
@@ -24,6 +25,8 @@ public class Chat extends BasePath implements Serializable {
     public final TdApi.Chat chat;
     public final TdApi.User me;
     public transient boolean firstLoad = true;
+
+    public @Nullable TdApi.User sharedContact;
 
     public Chat(TdApi.Chat chat, TdApi.User me) {
         this.chat = chat;
