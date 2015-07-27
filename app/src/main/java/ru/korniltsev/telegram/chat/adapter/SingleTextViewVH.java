@@ -120,7 +120,14 @@ public class SingleTextViewVH extends RealBaseVH {
                     .append(" ")
                     .append(res.getString(R.string.message_removed_group_photo));
             return sb;
-        } else {
+        } else if (msg instanceof TdApi.MessageChatJoinByLink) {
+            Spannable name = userColor(sGetNameForSenderOf(uh, msgRaw));
+            SpannableStringBuilder sb = new SpannableStringBuilder();
+            sb.append(name)
+                    .append(" ")
+                    .append(res.getString(R.string.message_joined_by_link));
+            return sb;
+        } else{
             return res.getString(R.string.message_unsupported);
         }
     }

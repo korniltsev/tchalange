@@ -270,7 +270,10 @@ public class RxChat implements UserHolder {
         }
     }
 
-    @Nullable public TdApi.File getSentImage(TdApi.Message msg) {
+    @Nullable public TdApi.File getSentImage(@Nullable TdApi.Message msg) {
+        if (msg == null){
+            return null;
+        }
         return sentMessageIdToImageLink.get(msg.id);
     }
 

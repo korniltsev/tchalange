@@ -33,6 +33,7 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
     public static final int VIEW_TYPE_GIF = 12;
     public static final int VIEW_TYPE_CONTACT = 13;
     public static final int VIEW_TYPE_NEW_MESSAGES = 14;
+    public static final int VIEW_TYPE_WEB_PAGE = 15;
 
 //    final Map<Integer, TdApi.User> users = new HashMap<>();
     final RxGlide picasso;
@@ -127,7 +128,9 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
                 }
             } else if (message instanceof TdApi.MessageContact) {
                 return VIEW_TYPE_CONTACT;
-            }else{
+            }else if (message instanceof TdApi.MessageWebPage){
+                return VIEW_TYPE_WEB_PAGE;
+            } else {
                 return VIEW_TYPE_SINGLE_TEXT_VIEW;
             }
         } else if (item instanceof RxChat.NewMessagesItem) {
@@ -201,6 +204,10 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
             case VIEW_TYPE_NEW_MESSAGES:{
                 View view = inflate(R.layout.chat_item_new_messages, p);
                 return new NewMessagesVH(view, this);
+            }
+            case VIEW_TYPE_WEB_PAGE:{
+                View view = inflate(R.layout.chat_item_webpage, p);
+                return new WebPageVH(view, this);
             }
             default: {
                 View view = inflate(R.layout.chat_item_single_text_view, p);

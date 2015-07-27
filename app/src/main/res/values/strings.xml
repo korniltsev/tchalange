@@ -88,6 +88,7 @@
     <string name="message_unsupported">Unsupported message</string>
     <string name="message_deleted">Deleted message</string>
     <string name="message_removed_group_photo">removed group photo</string>
+    <string name="message_joined_by_link">joined the group via invite link</string>
     <string name="message_changed_group_photo">changed group photo</string>
     <string name="message_created_group">created group</string>
     <string name="message_renamed_group">renamed group</string>
@@ -140,6 +141,7 @@
     <string name="menu_edit">Edit</string>
     <string name="menu_delete_contact">Delete</string>
     <string name="feature_unsupported">The feature will be supported in next release.</string>
+    <string name="web_page">Web page</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

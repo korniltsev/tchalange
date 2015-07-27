@@ -7,7 +7,7 @@
     <color name="text_black">#ff191a1a</color>
     <color name="primary">#5b95c2</color>
     <color name="primary_dark">#ff4e759b</color>
-
+    <color name="textColorLink">#ef0</color>
 
     <color name="debug">#b1000000</color>
     <color name="debug2">#ff4576a2</color>

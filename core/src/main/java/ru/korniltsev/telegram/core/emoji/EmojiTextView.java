@@ -19,6 +19,7 @@ public class EmojiTextView extends TextView{
     public EmojiTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
+
     }
 
     @Override

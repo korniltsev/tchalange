@@ -34,6 +34,6 @@ class TextMessageVH extends BaseAvatarVH {
 
     public static void applyTextStyle(TextView text) {
         text.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS);
-        text.setLinkTextColor(Colors.USER_NAME_COLOR);
+        text.setLinkTextColor(Colors.USER_NAME_COLOR);//todo specify in theme/style
     }
 }

@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat.adapter.view;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 import mortar.dagger1support.ObjectGraphService;
@@ -19,7 +20,7 @@ public class PhotoMessageView extends ImageView {
     @Inject RxGlide picasso;
     @Inject Presenter presenter;
     @Inject DpCalculator calc;
-    private TdApi.Message msg;
+    private TdApi.Photo photo;
     private int dip207;
     private int dip154;
     private int width;
@@ -43,14 +44,16 @@ public class PhotoMessageView extends ImageView {
         }
     }
 
-    public void load(TdApi.Message msg) {
-        if (this.msg == msg) {
+    public void load(final TdApi.Photo photo1, @Nullable TdApi.Message sentPhotoMessageHack) {
+        if (this.photo == photo1) {
             return;
         }
-        final TdApi.MessagePhoto photo = (TdApi.MessagePhoto) msg.message;
-        this.msg = msg;
+//        final TdApi.MessagePhoto photo = (TdApi.MessagePhoto) msg.message;
+         this.photo = photo1;
+//        this.msg = msg;
         setImageDrawable(null);
-        float ratio = PhotoUtils.getPhotoRation(photo.photo);
+
+        float ratio = PhotoUtils.getPhotoRation(photo1);
         if (ratio > 1) {
             width = dip207;
         } else {
@@ -60,9 +63,9 @@ public class PhotoMessageView extends ImageView {
 
 
         TdApi.File f = presenter.getRxChat()
-                .getSentImage(msg);
+                .getSentImage(sentPhotoMessageHack);
         if (f == null){
-            f = PhotoUtils.findSmallestBiggerThan(photo.photo, width, height);
+            f = PhotoUtils.findSmallestBiggerThan(photo1, width, height);
         }
 
         picasso.loadPhoto(f, false)
