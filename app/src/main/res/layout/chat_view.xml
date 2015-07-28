@@ -7,40 +7,88 @@
         >
 
     <include layout="@layout/toolbar"/>
+
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="4dp"
+            android:clipToPadding="false"
+            android:layout_marginTop="56dp"
+            android:layout_marginBottom="48dp"
+            />
     <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="10dp"
             style="@style/ToolbarShadow"
+            />
+    <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/empty_chat"
+            android:layout_gravity="center"
+            />
+
+    <View
+            android:id="@+id/scroll_down"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="56dp"
+            android:background="@drawable/ic_scroll"
+
+            />
+
+    <ru.korniltsev.telegram.chat.adapter.view.MessagePanel
+            android:id="@+id/message_panel"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:gravity="bottom"
+            android:layout_gravity="bottom"
+
             >
-        <android.support.v7.widget.RecyclerView
-                android:id="@+id/list"
-                android:scrollbars="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="4dp"
-                android:clipToPadding="false"
+
+        <ImageView
+                android:id="@+id/btn_left"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/chat_ic_keyboard_emoji_hide_levels"
+                android:scaleType="center"
+                android:background="@drawable/bg_keyboard_tab"
                 />
-        <TextView
-                android:id="@+id/empty_view"
-                android:layout_width="wrap_content"
+
+        <EditText
+                android:id="@+id/input"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="@string/empty_chat"
-                android:layout_gravity="center"
+                android:background="@null"
+                android:gravity="left|bottom"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:maxLines="4"
+                android:paddingBottom="12dp"
+                android:paddingTop="12dp"
+
+                android:hint="@string/hint_message_panel"
+                android:imeOptions="flagNoExtractUi"
                 />
 
-        <View
-                android:id="@+id/scroll_down"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_gravity="bottom|right"
-                android:layout_margin="8dp"
-                android:background="@drawable/ic_scroll"
+        <ImageView
+                android:id="@+id/btn_right"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/chat_ic_send_attach_levels"
+                android:scaleType="center"
+                android:background="@drawable/bg_keyboard_tab"
                 />
-    </FrameLayout>
-
-
-    <include layout="@layout/chat_message_panel"/>
+    </ru.korniltsev.telegram.chat.adapter.view.MessagePanel>
 
 </ru.korniltsev.telegram.chat.ChatView>

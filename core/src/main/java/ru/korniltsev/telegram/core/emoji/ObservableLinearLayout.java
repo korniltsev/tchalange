@@ -17,11 +17,12 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import java.lang.reflect.Field;
 
-public class ObservableLinearLayout extends LinearLayout {
+public class ObservableLinearLayout extends FrameLayout {
 
     private final int statusBarHeight;
     private final Point displaySize = new Point();

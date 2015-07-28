@@ -176,6 +176,12 @@ public class RXClient {
             return (TdApi.UpdateNotificationSettings) tlObject;
         }
     };
+    public static final Func1<TLObject, TdApi.UserFull> CAST_TO_USER_FULL = new Func1<TLObject, TdApi.UserFull>() {
+        @Override
+        public TdApi.UserFull call(TLObject tlObject) {
+            return (TdApi.UserFull) tlObject;
+        }
+    };
     private Context ctx;
     private final RXAuthState auth;
 
@@ -459,6 +465,11 @@ public class RXClient {
                     }
                 });
 
+    }
+
+    public Observable<TdApi.UserFull> getUserFull(int id) {
+        return sendRx(new TdApi.GetUserFull(id))
+                .map(CAST_TO_USER_FULL);
     }
 
     static class RxClientException extends Exception {

@@ -58,6 +58,7 @@ public class Presenter extends ViewPresenter<ChatView>
     private final NotificationManager nm;
 
     private final Observable<TdApi.GroupChatFull> fullChatInfoRequest;
+    private final Observable<TdApi.UserFull> userFullRequest;
     private final boolean isGroupChat;
     private final TdApi.Chat chat;
     private CompositeSubscription subscription;
@@ -69,6 +70,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     private final ActivityOwner owner;
     private final Stickers stickers;
+
     @Inject
     public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, Stickers stickers) {
         path = c;
@@ -84,12 +86,16 @@ public class Presenter extends ViewPresenter<ChatView>
             fullChatInfoRequest = client.getGroupChatInfo(groupChat.id)
                     .observeOn(mainThread());
             isGroupChat = true;
+            userFullRequest = Observable.empty();
         } else {
             fullChatInfoRequest = Observable.empty();
             isGroupChat = false;
+            final TdApi.PrivateChatInfo info = (TdApi.PrivateChatInfo) chat.type;
+            userFullRequest = client.getUserFull(info.user.id)
+                    .observeOn(mainThread());
+
+
         }
-
-
     }
 
     @Override
@@ -97,17 +103,14 @@ public class Presenter extends ViewPresenter<ChatView>
         if (path.firstLoad) {
             path.firstLoad = false;
             rxChat.clear();
-            if (chat.unreadCount == 0){
+            if (chat.unreadCount == 0) {
                 rxChat.initialRequest(chat);
             } else {
                 rxChat.requestUntilLastUnread(chat);
             }
-
         }
 
         shareContact();
-
-
 
         ChatView view = getView();
 
@@ -121,6 +124,19 @@ public class Presenter extends ViewPresenter<ChatView>
             TdApi.GroupChatInfo g = (TdApi.GroupChatInfo) this.chat.type;
             showMessagePanel(g.groupChat);
         }
+        userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
+            @Override
+            public void onNext(TdApi.UserFull response) {
+                System.out.println();
+                if (response.botInfo instanceof TdApi.BotInfoGeneral){
+                    final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
+//                    for (TdApi.BotCommand c : i.commands) {
+//                        client.sendRx()
+//                    }
+                }
+
+            }
+        });
     }
 
     private void shareContact() {
@@ -128,7 +144,6 @@ public class Presenter extends ViewPresenter<ChatView>
             rxChat.sendMessage(path.sharedContact);
             path.sharedContact = null;
         }
-
     }
 
     private void setViewSubtitle() {
@@ -164,7 +179,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
         subscription.add(
                 rxChat.history()
-                        .subscribe(new ObserverAdapter<RxChat.HistoryResponse>(){
+                        .subscribe(new ObserverAdapter<RxChat.HistoryResponse>() {
                             @Override
                             public void onNext(RxChat.HistoryResponse history) {
                                 //todo if unread messages
@@ -172,20 +187,20 @@ public class Presenter extends ViewPresenter<ChatView>
                             }
                         })
         );
-//        subscription.add(
-//                rxChat.messageList()
-//                        .subscribe(new ObserverAdapter<List<TdApi.Message>>() {
-//                            @Override
-//                            public void onNext(List<TdApi.Message> messages) {
-//                                getView()
-//                                        .setMessages(messages);
-//
-//                            }
-//                        }));
+        //        subscription.add(
+        //                rxChat.messageList()
+        //                        .subscribe(new ObserverAdapter<List<TdApi.Message>>() {
+        //                            @Override
+        //                            public void onNext(List<TdApi.Message> messages) {
+        //                                getView()
+        //                                        .setMessages(messages);
+        //
+        //                            }
+        //                        }));
 
         subscription.add(
                 rxChat.getDeletedMessagesSubject()
-                        .subscribe(new ObserverAdapter<RxChat.DeletedMessages>(){
+                        .subscribe(new ObserverAdapter<RxChat.DeletedMessages>() {
                             @Override
                             public void onNext(RxChat.DeletedMessages response) {
                                 getView().deleteMessages(response);
@@ -258,12 +273,12 @@ public class Presenter extends ViewPresenter<ChatView>
 
         subscription.add(
                 rxChat.getMessageChanged()
-                .subscribe(new ObserverAdapter<TdApi.Message>(){
-                    @Override
-                    public void onNext(TdApi.Message response) {
-                        getView().messageChanged(response);
-                    }
-                })
+                        .subscribe(new ObserverAdapter<TdApi.Message>() {
+                            @Override
+                            public void onNext(TdApi.Message response) {
+                                getView().messageChanged(response);
+                            }
+                        })
         );
 
         subscription.add(
@@ -377,8 +392,6 @@ public class Presenter extends ViewPresenter<ChatView>
         getView().setwGroupChatSubtitle(info.participants.length, online);
     }
 
-
-
     public void listScrolledToEnd() {
         if (rxChat.isDownloadedAll()) {
             return;
@@ -400,7 +413,6 @@ public class Presenter extends ViewPresenter<ChatView>
             return true;
         } else if (R.id.menu_mute_unmute == id) {
             getView().showMutePopup();
-
         }
         return false;
     }
@@ -495,7 +507,7 @@ public class Presenter extends ViewPresenter<ChatView>
             }
         } else if (request == REQUEST_CHOOS_FROM_GALLERY) {
             String picturePath = Utils.getGalleryPickedFilePath(getView().getContext(), data);
-            if (picturePath != null){
+            if (picturePath != null) {
                 rxChat.sendImage(picturePath);
                 getView()
                         .hideAttachPannel();
@@ -520,7 +532,6 @@ public class Presenter extends ViewPresenter<ChatView>
                         .set(new ChatInfo(response, groupChat));
             }
         });
-
     }
 
     public void muteFor(int duration) {
