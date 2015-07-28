@@ -4,14 +4,18 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
+import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
+import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.adapter.Adapter;
@@ -27,8 +31,10 @@ import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
+import rx.functions.Action1;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -65,6 +71,11 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private int myId;
     private View customToolbarView;
     private ListChoicePopup mutePopup;
+    private RecyclerView botsCommandList;
+
+
+    private TdApi.BotInfoGeneral commands;
+    private BotCommandsAdapter botsCommandAdapter;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -134,6 +145,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         adapter.registerAdapterDataObserver(new EmptyViewHelper());
         activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));
 
+        botsCommandList = ((RecyclerView) findViewById(R.id.bot_commands_list));
+        botsCommandList.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -403,6 +416,46 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             }
         });
     }
+
+    public void setCommands(TdApi.User user, TdApi.BotInfoGeneral i) {
+        this.commands = i;
+        List<BotCommandsAdapter.Record> cs = new ArrayList<>();
+        for (TdApi.BotCommand command : i.commands) {
+            cs.add(new BotCommandsAdapter.Record(user, command));
+        }
+        botsCommandAdapter = new BotCommandsAdapter(cs, getContext(), new Action1<BotCommandsAdapter.Record>() {
+            @Override
+            public void call(BotCommandsAdapter.Record record) {
+                presenter.sendBotCommand(record.user, record.cmd);
+                messagePanel.getInput()
+                        .getText()
+                        .clear();
+            }
+        });
+        botsCommandList.setAdapter(botsCommandAdapter);
+        messagePanel.getInput().addTextChangedListener(new TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                final int result = botsCommandAdapter.filter(s.toString());
+                if (result == 0){
+                    botsCommandList.setVisibility(View.GONE);
+                }   else{
+                    botsCommandList.setVisibility(View.VISIBLE);
+                    int newHeight ;
+                    final int commandHeight = calc.dp(36);
+                    if (result > 3){
+                        newHeight = (int) (3.5f * commandHeight);
+                    } else {
+                        newHeight = commandHeight * result;
+                    }
+                    final ViewGroup.LayoutParams lp = botsCommandList.getLayoutParams();
+                    lp.height = newHeight;
+                    botsCommandList.setLayoutParams(lp);
+                }
+            }
+        });
+    }
+
 
     private class EmptyViewHelper extends RecyclerView.AdapterDataObserver {
         @Override

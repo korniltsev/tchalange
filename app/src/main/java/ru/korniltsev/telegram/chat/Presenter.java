@@ -124,15 +124,20 @@ public class Presenter extends ViewPresenter<ChatView>
             TdApi.GroupChatInfo g = (TdApi.GroupChatInfo) this.chat.type;
             showMessagePanel(g.groupChat);
         }
+        //todo manage subscription!!!!!!!!!!
+        //todo manage subscription!!!!!!!!!!
+        //todo manage subscription!!!!!!!!!!
+        //todo manage subscription!!!!!!!!!!
+        //todo manage subscription!!!!!!!!!!
+        //todo manage subscription!!!!!!!!!!
         userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
             @Override
             public void onNext(TdApi.UserFull response) {
                 System.out.println();
                 if (response.botInfo instanceof TdApi.BotInfoGeneral){
                     final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
-//                    for (TdApi.BotCommand c : i.commands) {
-//                        client.sendRx()
-//                    }
+                    getView().setCommands(response.user, i);
+
                 }
 
             }
@@ -160,8 +165,13 @@ public class Presenter extends ViewPresenter<ChatView>
     private void setViewTitle(TdApi.User user) {
         getView().setPrivateChatTitle(user);
         final TdApi.UserStatus userStatus = rxChat.holder.getUserStatus(user);
-        getView().setPrivateChatSubtitle(
-                AppUtils.uiUserStatus(getView().getContext(), userStatus));
+
+        if (user.type instanceof TdApi.UserTypeBot){
+            getView().setPrivateChatSubtitle(getView().getContext().getString(R.string.user_status_bot));
+        } else {
+            getView().setPrivateChatSubtitle(
+                    AppUtils.uiUserStatus(getView().getContext(), userStatus));
+        }
     }
 
     @Override
@@ -537,5 +547,9 @@ public class Presenter extends ViewPresenter<ChatView>
     public void muteFor(int duration) {
         nm.muteChat(chat, duration);
         getView().initMenu(chat, nm.isMuted(this.chat));
+    }
+
+    public void sendBotCommand(TdApi.User bot, TdApi.BotCommand cmd) {
+        rxChat.sendMessage("/" + cmd.command);
     }
 }

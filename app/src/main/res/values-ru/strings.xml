@@ -159,4 +159,5 @@
         <item quantity="many">Отключить уведомления на %1$d дней</item>
     </plurals>
     <string name="message_joined_by_link">вступил в группу по пригласительной ссылке</string>
+    <string name="user_status_bot">бот</string>
 </resources>

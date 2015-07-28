@@ -191,7 +191,7 @@ public class MessagePanel extends LinearLayout {
     }
 
     private ObservableLinearLayout getParentView() {
-        return (ObservableLinearLayout) getParent();
+        return (ObservableLinearLayout) getParent().getParent();
     }
 
     //    public boolean isEmojiPopupShown() {
@@ -252,5 +252,9 @@ public class MessagePanel extends LinearLayout {
         super.onDetachedFromWindow();
         Utils.hideKeyboard(input);
 
+    }
+
+    public EditText getInput() {
+        return input;
     }
 }
