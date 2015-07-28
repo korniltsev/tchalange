@@ -12,12 +12,12 @@ import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.photoview.PhotoView;
 
-class WebPageVH extends BaseAvatarVH {
+class WebPagePreviewVH extends BaseAvatarVH {
     private final PhotoMessageView image;
     private final TextView link;
 
 
-    public WebPageVH(View itemView, final Adapter adapter) {
+    public WebPagePreviewVH(View itemView, final Adapter adapter) {
         super(itemView, adapter);
         image = (PhotoMessageView) itemView.findViewById(R.id.image);
 
@@ -51,7 +51,12 @@ class WebPageVH extends BaseAvatarVH {
         TdApi.Message msg = ((RxChat.MessageItem) item).msg;
         final TdApi.MessageWebPage webPage = (TdApi.MessageWebPage) msg.message;
 
-        image.load(webPage.webPage.photo, null);
+        if (webPage.webPage.photo.id == 0){
+            image.setVisibility(View.GONE);
+        } else {
+            image.setVisibility(View.VISIBLE);
+            image.load(webPage.webPage.photo, null);
+        }
         link.setText(webPage.text);
     }
 }

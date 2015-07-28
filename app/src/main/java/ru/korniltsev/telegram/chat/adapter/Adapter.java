@@ -207,7 +207,7 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
             }
             case VIEW_TYPE_WEB_PAGE:{
                 View view = inflate(R.layout.chat_item_webpage, p);
-                return new WebPageVH(view, this);
+                return new WebPagePreviewVH(view, this);
             }
             default: {
                 View view = inflate(R.layout.chat_item_single_text_view, p);
