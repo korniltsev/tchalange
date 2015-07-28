@@ -12,7 +12,7 @@
 
         <item name="colorControlNormal">#e0e0e0</item>
         <item name="colorControlActivated">#579cda</item>
-        <item name="colorControlHighlight">#ff75c1f7</item>
+        <item name="colorControlHighlight">@color/controlHighlight</item>
         <!--<item name="textColorLink">#ef0</item>-->
         <!--android:textColorLink-->
         <!--<item name="android:textColorLink">?android:attr/textColorLinkInverse</item>-->

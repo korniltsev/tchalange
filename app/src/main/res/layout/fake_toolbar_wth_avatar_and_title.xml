@@ -52,7 +52,7 @@
     <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_message"
+
             android:scaleType="center"
             android:background="@drawable/bg_fab_white_shadow"
             android:clickable="true"

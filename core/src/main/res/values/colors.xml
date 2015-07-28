@@ -9,6 +9,7 @@
     <color name="primary_dark">#ff4e759b</color>
     <color name="textColorLink">#ef0</color>
 
+    <color name="controlHighlight">#ff75c1f7</color>
     <color name="debug">#b1000000</color>
     <color name="debug2">#ff4576a2</color>
 
