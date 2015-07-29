@@ -71,16 +71,21 @@ public class RxChat implements UserHolder {
     private ObserverAdapter<TdApi.Message> HANDLE_NEW_MESSAGE = new ObserverAdapter<TdApi.Message>() {
         @Override
         public void onNext(final TdApi.Message tlObject) {
-            handleNewMessage(tlObject);
+            simulateUpdateNewMessage(tlObject);
+//            handleNewMessage(tlObject);
         }
     };
+
+    private void simulateUpdateNewMessage(TdApi.Message tlObject) {
+        client.simulateNewMessage(tlObject);
+    }
 
     final long id;
     final RXClient client;
     public final ChatDB holder;
 
     //    private final PublishSubject<List<TdApi.Message>> subject = PublishSubject.create();
-    private PublishSubject<TdApi.Message> newMessage = PublishSubject.create();
+    private PublishSubject<List<TdApi.Message>> newMessage = PublishSubject.create();
     private PublishSubject<HistoryResponse> historySubject = PublishSubject.create();
     private PublishSubject<DeletedMessages> deletedMessagesSubject = PublishSubject.create();
     private PublishSubject<TdApi.Message> messageChanged = PublishSubject.create();
@@ -102,7 +107,7 @@ public class RxChat implements UserHolder {
         this.holder = holder;
     }
 
-    public Observable<TdApi.Message> getNewMessage() {
+    public Observable<List<TdApi.Message>> getNewMessage() {
         return newMessage;
     }
 
@@ -229,15 +234,19 @@ public class RxChat implements UserHolder {
     //        }
     //    }
 
-    public void handleNewMessage(final TdApi.Message tlObject) {
-
-        sentPhotoHack(tlObject);
-
+    public void handleNewMessage(final List<TdApi.Message> ms) {
         final Set<Integer> tmpSet = tmpUIDs.get();
         tmpSet.clear();
-        getUIDs(tlObject, tmpSet);
+
+        for (TdApi.Message m : ms) {
+            sentPhotoHack(m);
+            getUIDs(m, tmpSet);
+        }
+
+
+
         if (tmpSet.isEmpty()) {
-            addNewMessageAndDispatch(tlObject);
+            addNewMessageAndDispatch(ms);
         } else {
             requestUsers(tmpSet)
                     .observeOn(mainThread())
@@ -248,7 +257,7 @@ public class RxChat implements UserHolder {
                                 TdApi.User user = response.get(i);
                                 holder.saveUser(user);
                             }
-                            addNewMessageAndDispatch(tlObject);
+                            addNewMessageAndDispatch(ms);
                         }
                     });
         }
@@ -277,9 +286,10 @@ public class RxChat implements UserHolder {
         return sentMessageIdToImageLink.get(msg.id);
     }
 
-    private void addNewMessageAndDispatch(TdApi.Message msg) {
-        data.add(0, msg);
-        newMessage.onNext(msg);
+    private void addNewMessageAndDispatch(List<TdApi.Message> ms) {
+        Collections.reverse(ms);
+        data.addAll(0, ms);
+        newMessage.onNext(ms);
     }
 
     public void deleteHistory() {
@@ -357,9 +367,12 @@ public class RxChat implements UserHolder {
                 .subscribe(HANDLE_NEW_MESSAGE);
     }
 
-    public void hackToReadTheMessage(TdApi.Message msg) {
-        client.sendRx(new TdApi.GetChatHistory(id, msg.id, -1, 1))
-                .subscribe(new ObserverAdapter<TdApi.TLObject>());
+    public void hackToReadTheMessage(List<TdApi.Message> msg) {
+        for (TdApi.Message message : msg) {
+            client.sendRx(new TdApi.GetChatHistory(id, message.id, -1, 1))
+                    .subscribe(new ObserverAdapter<TdApi.TLObject>());
+        }
+
     }
 
     public void sendImage(String imageFilePath) {
@@ -478,6 +491,20 @@ public class RxChat implements UserHolder {
     public void sendMessage(TdApi.User sharedContact) {
         TdApi.InputMessageContact content = new TdApi.InputMessageContact(sharedContact.phoneNumber, sharedContact.firstName, sharedContact.lastName);
         sendMessageImpl(content);
+    }
+
+    public void handleNewMessageList(List<TdApi.UpdateNewMessage> allhatsNewMessagesBuffer) {
+        //здесь могут быть сообщения из другого чата!!!
+        List<TdApi.Message> newMessages = new ArrayList<>();
+        for (TdApi.UpdateNewMessage u : allhatsNewMessagesBuffer) {
+            if (u.message.chatId == id) {
+                newMessages.add(u.message);
+
+            }
+        }
+
+        handleNewMessage(newMessages);
+//        handleNewMessage(newMessages);
     }
 
     public static abstract class ChatListItem {

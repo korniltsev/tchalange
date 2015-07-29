@@ -107,23 +107,33 @@ public class NotificationManager {
         return SystemClock.elapsedRealtime();
     }
 
-    public void notifyNewMessage(TdApi.Message msg) {
+    public void notifyOnce(List<TdApi.UpdateNewMessage> ms){
+        for (TdApi.UpdateNewMessage m : ms) {
+            if (notifyNewMessage(m.message)){
+                break;
+            }
+        }
+    }
+    public boolean notifyNewMessage(TdApi.Message msg) {
         if (state == null || !(state instanceof RXAuthState.StateAuthorized)){
-            return;
+            return false;
         }
         int myId = ((RXAuthState.StateAuthorized) state).id;
         if (myId == msg.fromId){//do not notify new messages from self
-            return;
+            return false;
         }
 
         TdApi.NotificationSettings s = this.settings.get(msg.chatId);
         if (s == null) {
             notifyNewMessageImpl();
+            return true;
         } else {
             if (!isMuted(s)) {
                 notifyNewMessageImpl();
+                return true;
             }
         }
+        return false;
     }
 
     public boolean isMuted(TdApi.NotificationSettings s) {

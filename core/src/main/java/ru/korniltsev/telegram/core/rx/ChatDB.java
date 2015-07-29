@@ -8,13 +8,13 @@ import android.util.SparseArray;
 import android.view.WindowManager;
 import junit.framework.Assert;
 import org.drinkless.td.libcore.telegram.TdApi;
-import org.joda.time.DateTime;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.rx.operators.ImmediateBufferOperator;
 import rx.Observable;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
 import javax.inject.Inject;
@@ -36,8 +36,7 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 @Singleton
 public class ChatDB implements UserHolder {
 
-
-
+    public static final long IMMEDIATE_BUFFER_INTERVAl = 128l + 64l;
     private final int chatLimit;
     private final int messageLimit;
     //guarded by ui thread
@@ -71,8 +70,6 @@ public class ChatDB implements UserHolder {
         this.nm = nm;
         prepareForUpdates();
 
-
-
         DisplayMetrics displaymetrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay()
@@ -92,8 +89,8 @@ public class ChatDB implements UserHolder {
                 .subscribe(new ObserverAdapter<RXAuthState.AuthState>() {
                     @Override
                     public void onNext(RXAuthState.AuthState authState) {
-                        if (authState instanceof RXAuthState.StateLogout){
-                            synchronized (userIdToUser){
+                        if (authState instanceof RXAuthState.StateLogout) {
+                            synchronized (userIdToUser) {
                                 userIdToUser.clear();
                             }
                             chatIdToRxChat.clear();
@@ -105,21 +102,19 @@ public class ChatDB implements UserHolder {
                 });
     }
 
-
-
     private void prepareForUpdates() {
         prepareForUpdateNewMessage();
         prepareForUpdateDeleteMessages();
         prepareForUpdateMessageId();
         prepareForUpdateMessageDate();
         //todo this 3 ones are probably needed
-//        prepareForUpdateChatReadInbox();
+        //        prepareForUpdateChatReadInbox();
         prepareForUpdateChatReadOutbox();
         prepareForUpdateUserStatus();
         prepareForUpdateMessageContent();
 
-//        prepareForUpdateChatTitle();
-//        prepareForUpdateChatParticipantsCount();
+        //        prepareForUpdateChatTitle();
+        //        prepareForUpdateChatParticipantsCount();
     }
 
     Map<Integer, TdApi.UserStatus> userIdToUserStatus = new HashMap<>();
@@ -163,23 +158,23 @@ public class ChatDB implements UserHolder {
                 .subscribe(new ObserverAdapter<TdApi.UpdateChatReadOutbox>() {
                     @Override
                     public void onNext(TdApi.UpdateChatReadOutbox response) {
-//                        updateChatMessageList(updateChatReadInbox.chatId);
+                        //                        updateChatMessageList(updateChatReadInbox.chatId);
                         updateCurrentChatList();
                     }
                 });
     }
 
-//    private void prepareForUpdateChatReadInbox() {
-//        client.updateChatReadInbox()
-//                .observeOn(mainThread())
-//                .subscribe(new ObserverAdapter<TdApi.UpdateChatReadInbox>() {
-//                    @Override
-//                    public void onNext(TdApi.UpdateChatReadInbox updateChatReadInbox) {
-//                        updateChatMessageList(updateChatReadInbox.chatId);
-//                        updateCurrentChatList();
-//                    }
-//                });
-//    }
+    //    private void prepareForUpdateChatReadInbox() {
+    //        client.updateChatReadInbox()
+    //                .observeOn(mainThread())
+    //                .subscribe(new ObserverAdapter<TdApi.UpdateChatReadInbox>() {
+    //                    @Override
+    //                    public void onNext(TdApi.UpdateChatReadInbox updateChatReadInbox) {
+    //                        updateChatMessageList(updateChatReadInbox.chatId);
+    //                        updateCurrentChatList();
+    //                    }
+    //                });
+    //    }
 
     private void prepareForUpdateMessageDate() {
         client.updateMessageDate()
@@ -224,30 +219,59 @@ public class ChatDB implements UserHolder {
 
     private void prepareForUpdateNewMessage() {
         client.updateNewMessages()
-                .map(new Func1<TdApi.UpdateNewMessage, TdApi.UpdateNewMessage>() {
+                .lift(new ImmediateBufferOperator<TdApi.UpdateNewMessage>(Schedulers.computation(), IMMEDIATE_BUFFER_INTERVAl))
+                .map(new Func1<List<TdApi.UpdateNewMessage>, List<TdApi.UpdateNewMessage>>() {
                     @Override
-                    public TdApi.UpdateNewMessage call(TdApi.UpdateNewMessage updateNewMessage) {
-                        parser.parse(updateNewMessage.message);
-                        return updateNewMessage;
+                    public List<TdApi.UpdateNewMessage> call(List<TdApi.UpdateNewMessage> updateNewMessages) {
+//                        Log.d("ImmediateBufferOperator", "handle  " + updateNewMessages.size());
+                        for (TdApi.UpdateNewMessage msg : updateNewMessages) {
+                            parser.parse(msg.message);
+                        }
+                        return updateNewMessages;
                     }
-                })
-                .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.UpdateNewMessage>() {
+                }).observeOn(mainThread())
+                .subscribe(new ObserverAdapter<List<TdApi.UpdateNewMessage>>() {
                     @Override
-                    public void onNext(TdApi.UpdateNewMessage updateNewMessage) {
-                        getRxChat(updateNewMessage.message.chatId)
-                                .handleNewMessage(updateNewMessage.message);
-                        nm.notifyNewMessage(updateNewMessage.message);
+                    public void onNext(List<TdApi.UpdateNewMessage> response) {
+                        tmpChatIds.clear();
+                        for (TdApi.UpdateNewMessage u : response) {
+                            tmpChatIds.add(u.message.chatId);
+                        }
+                        for (Long chatId : tmpChatIds) {
+                            getRxChat(chatId)
+                                    .handleNewMessageList(response);
+                        }
+                        nm.notifyOnce(response);
                         updateCurrentChatList();
                     }
                 });
+
+        //        client.updateNewMessages()
+        //                .map(new Func1<TdApi.UpdateNewMessage, TdApi.UpdateNewMessage>() {
+        //                    @Override
+        //                    public TdApi.UpdateNewMessage call(TdApi.UpdateNewMessage updateNewMessage) {
+        //                        parser.parse(updateNewMessage.message);
+        //                        return updateNewMessage;
+        //                    }
+        //                })
+        //                .observeOn(mainThread())
+        //                .subscribe(new ObserverAdapter<TdApi.UpdateNewMessage>() {
+        //                    @Override
+        //                    public void onNext(TdApi.UpdateNewMessage updateNewMessage) {
+        //                        getRxChat(updateNewMessage.message.chatId)
+        //                                .handleNewMessage(updateNewMessage.message);
+        //                        nm.notifyNewMessage(updateNewMessage.message);
+        //                        updateCurrentChatList();
+        //                    }
+        //                });
     }
 
-//    private void updateChatMessageList(long id){
-//        getRxChat(id)
-//                .updateCurrentMessageList();
-//    }
+    final Set<Long> tmpChatIds = new HashSet<>();
 
+    //    private void updateChatMessageList(long id){
+    //        getRxChat(id)
+    //                .updateCurrentMessageList();
+    //    }
 
     public void updateCurrentChatList() {
         checkMainThread();
@@ -259,16 +283,15 @@ public class ChatDB implements UserHolder {
     }
 
     public void saveUsers(SparseArray<TdApi.User> us) {
-        for(int i = 0; i < us.size(); i++) {
+        for (int i = 0; i < us.size(); i++) {
             TdApi.User obj = us.get(
                     us.keyAt(i));
             saveUser(obj);
         }
     }
 
-
-    class  ChatPortion {
-        final TdApi.Chats  cs ;
+    class ChatPortion {
+        final TdApi.Chats cs;
         final SparseArray<TdApi.User> us;
 
         public ChatPortion(TdApi.Chats cs, SparseArray<TdApi.User> us) {
@@ -276,12 +299,14 @@ public class ChatDB implements UserHolder {
             this.us = us;
         }
     }
+
     //request new portion
     public void requestPortion() {
         requestImpl(chatsList.size(), chatLimit, true);
     }
 
     final Set<Integer> tmpIds = new HashSet<>();
+
     private void requestImpl(int offset, int limit, final boolean historyRequest) {
         Assert.assertNull(chatsRequest);
         chatsRequest = client.getChats(offset, limit)
@@ -319,8 +344,6 @@ public class ChatDB implements UserHolder {
                 })
                 .observeOn(mainThread());
 
-
-
         chatsRequest.subscribe(new ObserverAdapter<ChatPortion>() {
             @Override
             public void onNext(ChatPortion p) {
@@ -340,8 +363,6 @@ public class ChatDB implements UserHolder {
             }
         });
     }
-
-
 
     public Observable<List<TdApi.Chat>> chatList() {
         checkMainThread();
@@ -401,7 +422,7 @@ public class ChatDB implements UserHolder {
 
     public static class Portion {
         public final List<TdApi.Message> ms;
-//        public final List<RxChat.ChatListItem> items;
+        //        public final List<RxChat.ChatListItem> items;
         public final SparseArray<TdApi.User> us;
 
         public Portion(List<TdApi.Message> ms, List<TdApi.User> us) {

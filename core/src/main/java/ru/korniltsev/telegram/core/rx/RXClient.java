@@ -472,6 +472,10 @@ public class RXClient {
                 .map(CAST_TO_USER_FULL);
     }
 
+    public void simulateNewMessage(TdApi.Message tlObject) {
+        globalSubject2.onNext(new TdApi.UpdateNewMessage(tlObject));
+    }
+
     static class RxClientException extends Exception {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;

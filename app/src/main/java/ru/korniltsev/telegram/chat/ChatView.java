@@ -295,7 +295,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
 
 
-    public void addNewMessage(TdApi.Message message) {
+    public void addNewMessages(List<TdApi.Message> ms) {
         boolean scrollDown;
         int firstFullVisible = layout.findFirstCompletelyVisibleItemPosition();
         if (firstFullVisible == 0) {
@@ -308,9 +308,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             }
         }
         List<RxChat.ChatListItem> data = adapter.getData();
-        List<RxChat.ChatListItem> prepend= splitter.prepend(data, message);
+        final List<RxChat.ChatListItem> splitNewMessages = splitter.split(ms);
+        List<RxChat.ChatListItem> prepend = splitter.prepend(data, splitNewMessages);
 
-        Collections.reverse(prepend);
+//        Collections.reverse(prepend);
         adapter.addFirst(prepend);
         if (scrollDown) {
             layout.scrollToPosition(0);

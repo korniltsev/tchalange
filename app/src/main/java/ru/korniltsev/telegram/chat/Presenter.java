@@ -219,12 +219,12 @@ public class Presenter extends ViewPresenter<ChatView>
         );
         subscription.add(
                 rxChat.getNewMessage()
-                        .subscribe(new ObserverAdapter<TdApi.Message>() {
+                        .subscribe(new ObserverAdapter<List<TdApi.Message>>() {
                                        @Override
-                                       public void onNext(TdApi.Message chatListItems) {
+                                       public void onNext(List<TdApi.Message> ms) {
                                            getView()
-                                                   .addNewMessage(chatListItems);
-                                           rxChat.hackToReadTheMessage(chatListItems);
+                                                   .addNewMessages(ms);
+                                           rxChat.hackToReadTheMessage(ms);
                                        }
                                    }
                         ));

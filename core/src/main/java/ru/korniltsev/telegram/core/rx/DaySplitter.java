@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.core.rx;
 
+import junit.framework.Assert;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -11,6 +12,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static junit.framework.Assert.assertTrue;
 
 public class DaySplitter {
 
@@ -36,6 +39,10 @@ public class DaySplitter {
         return new DateTime(localTime);
     }
 
+    //  0 item
+    //  1 separator
+    //  2 item
+    //  3 separator
     public List<RxChat.ChatListItem> split(List<TdApi.Message> ms) {
         if (ms.isEmpty()) {
             return new ArrayList<>();
@@ -76,27 +83,31 @@ public class DaySplitter {
         }
     }
 
-    public List<RxChat.ChatListItem> prepend(List<RxChat.ChatListItem> data, TdApi.Message message) {
-        boolean addDateItem = false;
+    public List<RxChat.ChatListItem> prepend(List<RxChat.ChatListItem> data, List<RxChat.ChatListItem> newMessages) {
+        assertTrue(newMessages.size() > 1);//message item + date item
+
         if (data.isEmpty()) {
-            addDateItem = true;
+            return newMessages;
         } else {
             RxChat.MessageItem firstMessage = (RxChat.MessageItem) data.get(0);
-            if (!hasTheSameDay(message, firstMessage.msg)) {
-                addDateItem = true;
+            RxChat.MessageItem lastNewMessage = (RxChat.MessageItem) newMessages.get(newMessages.size() - 2);
+            if (hasTheSameDay(lastNewMessage.msg, firstMessage.msg)) {
+                final RxChat.ChatListItem removedDateItem = newMessages.remove(newMessages.size() - 1);
+                assertTrue(removedDateItem instanceof RxChat.DaySeparatorItem);
             }
         }
-        RxChat.MessageItem newMessageItem = new RxChat.MessageItem(message);
-        if (addDateItem) {
-            return Arrays.asList(
-                    createSeparator(message),
-                    newMessageItem
-            );
-        } else {
-            return Collections.<RxChat.ChatListItem>singletonList(
-                    newMessageItem
-            );
-        }
+        return newMessages;
+//        RxChat.MessageItem newMessageItem = new RxChat.MessageItem(message);
+//        if (addDateItem) {
+//            return Arrays.asList(
+//                    createSeparator(message),
+//                    newMessageItem
+//            );
+//        } else {
+//            return Collections.<RxChat.ChatListItem>singletonList(
+//                    newMessageItem
+//            );
+//        }
     }
 
     //notice: may not insert the NewMessagesItem!!
