@@ -134,8 +134,8 @@
     <string name="invalid_code_empty">Код активации не может быть пустым</string>
     <string name="choose_your_password_2">Введите Ваш пароль повторно</string>
     <string name="passcode_timing_how_to">Запрашивать пароль, в случае если приложение свернуто некоторое время</string>
-    <string name="add_member">Add member</string>
-    <string name="delete_and_leave">Delete and leave</string>
+    <string name="add_member">Добавить участника</string>
+    <string name="delete_and_leave">Удалить и покинуть</string>
     <string name="notifications_enabled">Включить</string>
     <string name="notifications_disabled">Выключить</string>
     <string name="menu_share">Share</string>
