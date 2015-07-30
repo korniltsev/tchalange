@@ -62,7 +62,7 @@ public class EditPasscodeView extends LinearLayout implements HandlesBack{
 
         ToolbarUtils.initToolbar(this)
                 .pop()
-                .setTitle(R.string.edit_name);
+                .setTitle(R.string.passcode_lock);
 
         timingViews = Arrays.asList(
                 findViewById(R.id.timing_howto),

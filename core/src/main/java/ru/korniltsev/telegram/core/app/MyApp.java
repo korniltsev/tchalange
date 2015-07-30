@@ -30,6 +30,7 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        System.setProperty("rx.scheduler.jdk6.purge-force", "true");
         maximizeCurrentThreadPriority();
         //        final CrashlyticsCore.Builder builder = new CrashlyticsCore.Builder();
 
