@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
@@ -76,6 +78,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     private TdApi.BotInfoGeneral commands;
     private BotCommandsAdapter botsCommandAdapter;
+    private LinearLayout botReplyKeyboard;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -147,6 +150,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
         botsCommandList = ((RecyclerView) findViewById(R.id.bot_commands_list));
         botsCommandList.setLayoutManager(new LinearLayoutManager(getContext()));
+        botReplyKeyboard = ((LinearLayout) findViewById(R.id.bot_reply_keyboard));
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -457,6 +461,27 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         });
     }
 
+
+    public void showKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
+        if (replyMarkup.rows == null){
+            return;
+        }
+        botReplyKeyboard.setVisibility(View.VISIBLE);
+        botReplyKeyboard.removeAllViews();
+        for (String[] rowStr : replyMarkup.rows) {
+            final Context ctx = getContext();
+            final LinearLayout row = new LinearLayout(ctx);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (String s : rowStr) {
+                final Button button = new Button(ctx);
+                button.setText(s);
+                final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.weight = 1;
+                row.addView(button, lp);
+            }
+            botReplyKeyboard.addView(row, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+    }
 
     private class EmptyViewHelper extends RecyclerView.AdapterDataObserver {
         @Override

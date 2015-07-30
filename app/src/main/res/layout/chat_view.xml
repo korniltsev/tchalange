@@ -34,7 +34,6 @@
 
             />
 
-
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:layout_marginTop="56dp"
@@ -95,8 +94,17 @@
                     android:background="@drawable/bg_keyboard_tab"
                     />
         </ru.korniltsev.telegram.chat.adapter.view.MessagePanel>
-    </LinearLayout>
+        <LinearLayout
+                android:id="@+id/bot_reply_keyboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:visibility="gone"
+                >
 
+        </LinearLayout>
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
             android:id="@+id/bot_commands_list"

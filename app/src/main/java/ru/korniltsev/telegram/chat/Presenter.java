@@ -93,8 +93,6 @@ public class Presenter extends ViewPresenter<ChatView>
             final TdApi.PrivateChatInfo info = (TdApi.PrivateChatInfo) chat.type;
             userFullRequest = client.getUserFull(info.user.id)
                     .observeOn(mainThread());
-
-
         }
     }
 
@@ -134,12 +132,10 @@ public class Presenter extends ViewPresenter<ChatView>
             @Override
             public void onNext(TdApi.UserFull response) {
                 System.out.println();
-                if (response.botInfo instanceof TdApi.BotInfoGeneral){
+                if (response.botInfo instanceof TdApi.BotInfoGeneral) {
                     final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
                     getView().setCommands(response.user, i);
-
                 }
-
             }
         });
     }
@@ -166,7 +162,7 @@ public class Presenter extends ViewPresenter<ChatView>
         getView().setPrivateChatTitle(user);
         final TdApi.UserStatus userStatus = rxChat.holder.getUserStatus(user);
 
-        if (user.type instanceof TdApi.UserTypeBot){
+        if (user.type instanceof TdApi.UserTypeBot) {
             getView().setPrivateChatSubtitle(getView().getContext().getString(R.string.user_status_bot));
         } else {
             getView().setPrivateChatSubtitle(
@@ -224,6 +220,7 @@ public class Presenter extends ViewPresenter<ChatView>
                                        public void onNext(List<TdApi.Message> ms) {
                                            getView()
                                                    .addNewMessages(ms);
+//                                           showBotKeyboard(ms);
                                            rxChat.hackToReadTheMessage(ms);
                                        }
                                    }
@@ -299,6 +296,34 @@ public class Presenter extends ViewPresenter<ChatView>
                                 onActivityResult(response.request, response.result, response.data);
                             }
                         }));
+    }
+
+    private void showBotKeyboard(List<TdApi.Message> ms) {
+        for (int i = ms.size() - 1; i >= 0; i--) {
+            final TdApi.Message msg = ms.get(i);
+            if (showKeyboardForMessage(msg)) {
+                break;
+            }
+        }
+    }
+
+    private boolean showKeyboardForMessage(TdApi.Message msg) {
+        //todo should save last shown, but not here - in RxChat
+        if (msg.fromId == path.me.id) {
+            return false;
+        }
+        final TdApi.ReplyMarkup replyMarkup = msg.replyMarkup;
+        if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
+            return true;
+        } else if (replyMarkup instanceof TdApi.ReplyMarkupHideKeyboard) {
+            return true;
+        } else if (replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
+            getView().showKeyboard(((TdApi.ReplyMarkupShowKeyboard) replyMarkup));
+            return true;
+        } else if (replyMarkup instanceof TdApi.ReplyMarkupNone) {
+            return false;
+        }
+        return false;
     }
 
     private Observable<TdApi.UpdateChatParticipantsCount> updatesChatsParticipantCount() {
