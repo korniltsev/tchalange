@@ -11,8 +11,9 @@ import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.photoview.PhotoView;
 
@@ -31,7 +32,7 @@ public class ChatPhotoChangedVH extends RealBaseVH {
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RxChat.MessageItem item = (RxChat.MessageItem) adapter.getItem(getPosition());
+                MessageItem item = (MessageItem) adapter.getItem(getPosition());
                 TdApi.MessageChatChangePhoto change = (TdApi.MessageChatChangePhoto) item.msg.message;
                 Flow.get(v.getContext())
                         .set(new PhotoView(change.photo));
@@ -41,8 +42,8 @@ public class ChatPhotoChangedVH extends RealBaseVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
-        TdApi.Message msg = ((RxChat.MessageItem) item).msg;
+    public void bind(ChatListItem item, long lastReadOutbox) {
+        TdApi.Message msg = ((MessageItem) item).msg;
         SpannableStringBuilder sb = getTextFor(res, msg, adapter.getUserHolder());
         //        String text =  this.text.getResources().getString(R.string.message_changed_group_photo, userName);
         this.text.setText(sb);

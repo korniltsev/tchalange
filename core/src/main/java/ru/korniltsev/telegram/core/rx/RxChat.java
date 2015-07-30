@@ -7,6 +7,7 @@ import android.util.SparseArray;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Func1;
@@ -505,38 +506,6 @@ public class RxChat implements UserHolder {
 
         handleNewMessage(newMessages);
 //        handleNewMessage(newMessages);
-    }
-
-    public static abstract class ChatListItem {
-
-    }
-
-    public static class NewMessagesItem extends ChatListItem {
-        public final int newMessagesCount;
-        public final long id;
-
-        public NewMessagesItem(int newMessagesCount, long id) {
-            this.newMessagesCount = newMessagesCount;
-            this.id = id;
-        }
-    }
-
-    public static class MessageItem extends ChatListItem {
-        public final TdApi.Message msg;
-
-        public MessageItem(TdApi.Message msg) {
-            this.msg = msg;
-        }
-    }
-
-    public static class DaySeparatorItem extends ChatListItem {
-        public final long id;
-        public final DateTime day;//millis
-
-        public DaySeparatorItem(long id, DateTime day) {
-            this.id = id;
-            this.day = day;
-        }
     }
 
     public int getMessageState(TdApi.Message msg, long lastReadOutbox, int myId) {

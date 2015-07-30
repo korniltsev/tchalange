@@ -29,6 +29,10 @@ import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.DaySplitter;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
+import ru.korniltsev.telegram.core.rx.items.NewMessagesItem;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
@@ -37,7 +41,6 @@ import rx.functions.Action1;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -256,7 +259,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     public void initList(RxChat rxChat) {
         adapter.setChat(rxChat);
         List<TdApi.Message> messages = rxChat.getMessages();
-        List<RxChat.ChatListItem> split = splitter.split(messages);
+        List<ChatListItem> split = splitter.split(messages);
         adapter.setData(split);
         CheckRecyclerViewSpan.check(list, viewSpanNotFilledAction);
     }
@@ -311,9 +314,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                 scrollDown = false;
             }
         }
-        List<RxChat.ChatListItem> data = adapter.getData();
-        final List<RxChat.ChatListItem> splitNewMessages = splitter.split(ms);
-        List<RxChat.ChatListItem> prepend = splitter.prepend(data, splitNewMessages);
+        List<ChatListItem> data = adapter.getData();
+        final List<ChatListItem> splitNewMessages = splitter.split(ms);
+        List<ChatListItem> prepend = splitter.prepend(data, splitNewMessages);
 
 //        Collections.reverse(prepend);
         adapter.addFirst(prepend);
@@ -323,9 +326,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     }
 
     public void addHistory(TdApi.Chat chat, RxChat.HistoryResponse history) {
-        final List<RxChat.ChatListItem> split = splitter.split(history.ms);
+        final List<ChatListItem> split = splitter.split(history.ms);
         if (history.showUnreadMessages) {
-            final RxChat.NewMessagesItem newItem = splitter.insertNewMessageItem(split, chat, myId);
+            final NewMessagesItem newItem = splitter.insertNewMessageItem(split, chat, myId);
             adapter.addAll(split);
             final int i = adapter.getData()
                     .indexOf(newItem);
@@ -356,28 +359,28 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     private void deleteMessage(TdApi.Message deletedMsg) {
         //todo wtf, why so complex
-        final List<RxChat.ChatListItem> data = adapter.getData();
+        final List<ChatListItem> data = adapter.getData();
         for (int i = 0; i < data.size(); i++) {
-            RxChat.ChatListItem item = data.get(i);
-            if (item instanceof RxChat.MessageItem) {
-                final TdApi.Message msg = ((RxChat.MessageItem) item).msg;
+            ChatListItem item = data.get(i);
+            if (item instanceof MessageItem) {
+                final TdApi.Message msg = ((MessageItem) item).msg;
                 if (msg == deletedMsg) {
                     adapter.deleteItem(i);
                     if (i != 0){//not first item
-                        final RxChat.ChatListItem next = data.get(i-1);
+                        final ChatListItem next = data.get(i-1);
                         //next item is not message
-                        if (!(next instanceof RxChat.MessageItem)){
+                        if (!(next instanceof MessageItem)){
                             if (i < data.size()) {
-                                final RxChat.ChatListItem prev = data.get(i);
-                                if (prev instanceof RxChat.DaySeparatorItem){
+                                final ChatListItem prev = data.get(i);
+                                if (prev instanceof DaySeparatorItem){
                                     adapter.deleteItem(i);//delete separator
                                 }
                             }
                         }
                     } else {
                         if (i < data.size()) {
-                            final RxChat.ChatListItem prev = data.get(i);
-                            if (prev instanceof RxChat.DaySeparatorItem){
+                            final ChatListItem prev = data.get(i);
+                            if (prev instanceof DaySeparatorItem){
                                 adapter.deleteItem(i);//delete separator
                             }
                         }
@@ -389,7 +392,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
 
         if (!data.isEmpty()){
-            if (data.get(0) instanceof RxChat.NewMessagesItem) {
+            if (data.get(0) instanceof NewMessagesItem) {
                 adapter.deleteItem(0);
 
             }
@@ -397,11 +400,11 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     }
 
     public void messageChanged(TdApi.Message response) {
-        final List<RxChat.ChatListItem> data = adapter.getData();
+        final List<ChatListItem> data = adapter.getData();
         for (int i = 0; i < data.size(); i++) {
-            RxChat.ChatListItem it = data.get(i);
-            if (it instanceof RxChat.MessageItem) {
-                final TdApi.Message msg = ((RxChat.MessageItem) it).msg;
+            ChatListItem it = data.get(i);
+            if (it instanceof MessageItem) {
+                final TdApi.Message msg = ((MessageItem) it).msg;
                 if (msg == response) {
                     adapter.notifyItemChanged(i);
                 }
@@ -442,13 +445,13 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             @Override
             public void afterTextChanged(Editable s) {
                 final int result = botsCommandAdapter.filter(s.toString());
-                if (result == 0){
+                if (result == 0) {
                     botsCommandList.setVisibility(View.GONE);
-                }   else{
+                } else {
                     botsCommandList.setVisibility(View.VISIBLE);
-                    int newHeight ;
+                    int newHeight;
                     final int commandHeight = calc.dp(36);
-                    if (result > 3){
+                    if (result > 3) {
                         newHeight = (int) (3.5f * commandHeight);
                     } else {
                         newHeight = commandHeight * result;

@@ -5,7 +5,8 @@ import android.widget.TextView;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -33,8 +34,8 @@ public class DaySeparatorVH extends RealBaseVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
-        RxChat.DaySeparatorItem s = (RxChat.DaySeparatorItem) item;
+    public void bind(ChatListItem item, long lastReadOutbox) {
+        DaySeparatorItem s = (DaySeparatorItem) item;
         text.setText(FORMATTER.print(s.day));
 
     }

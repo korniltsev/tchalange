@@ -10,13 +10,17 @@ import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
+import ru.korniltsev.telegram.core.rx.items.NewMessagesItem;
 
 // Message types left:
 
 //        MessageContact extends MessageContent {
 
 //
-public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
+public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     public static final int VIEW_TYPE_PHOTO = 0;
     public static final int VIEW_TYPE_TEXT = 1;
@@ -59,14 +63,14 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
 
     @Override
     public long getItemId(int position) {
-        RxChat.ChatListItem item = getItem(position);
-        if (item instanceof RxChat.MessageItem){
-            TdApi.Message msg = ((RxChat.MessageItem) item).msg;
+        ChatListItem item = getItem(position);
+        if (item instanceof MessageItem){
+            TdApi.Message msg = ((MessageItem) item).msg;
             return getIdForMessageItem(msg);
-        } else if (item instanceof RxChat.DaySeparatorItem) {
-            return ((RxChat.DaySeparatorItem) item).id;
-        } else if (item instanceof RxChat.NewMessagesItem){
-            return ((RxChat.NewMessagesItem) item).id;
+        } else if (item instanceof DaySeparatorItem) {
+            return ((DaySeparatorItem) item).id;
+        } else if (item instanceof NewMessagesItem){
+            return ((NewMessagesItem) item).id;
         } else {
             throw new IllegalArgumentException();
         }
@@ -82,9 +86,9 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
 
     @Override
     public int getItemViewType(int position) {
-        RxChat.ChatListItem item = getItem(position);
-        if (item instanceof RxChat.MessageItem){
-            RxChat.MessageItem rawMsg = (RxChat.MessageItem) item;
+        ChatListItem item = getItem(position);
+        if (item instanceof MessageItem){
+            MessageItem rawMsg = (MessageItem) item;
             TdApi.MessageContent message = rawMsg.msg.message;
             if (message instanceof TdApi.MessagePhoto) {
                 return VIEW_TYPE_PHOTO;
@@ -103,11 +107,11 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
                     if (position == getItemCount() -1){
                         return VIEW_TYPE_TEXT_FORWARD;
                     }
-                    RxChat.ChatListItem nextItem = getItem(position + 1);
-                    if (!(nextItem instanceof RxChat.MessageItem)){
+                    ChatListItem nextItem = getItem(position + 1);
+                    if (!(nextItem instanceof MessageItem)){
                         return VIEW_TYPE_TEXT_FORWARD;
                     }
-                    TdApi.Message nextMessage = ((RxChat.MessageItem) nextItem).msg;
+                    TdApi.Message nextMessage = ((MessageItem) nextItem).msg;
                     if (nextMessage.message instanceof TdApi.MessageText){
                         if (nextMessage.fromId == rawMsg.msg.fromId
                                 && nextMessage.forwardFromId != 0
@@ -133,7 +137,7 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
             } else {
                 return VIEW_TYPE_SINGLE_TEXT_VIEW;
             }
-        } else if (item instanceof RxChat.NewMessagesItem) {
+        } else if (item instanceof NewMessagesItem) {
             return VIEW_TYPE_NEW_MESSAGES;
         } else {
             return VIEW_TYPE_DAY_SEPARATOR;
@@ -218,7 +222,7 @@ public class Adapter extends BaseAdapter<RxChat.ChatListItem, RealBaseVH> {
 
     @Override
     public void onBindViewHolder(RealBaseVH holder, int position) {
-        RxChat.ChatListItem item1 = getItem(position);
+        ChatListItem item1 = getItem(position);
 //        TdApi.Message item = (TdApi.Message) item1;
         holder.bind(item1, lastReadOutbox);
     }

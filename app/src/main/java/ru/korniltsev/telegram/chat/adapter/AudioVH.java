@@ -4,7 +4,8 @@ import android.view.View;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.AudioMessageView;
-import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
 public class AudioVH extends BaseAvatarVH {
 
@@ -16,9 +17,9 @@ public class AudioVH extends BaseAvatarVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
+    public void bind(ChatListItem item, long lastReadOutbox) {
         super.bind(item, lastReadOutbox);
-        TdApi.Message rawMsg = ((RxChat.MessageItem) item).msg;
+        TdApi.Message rawMsg = ((MessageItem) item).msg;
         TdApi.MessageAudio msg = (TdApi.MessageAudio) rawMsg.message;
         audioView.setAudio(msg.audio);
     }

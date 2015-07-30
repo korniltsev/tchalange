@@ -10,8 +10,9 @@ import android.view.View;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
 import ru.korniltsev.telegram.common.AppUtils;
 
@@ -38,8 +39,8 @@ public class SingleTextViewVH extends RealBaseVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
-        TdApi.Message msgRaw = ((RxChat.MessageItem) item).msg;
+    public void bind(ChatListItem item, long lastReadOutbox) {
+        TdApi.Message msgRaw = ((MessageItem) item).msg;
         TdApi.MessageContent msg = msgRaw.message;
         CharSequence textFor = getTextFor(itemView.getContext(), msgRaw, msg, adapter.getUserHolder());
         text.setText(textFor);

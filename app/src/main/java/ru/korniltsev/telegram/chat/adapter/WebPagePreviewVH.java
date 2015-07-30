@@ -5,12 +5,11 @@ import android.net.Uri;
 import android.view.View;
 import android.widget.TextView;
 import com.crashlytics.android.core.CrashlyticsCore;
-import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
-import ru.korniltsev.telegram.core.rx.RxChat;
-import ru.korniltsev.telegram.photoview.PhotoView;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
 class WebPagePreviewVH extends BaseAvatarVH {
     private final PhotoMessageView image;
@@ -32,8 +31,8 @@ class WebPagePreviewVH extends BaseAvatarVH {
     }
 
     private void openLink() {
-        final RxChat.ChatListItem item = adapter.getItem(getAdapterPosition());
-        final RxChat.MessageItem msg = (RxChat.MessageItem) item;
+        final ChatListItem item = adapter.getItem(getAdapterPosition());
+        final MessageItem msg = (MessageItem) item;
         final TdApi.MessageWebPage webPage = (TdApi.MessageWebPage) msg.msg.message;
 
         try {
@@ -46,9 +45,9 @@ class WebPagePreviewVH extends BaseAvatarVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
+    public void bind(ChatListItem item, long lastReadOutbox) {
         super.bind(item, lastReadOutbox);
-        TdApi.Message msg = ((RxChat.MessageItem) item).msg;
+        TdApi.Message msg = ((MessageItem) item).msg;
         final TdApi.MessageWebPage webPage = (TdApi.MessageWebPage) msg.message;
 
         if (webPage.webPage.photo.id == 0){

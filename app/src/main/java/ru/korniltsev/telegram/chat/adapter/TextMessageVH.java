@@ -5,7 +5,8 @@ import android.view.View;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
 
 class TextMessageVH extends BaseAvatarVH {
@@ -21,9 +22,9 @@ class TextMessageVH extends BaseAvatarVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
+    public void bind(ChatListItem item, long lastReadOutbox) {
         super.bind(item, lastReadOutbox);
-        TdApi.Message rawMsg = ((RxChat.MessageItem) item).msg;
+        TdApi.Message rawMsg = ((MessageItem) item).msg;
 
         TdApi.MessageContent msg = rawMsg.message;
         TdApi.MessageText text = (TdApi.MessageText) msg;

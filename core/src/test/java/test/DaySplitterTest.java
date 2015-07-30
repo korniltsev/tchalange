@@ -4,12 +4,13 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import org.junit.Before;
 import org.junit.Test;
 import ru.korniltsev.telegram.core.rx.DaySplitter;
-import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -71,14 +72,14 @@ public class DaySplitterTest {
         TdApi.Message b = createMessage();
         ms.add(b);
 
-        List<RxChat.ChatListItem> split = daySplitter.split(ms);
+        List<ChatListItem> split = daySplitter.split(ms);
         assertEquals(4, split.size());
-        assertThat(split.get(1), instanceOf(RxChat.DaySeparatorItem.class));
-        assertThat(split.get(3), instanceOf(RxChat.DaySeparatorItem.class));
-        assertThat(split.get(0), instanceOf(RxChat.MessageItem.class));
-        assertThat(split.get(2), instanceOf(RxChat.MessageItem.class));
-        assertEquals(a.id, ((RxChat.MessageItem) split.get(0)).msg.id);
-        assertEquals(b.id, ((RxChat.MessageItem) split.get(2)).msg.id);
+        assertThat(split.get(1), instanceOf(DaySeparatorItem.class));
+        assertThat(split.get(3), instanceOf(DaySeparatorItem.class));
+        assertThat(split.get(0), instanceOf(MessageItem.class));
+        assertThat(split.get(2), instanceOf(MessageItem.class));
+        assertEquals(a.id, ((MessageItem) split.get(0)).msg.id);
+        assertEquals(b.id, ((MessageItem) split.get(2)).msg.id);
     }
 
 
@@ -90,15 +91,15 @@ public class DaySplitterTest {
     public void test(){
         cal.set(Calendar.HOUR_OF_DAY, 4);
 
-        RxChat.DaySeparatorItem separator1 = daySplitter.createSeparator(createMessage());
-        RxChat.DaySeparatorItem separator2 = daySplitter.createSeparator(createMessage());
+        DaySeparatorItem separator1 = daySplitter.createSeparator(createMessage());
+        DaySeparatorItem separator2 = daySplitter.createSeparator(createMessage());
 
         cal.add(Calendar.HOUR_OF_DAY, 1);
-        RxChat.DaySeparatorItem separator3 = daySplitter.createSeparator(createMessage());
+        DaySeparatorItem separator3 = daySplitter.createSeparator(createMessage());
 
         cal.add(Calendar.DAY_OF_YEAR, 1);
         TdApi.Message msg4 = createMessage();
-        RxChat.DaySeparatorItem separator4 = daySplitter.createSeparator(msg4);
+        DaySeparatorItem separator4 = daySplitter.createSeparator(msg4);
 
         assertThat(separator1.id, equalTo(separator2.id));
         assertThat(separator1.day, equalTo(separator2.day));

@@ -4,7 +4,8 @@ import android.content.res.Resources;
 import android.view.View;
 import android.widget.TextView;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.NewMessagesItem;
 
 public class NewMessagesVH extends RealBaseVH {
 
@@ -18,8 +19,8 @@ public class NewMessagesVH extends RealBaseVH {
     }
 
     @Override
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox) {
-        final RxChat.NewMessagesItem i = (RxChat.NewMessagesItem) item;
+    public void bind(ChatListItem item, long lastReadOutbox) {
+        final NewMessagesItem i = (NewMessagesItem) item;
         final String label = res.getQuantityString(R.plurals.n_new_messages, i.newMessagesCount, i.newMessagesCount);
         this.text.setText(label);
     }

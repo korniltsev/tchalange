@@ -1,14 +1,15 @@
 package ru.korniltsev.telegram.core.rx;
 
-import junit.framework.Assert;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import ru.korniltsev.telegram.core.Utils;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
+import ru.korniltsev.telegram.core.rx.items.NewMessagesItem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,22 +44,22 @@ public class DaySplitter {
     //  1 separator
     //  2 item
     //  3 separator
-    public List<RxChat.ChatListItem> split(List<TdApi.Message> ms) {
+    public List<ChatListItem> split(List<TdApi.Message> ms) {
         if (ms.isEmpty()) {
             return new ArrayList<>();
         }
 
-        ArrayList<RxChat.ChatListItem> res = new ArrayList<>();
+        ArrayList<ChatListItem> res = new ArrayList<>();
         TdApi.Message current = ms.get(0);
-        res.add(new RxChat.MessageItem(current));
+        res.add(new MessageItem(current));
         for (int i = 1; i < ms.size(); ++i) {
             TdApi.Message it = ms.get(i);
             if (hasTheSameDay(current, it)) {
-                res.add(new RxChat.MessageItem(it));
+                res.add(new MessageItem(it));
             } else {
 
                 res.add(createSeparator(current));
-                res.add(new RxChat.MessageItem(it));
+                res.add(new MessageItem(it));
             }
             current = it;
         }
@@ -66,34 +67,34 @@ public class DaySplitter {
         return res;
     }
 
-    private final Map<DateTime, RxChat.DaySeparatorItem> cache = new HashMap<>();
+    private final Map<DateTime, DaySeparatorItem> cache = new HashMap<>();
     public static final long ID_NEW_MESSAGES = -1;
     private int counter = -5;
 
-    public RxChat.DaySeparatorItem createSeparator(TdApi.Message msg) {
+    public DaySeparatorItem createSeparator(TdApi.Message msg) {
         DateTime time = localTime(timInMillis(msg))
                 .withTimeAtStartOfDay();
-        RxChat.DaySeparatorItem cached = cache.get(time);
+        DaySeparatorItem cached = cache.get(time);
         if (cached != null) {
             return cached;
         } else {
-            RxChat.DaySeparatorItem newSeparator = new RxChat.DaySeparatorItem(counter--, time);
+            DaySeparatorItem newSeparator = new DaySeparatorItem(counter--, time);
             cache.put(time, newSeparator);
             return newSeparator;
         }
     }
 
-    public List<RxChat.ChatListItem> prepend(List<RxChat.ChatListItem> data, List<RxChat.ChatListItem> newMessages) {
+    public List<ChatListItem> prepend(List<ChatListItem> data, List<ChatListItem> newMessages) {
         assertTrue(newMessages.size() > 1);//message item + date item
 
         if (data.isEmpty()) {
             return newMessages;
         } else {
-            RxChat.MessageItem firstMessage = (RxChat.MessageItem) data.get(0);
-            RxChat.MessageItem lastNewMessage = (RxChat.MessageItem) newMessages.get(newMessages.size() - 2);
+            MessageItem firstMessage = (MessageItem) data.get(0);
+            MessageItem lastNewMessage = (MessageItem) newMessages.get(newMessages.size() - 2);
             if (hasTheSameDay(lastNewMessage.msg, firstMessage.msg)) {
-                final RxChat.ChatListItem removedDateItem = newMessages.remove(newMessages.size() - 1);
-                assertTrue(removedDateItem instanceof RxChat.DaySeparatorItem);
+                final ChatListItem removedDateItem = newMessages.remove(newMessages.size() - 1);
+                assertTrue(removedDateItem instanceof DaySeparatorItem);
             }
         }
         return newMessages;
@@ -111,31 +112,31 @@ public class DaySplitter {
     }
 
     //notice: may not insert the NewMessagesItem!!
-    public RxChat.NewMessagesItem insertNewMessageItem(List<RxChat.ChatListItem> split, TdApi.Chat chat, int myId) {
+    public NewMessagesItem insertNewMessageItem(List<ChatListItem> split, TdApi.Chat chat, int myId) {
         int lastReadIndex = -1;
         for (int i = 0, splitSize = split.size(); i < splitSize; i++) {
-            RxChat.ChatListItem it = split.get(i);
-            if (it instanceof RxChat.MessageItem) {
-                final TdApi.Message msg = ((RxChat.MessageItem) it).msg;
+            ChatListItem it = split.get(i);
+            if (it instanceof MessageItem) {
+                final TdApi.Message msg = ((MessageItem) it).msg;
                 if (msg.id == chat.lastReadInboxMessageId) {
                     lastReadIndex = i;
                 }
             }
         }
-        final RxChat.NewMessagesItem result = new RxChat.NewMessagesItem(chat.unreadCount, ID_NEW_MESSAGES);
+        final NewMessagesItem result = new NewMessagesItem(chat.unreadCount, ID_NEW_MESSAGES);
         if (lastReadIndex == -1) {
             split.add(result);
             return result;
         }
         for (int i = lastReadIndex-1; i >= 0; i--) {
-            RxChat.ChatListItem it = split.get(i);
-            if (it instanceof RxChat.MessageItem){
-                final RxChat.MessageItem messageItem = (RxChat.MessageItem) it;
+            ChatListItem it = split.get(i);
+            if (it instanceof MessageItem){
+                final MessageItem messageItem = (MessageItem) it;
                 final TdApi.Message msg = messageItem.msg;
                 if (msg.fromId != myId) {//income message
                     int insertIndex = i + 1;
                     if (insertIndex < split.size()//есть чо сверху
-                            && split.get(insertIndex) instanceof RxChat.DaySeparatorItem) {//и это сепаратор
+                            && split.get(insertIndex) instanceof DaySeparatorItem) {//и это сепаратор
                         insertIndex++;
                     }
                     split.add(insertIndex, result);

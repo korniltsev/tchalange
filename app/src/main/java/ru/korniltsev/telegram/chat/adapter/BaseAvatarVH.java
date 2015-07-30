@@ -10,6 +10,8 @@ import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
@@ -43,8 +45,8 @@ abstract class BaseAvatarVH extends RealBaseVH {
         v.setTextColor(Colors.USER_NAME_COLOR_STATE_LIST);
     }
 
-    public void bind(RxChat.ChatListItem item, long lastReadOutbox){
-        TdApi.Message msg = ((RxChat.MessageItem) item).msg;
+    public void bind(ChatListItem item, long lastReadOutbox){
+        TdApi.Message msg = ((MessageItem) item).msg;
         TdApi.User user = adapter.getUserHolder().getUser(msg.fromId);
         if (user != null){
             avatar.loadAvatarFor(user);
