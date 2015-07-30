@@ -302,7 +302,7 @@ public class RXClient {
     }
 
     public Observable<TLObject> sendRx(final TdApi.TLFunction function) {
-        final Throwable th = new Throwable();
+//        final Throwable th = new Throwable();
         return Observable.create(new Observable.OnSubscribe<TLObject>() {
             @Override
             public void call(final Subscriber<? super TLObject> s) {
@@ -311,7 +311,7 @@ public class RXClient {
                     @Override
                     public void onResult(TLObject object) {
                         try {
-                            dispatchResult(object, s, function, th);
+                            dispatchResult(object, s, function);
                         } catch (Exception e) {
                             Log.e("ObserverAdapter", "error dispatching error", e);
                             CrashlyticsCore.getInstance()
@@ -323,7 +323,7 @@ public class RXClient {
         });
     }
 
-    private void dispatchResult(TLObject object, Subscriber<? super TLObject> s, TdApi.TLFunction function, Throwable th) {
+    private void dispatchResult(TLObject object, Subscriber<? super TLObject> s, TdApi.TLFunction function) {
         if (object instanceof TdApi.Error) {
             TdApi.Error err = (TdApi.Error) object;
             Log.e("RxClient", (err).text);
@@ -336,7 +336,7 @@ public class RXClient {
                     }
                 });
             } else {
-                s.onError(new RxClientException(err, function, th));
+                s.onError(new RxClientException(err, function));
             }
         } else {
             s.onNext(object);
@@ -480,8 +480,8 @@ public class RXClient {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;
 
-        public RxClientException(TdApi.Error error, TdApi.TLFunction f, Throwable th) {
-            super(error.text + " " + f.toString(), th);
+        public RxClientException(TdApi.Error error, TdApi.TLFunction f) {
+            super("error " + error.text + " sending " + f.toString());
             this.error = error;
             this.f = f;
         }
