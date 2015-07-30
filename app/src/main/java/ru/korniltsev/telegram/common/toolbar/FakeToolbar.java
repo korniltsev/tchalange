@@ -124,7 +124,7 @@ public class FakeToolbar extends FrameLayout {
             fabVisible = false;
             fab.clearAnimation();
             fab.animate()
-//                    .alpha(0f)
+                    .alpha(0f)
                     .scaleX(0f)
                     .scaleY(0f)
             .setDuration(128);
@@ -133,7 +133,7 @@ public class FakeToolbar extends FrameLayout {
             fabVisible = true;
             fab.clearAnimation();
             fab.animate()
-//                    .alpha(1f)
+                    .alpha(1f)
                     .scaleX(1f)
                     .scaleY(1f)
                     .setDuration(128);
