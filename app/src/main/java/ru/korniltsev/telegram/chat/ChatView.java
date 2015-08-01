@@ -1,5 +1,7 @@
 package ru.korniltsev.telegram.chat;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
@@ -13,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -58,6 +61,7 @@ import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
 public class ChatView extends ObservableLinearLayout implements HandlesBack {
     public static final int SHOW_SCROLL_DOWN_BUTTON_ITEMS_COUNT = 10;
+    public static final DecelerateInterpolator INTERPOLATOR = new DecelerateInterpolator(1.5f);
     @Inject Presenter presenter;
     @Inject RxGlide picasso;
     @Inject DpCalculator calc;
@@ -78,6 +82,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private View emptyViewBotInfo;
     private TextView botInfoDescription;
     private LinearLayout botReplyKeyboard;
+    private View botCommandsListConainer;
 
     private Adapter adapter;
 
@@ -100,6 +105,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private View botStartPanel;
     private TextView btnBotStart;
     private Subscription clickedSpansSubscription;
+    private View botCommandsShadow;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -181,6 +187,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
         botStartPanel = findViewById(R.id.bot_start_panel);
         btnBotStart = (TextView) findViewById(R.id.btn_bot_start);
+        botCommandsShadow = findViewById(R.id.bot_command_shadow);
+        botCommandsListConainer = findViewById(R.id.bot_commands_list_container);
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -486,6 +494,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         });
     }
 
+    boolean botCommandListVisible = false;
+
     public void setCommands(TdApi.User user, TdApi.BotInfoGeneral i) {
         this.commands = i;
         List<BotCommandsAdapter.Record> cs = new ArrayList<>();
@@ -507,9 +517,33 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             public void afterTextChanged(Editable s) {
                 final int result = botsCommandAdapter.filter(s.toString());
                 if (result == 0) {
-                    botsCommandList.setVisibility(View.GONE);
+                    if (botCommandListVisible) {
+
+                        botCommandsShadow.clearAnimation();
+                        botCommandsShadow.animate()
+                                .alpha(0f)
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        botCommandsShadow.setVisibility(View.GONE);
+                                    }
+                                });
+
+                        botsCommandList.clearAnimation();
+                        botsCommandList.animate()
+                                .setDuration(128)
+                                .setInterpolator(INTERPOLATOR)
+                                .translationY(botsCommandList.getHeight())
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        botCommandsListConainer.setVisibility(View.GONE);
+                                    }
+                                });
+                    }
+                    botCommandListVisible = false;
                 } else {
-                    botsCommandList.setVisibility(View.VISIBLE);
+
                     int newHeight;
                     final int commandHeight = calc.dp(36);
                     if (result > 3) {
@@ -518,9 +552,29 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                         newHeight = commandHeight * result;
                     }
                     newHeight += botsCommandList.getPaddingTop();
-                    final ViewGroup.LayoutParams lp = botsCommandList.getLayoutParams();
+                    final ViewGroup.LayoutParams lp = botCommandsListConainer.getLayoutParams();
                     lp.height = newHeight;
-                    botsCommandList.setLayoutParams(lp);
+
+                    if (!botCommandListVisible) {
+                        botCommandsListConainer.setVisibility(View.VISIBLE);
+                        botsCommandList.clearAnimation();
+                        botsCommandList.setTranslationY(newHeight);
+                        botsCommandList.animate()
+                                .translationY(0)
+                                .setDuration(128)
+                                .setInterpolator(INTERPOLATOR)
+                                .setListener(null);
+
+
+                        botCommandsShadow.setVisibility(View.VISIBLE);
+                        botCommandsShadow.clearAnimation();
+                        botCommandsShadow.setAlpha(0f);
+                        botCommandsShadow.animate()
+                                .setListener(null)
+                                .alpha(0.4f);
+                    }
+                    botCommandsListConainer.setLayoutParams(lp);
+                    botCommandListVisible = true;
                 }
             }
         });

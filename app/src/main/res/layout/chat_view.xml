@@ -94,17 +94,29 @@
 
         </LinearLayout>
     </LinearLayout>
-
-    <ru.korniltsev.telegram.chat.bot.BotCommandsRecyclerView
-            android:id="@+id/bot_commands_list"
+    <View
+            android:id="@+id/bot_command_shadow"
             android:layout_width="match_parent"
-            android:layout_height="128dp"
-            android:background="#fff"
-            android:layout_gravity="bottom"
+            android:layout_height="match_parent"
+            android:background="#000000"
             android:visibility="gone"
             android:layout_marginBottom="48dp"
-            android:paddingTop="2dp"
             />
+    <!-- frame to create translate animations-->
+    <FrameLayout
+            android:id="@+id/bot_commands_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:visibility="gone"
+            android:layout_marginBottom="48dp">
+        <ru.korniltsev.telegram.chat.bot.BotCommandsRecyclerView
+                android:id="@+id/bot_commands_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="2dp"
+                />
+    </FrameLayout>
 
     <View
             android:id="@+id/scroll_down"
@@ -139,6 +151,6 @@
         <View android:layout_width="match_parent"
               android:layout_height="1dp"
               android:background="#ededed"/>
-
     </FrameLayout>
+
 </ru.korniltsev.telegram.chat.ChatView>
