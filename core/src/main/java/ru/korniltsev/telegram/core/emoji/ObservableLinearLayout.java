@@ -9,6 +9,8 @@
 package ru.korniltsev.telegram.core.emoji;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
@@ -19,24 +21,31 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import mortar.dagger1support.ObjectGraphService;
 
+import javax.inject.Inject;
 import java.lang.reflect.Field;
 
 public class ObservableLinearLayout extends FrameLayout {
 
     private final int statusBarHeight;
     private final Point displaySize = new Point();
+    private final SharedPreferences prefs;
     private Rect rect = new Rect();
     private int keyboardHeight;
     private ObservableLinearLayout.CallBack cb;
 
+    @Inject DpCalculator calc;
+
     public interface CallBack {
-        void onLayout(int keyboardHeight, boolean landscape);
+        void onLayout(int keyboardHeight);
     }
 
     public ObservableLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        ObjectGraphService.inject(context, this);
         setWillNotDraw(false);
+        prefs = context.getSharedPreferences("EmojiPopup", Context.MODE_PRIVATE);
 
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -64,13 +73,15 @@ public class ObservableLinearLayout extends FrameLayout {
         int usableViewHeight = rootView.getHeight() - statusBarHeight - getViewInset(rootView);
         this.getWindowVisibleDisplayFrame(rect);
         keyboardHeight = usableViewHeight - (rect.bottom - rect.top);
-        final boolean landscape = displaySize.x > displaySize.y;
+        if (keyboardHeight >0 ){
+            saveKeyboardHeight(keyboardHeight);
+        }
         if (cb != null) {
             post(new Runnable() {
                 @Override
                 public void run() {
                     if (cb != null) {
-                        cb.onLayout(keyboardHeight, landscape);
+                        cb.onLayout(keyboardHeight);
                     }
                 }
             });
@@ -99,5 +110,30 @@ public class ObservableLinearLayout extends FrameLayout {
             Log.e("libtd", "reflection err", e);
         }
         return 0;
+    }
+
+    private void saveKeyboardHeight(int keyboardHeight) {
+        boolean portrait = isPortrait();
+        prefs.edit()
+                .putInt(getKeyForConfiguration(portrait), keyboardHeight)
+                .apply();
+    }
+
+    public int guessKeyboardHeight() {
+        boolean portrait = isPortrait();
+        String prefKey = getKeyForConfiguration(portrait);
+        return prefs.getInt(prefKey, calc.dp(portrait ? 240 : 150));
+    }
+
+    private String getKeyForConfiguration(boolean portrait){
+        String prefKey;
+        prefKey = "keyboard_height_" + portrait;
+        return prefKey;
+    }
+
+    private boolean isPortrait(){
+        int orientation = getContext().getResources().getConfiguration().orientation;
+        boolean portrait = orientation == Configuration.ORIENTATION_PORTRAIT;
+        return portrait;
     }
 }

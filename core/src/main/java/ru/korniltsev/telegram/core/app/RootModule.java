@@ -23,8 +23,8 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.audio.AudioPlayer;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
-import ru.korniltsev.telegram.core.emoji.EmojiPopup;
 import ru.korniltsev.telegram.core.emoji.EmojiTextView;
+import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.BootReceiver;
@@ -62,12 +62,13 @@ import java.util.concurrent.Executors;
 
 
                 EmojiKeyboardView.class,
-                EmojiPopup.class,
+//                EmojiPopup.class,
 
                 DownloadView.class,
                 EmojiTextView.class,
                 BootReceiver.class  ,
-                PasscodeManager.class
+                PasscodeManager.class,
+                ObservableLinearLayout.class
         },
         library = true)
 public class RootModule {

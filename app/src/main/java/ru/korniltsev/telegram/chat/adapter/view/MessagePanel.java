@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.LevelListDrawable;
-import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -16,23 +15,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
 import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
+import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelController;
 import ru.korniltsev.telegram.chat.Presenter;
+import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
+import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
-import ru.korniltsev.telegram.core.emoji.EmojiPopup;
 import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.ChatDB;
-
 
 import javax.inject.Inject;
 
@@ -57,7 +56,8 @@ public class MessagePanel extends LinearLayout {
     @Inject Emoji emoji;
     @Inject DpCalculator calc;
     @Inject ChatDB chat;
-    @Nullable private EmojiPopup emojiPopup;
+//    @Nullable private EmojiPopup emojiPopup;
+
     private boolean emojiPopupShowWithKeyboard;
     private EmojiKeyboardView.CallBack emojiKeyboardCallback = new EmojiKeyboardView.CallBack() {
         @Override
@@ -75,11 +75,11 @@ public class MessagePanel extends LinearLayout {
         @Override
         public void stickerCLicked(String stickerFilePath, TdApi.Sticker sticker) {
             presenter.sendSticker(stickerFilePath, sticker);
-
         }
     };
     private AnimatorSet currentAnimation;
     private AttachPanelPopup attachPanelPopup;
+    private FrameUnderMessagePanelController bottomFrame;
 
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -121,52 +121,27 @@ public class MessagePanel extends LinearLayout {
                 }
             }
         });
-        input.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //                getParentView().setPadding(0, 0, 0, 0);
-            }
-        });
+
         btnLeft.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (emojiPopup != null) {
-                    emojiPopup.dismiss();
-                } else {
-                    ObservableLinearLayout parent = getParentView();
-                    emojiPopup = EmojiPopup.create(activityOwner.expose(), parent, emojiKeyboardCallback);
-                    emojiPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                        @Override
-                        public void onDismiss() {
-                            emojiPopup = null;
-                            btnLeft.setImageLevel(LEVEL_SMILE);
-                        }
-                    });
-                    assert emojiPopup != null;
-                    emojiPopupShowWithKeyboard = parent.getKeyboardHeight() > 0;
-                    if (emojiPopupShowWithKeyboard) {
-                        btnLeft.setImageLevel(LEVEL_KB);
-                    } else {
-                        btnLeft.setImageLevel(LEVEL_ARROW);
-                    }
-                }
+
+                bottomFrame.showEmoji(emojiKeyboardCallback);
             }
         });
     }
 
     private void animateLevel(final int level) {
         LevelListDrawable drawable = (LevelListDrawable) btnRight.getDrawable();
-        if (drawable.getLevel() == level){
+        if (drawable.getLevel() == level) {
             return;
         }
-        if (currentAnimation != null){
+        if (currentAnimation != null) {
             currentAnimation.cancel();
         }
 
 
-//        if (drawable)
-
-        AnimatorSet scaleDown = (AnimatorSet) new AnimatorSet()
+        AnimatorSet scaleDown = new AnimatorSet()
                 .setDuration(SCALE_DOWN_DURATION);
         scaleDown.playTogether(
                 ObjectAnimator.ofFloat(btnRight, View.SCALE_X, 1f, 0.1f),
@@ -187,16 +162,12 @@ public class MessagePanel extends LinearLayout {
         currentAnimation.playSequentially(scaleDown, scaleUp);
         currentAnimation.start();
 
-//        btnRight.setImageLevel(level);
     }
 
-    private ObservableLinearLayout getParentView() {
+    private ObservableLinearLayout getObservableContainer() {
         return (ObservableLinearLayout) getParent().getParent();
     }
 
-    //    public boolean isEmojiPopupShown() {
-    //        return emojiPopup != null;
-    //    }
 
     private void showAttachPopup() {
         attachPanelPopup = RecentImagesBottomSheet.create(activityOwner.expose(), presenter);
@@ -209,26 +180,31 @@ public class MessagePanel extends LinearLayout {
     }
 
     public boolean onBackPressed() {
-        if (attachPanelPopup != null && attachPanelPopup.isShowing()){
+        if (attachPanelPopup != null && attachPanelPopup.isShowing()) {
             attachPanelPopup.dismiss();
             attachPanelPopup = null;
             return true;
         }
         attachPanelPopup = null;
-        if (emojiPopup != null) {
-            emojiPopup.dismiss();
-            emojiPopup = null;
-            Utils.hideKeyboard(input);
-            return true;
-        }
-        return false;
+//        if ()
+//        if (emojiPopup != null) {
+//            emojiPopup.dismiss();
+//            emojiPopup = null;
+//            Utils.hideKeyboard(input);
+//            return true;
+//        }
+        return bottomFrame.dismisAnyKeyboard();
     }
 
     public void hideAttachPannel() {
-        if (attachPanelPopup != null){
+        if (attachPanelPopup != null) {
             attachPanelPopup.dismiss();
             attachPanelPopup = null;
         }
+    }
+
+    public void initBottomFrame(TrickyBottomFrame bottomFrame, TrickyLinearyLayout tricky) {
+        this.bottomFrame = new FrameUnderMessagePanelController(bottomFrame, this, getObservableContainer(), tricky);
     }
 
     public interface OnSendListener {
@@ -251,10 +227,13 @@ public class MessagePanel extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Utils.hideKeyboard(input);
-
     }
 
     public EditText getInput() {
         return input;
+    }
+
+    public FrameUnderMessagePanelController getBottomFrame() {
+        return bottomFrame;
     }
 }

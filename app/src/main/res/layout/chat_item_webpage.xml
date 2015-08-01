@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:paddingRight="4dp"
                 android:paddingBottom="4dp"
-
+                android:textColor="#000"
                 android:autoLink="web"/>
         <ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView
                 android:id="@+id/image"

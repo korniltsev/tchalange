@@ -235,7 +235,7 @@ public class Presenter extends ViewPresenter<ChatView>
                                        public void onNext(List<TdApi.Message> ms) {
                                            getView()
                                                    .addNewMessages(ms);
-//                                           showBotKeyboard(ms);
+                                           showBotKeyboard(ms);
                                            rxChat.hackToReadTheMessage(ms);
                                        }
                                    }
@@ -331,6 +331,7 @@ public class Presenter extends ViewPresenter<ChatView>
         if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
             return true;
         } else if (replyMarkup instanceof TdApi.ReplyMarkupHideKeyboard) {
+            getView().hideReplyKeyboard();
             return true;
         } else if (replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
             getView().showBotKeyboard(((TdApi.ReplyMarkupShowKeyboard) replyMarkup));

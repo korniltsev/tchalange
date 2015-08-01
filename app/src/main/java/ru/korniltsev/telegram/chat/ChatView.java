@@ -16,8 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
@@ -25,6 +23,8 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.adapter.TextMessageVH;
 import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
+import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
+import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
@@ -80,7 +80,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private RecyclerView botsCommandList;
     private View emptyViewBotInfo;
     private TextView botInfoDescription;
-    private LinearLayout botReplyKeyboard;
+//    private LinearLayout botReplyKeyboard;
     private View botCommandsListConainer;
 
     private Adapter adapter;
@@ -180,7 +180,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
         botsCommandList = ((RecyclerView) findViewById(R.id.bot_commands_list));
         botsCommandList.setLayoutManager(new LinearLayoutManager(getContext()));
-        botReplyKeyboard = ((LinearLayout) findViewById(R.id.bot_reply_keyboard));
+//        botReplyKeyboard = ((LinearLayout) findViewById(R.id.bot_reply_keyboard));
         emptyViewBotInfo = findViewById(R.id.bot_info_root);
         botInfoDescription = ((TextView) findViewById(R.id.bot_info_description));
 
@@ -188,6 +188,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         btnBotStart = (TextView) findViewById(R.id.btn_bot_start);
         botCommandsShadow = findViewById(R.id.bot_command_shadow);
         botCommandsListConainer = findViewById(R.id.bot_commands_list_container);
+
+        final TrickyBottomFrame bottomFrame = (TrickyBottomFrame) findViewById(R.id.frame_under_message_panel);
+        final TrickyLinearyLayout tricky = (TrickyLinearyLayout) findViewById(R.id.list_and_message_panel);
+        messagePanel.initBottomFrame(bottomFrame, tricky);
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -580,24 +584,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     }
 
     public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
-        if (replyMarkup.rows == null) {
-            return;
-        }
-        botReplyKeyboard.setVisibility(View.VISIBLE);
-        botReplyKeyboard.removeAllViews();
-        for (String[] rowStr : replyMarkup.rows) {
-            final Context ctx = getContext();
-            final LinearLayout row = new LinearLayout(ctx);
-            row.setOrientation(LinearLayout.HORIZONTAL);
-            for (String s : rowStr) {
-                final Button button = new Button(ctx);
-                button.setText(s);
-                final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.weight = 1;
-                row.addView(button, lp);
-            }
-            botReplyKeyboard.addView(row, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
+        messagePanel.getBottomFrame().showBotKeyboard(replyMarkup);
+//        bottomFrame.showBotKeyboard(replyMarkup);
+
     }
 
     public void addBotInfoHeader(TdApi.BotInfoGeneral botInfo, final TdApi.User user) {
@@ -647,6 +636,13 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     public void setBot(boolean isBot) {
         this.isBot = isBot;
+    }
+
+    public void hideReplyKeyboard() {
+        messagePanel.getBottomFrame()
+                .dismisAnyKeyboard();
+//        bottomFrame.hideAll();
+
     }
 
     //    public void setCommands(TdApi.ChatParticipant[] participants) {
