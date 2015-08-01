@@ -160,4 +160,5 @@
     </plurals>
     <string name="message_joined_by_link">вступил в группу по пригласительной ссылке</string>
     <string name="user_status_bot">бот</string>
+    <string name="what_the_bot_can_do">What this bot can do?</string>
 </resources>

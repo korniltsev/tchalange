@@ -10,16 +10,12 @@ import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.items.BotInfoItem;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.rx.items.NewMessagesItem;
 
-// Message types left:
-
-//        MessageContact extends MessageContent {
-
-//
 public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     public static final int VIEW_TYPE_PHOTO = 0;
@@ -38,8 +34,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public static final int VIEW_TYPE_CONTACT = 13;
     public static final int VIEW_TYPE_NEW_MESSAGES = 14;
     public static final int VIEW_TYPE_WEB_PAGE = 15;
+    public static final int VIEW_TYPE_BOT_INFO = 16;
 
-//    final Map<Integer, TdApi.User> users = new HashMap<>();
     final RxGlide picasso;
     private final Chat chatPath;
     private long lastReadOutbox;
@@ -64,13 +60,15 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     @Override
     public long getItemId(int position) {
         ChatListItem item = getItem(position);
-        if (item instanceof MessageItem){
+        if (item instanceof MessageItem) {
             TdApi.Message msg = ((MessageItem) item).msg;
             return getIdForMessageItem(msg);
         } else if (item instanceof DaySeparatorItem) {
             return ((DaySeparatorItem) item).id;
-        } else if (item instanceof NewMessagesItem){
+        } else if (item instanceof NewMessagesItem) {
             return ((NewMessagesItem) item).id;
+        } else if (item instanceof BotInfoItem) {
+            return ((BotInfoItem) item).id;
         } else {
             throw new IllegalArgumentException();
         }
@@ -87,7 +85,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     @Override
     public int getItemViewType(int position) {
         ChatListItem item = getItem(position);
-        if (item instanceof MessageItem){
+        if (item instanceof MessageItem) {
             MessageItem rawMsg = (MessageItem) item;
             TdApi.MessageContent message = rawMsg.msg.message;
             if (message instanceof TdApi.MessagePhoto) {
@@ -101,18 +99,18 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
             } else if (message instanceof TdApi.MessageVideo) {
                 return VIEW_TYPE_VIDEO;
             } else if (message instanceof TdApi.MessageText) {
-                if (rawMsg.msg.forwardFromId == 0){
+                if (rawMsg.msg.forwardFromId == 0) {
                     return VIEW_TYPE_TEXT;
                 } else {
-                    if (position == getItemCount() -1){
+                    if (position == getItemCount() - 1) {
                         return VIEW_TYPE_TEXT_FORWARD;
                     }
                     ChatListItem nextItem = getItem(position + 1);
-                    if (!(nextItem instanceof MessageItem)){
+                    if (!(nextItem instanceof MessageItem)) {
                         return VIEW_TYPE_TEXT_FORWARD;
                     }
                     TdApi.Message nextMessage = ((MessageItem) nextItem).msg;
-                    if (nextMessage.message instanceof TdApi.MessageText){
+                    if (nextMessage.message instanceof TdApi.MessageText) {
                         if (nextMessage.fromId == rawMsg.msg.fromId
                                 && nextMessage.forwardFromId != 0
                                 && nextMessage.date == rawMsg.msg.date) {
@@ -121,34 +119,34 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                     }
                     return VIEW_TYPE_TEXT_FORWARD;
                 }
-            } else if (message instanceof TdApi.MessageChatChangePhoto){
+            } else if (message instanceof TdApi.MessageChatChangePhoto) {
                 return VIEW_TYPE_CHAT_PHOTO_CHANGED;
-            } else if (message instanceof TdApi.MessageDocument){
+            } else if (message instanceof TdApi.MessageDocument) {
                 TdApi.Document doc = ((TdApi.MessageDocument) message).document;
-                if (doc.mimeType.equals("image/gif")){
+                if (doc.mimeType.equals("image/gif")) {
                     return VIEW_TYPE_GIF;
                 } else {
                     return VIEW_TYPE_DOCUMENT;
                 }
             } else if (message instanceof TdApi.MessageContact) {
                 return VIEW_TYPE_CONTACT;
-            }else if (message instanceof TdApi.MessageWebPage){
+            } else if (message instanceof TdApi.MessageWebPage) {
                 return VIEW_TYPE_WEB_PAGE;
             } else {
                 return VIEW_TYPE_SINGLE_TEXT_VIEW;
             }
         } else if (item instanceof NewMessagesItem) {
             return VIEW_TYPE_NEW_MESSAGES;
+        } else if (item instanceof BotInfoItem) {
+            return VIEW_TYPE_BOT_INFO;
         } else {
             return VIEW_TYPE_DAY_SEPARATOR;
         }
-
     }
 
     private View inflate(int id, ViewGroup parent) {
         return getViewFactory().inflate(id, parent, false);
     }
-
 
     @Override
     public RealBaseVH onCreateViewHolder(ViewGroup p, int viewType) {
@@ -201,17 +199,21 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 View view = inflate(R.layout.chat_item_message_forward, p);
                 return new ContactVH(view, this);
             }
-            case VIEW_TYPE_DAY_SEPARATOR:{
+            case VIEW_TYPE_DAY_SEPARATOR: {
                 View view = inflate(R.layout.chat_item_day_separator, p);
                 return new DaySeparatorVH(view, this);
             }
-            case VIEW_TYPE_NEW_MESSAGES:{
+            case VIEW_TYPE_NEW_MESSAGES: {
                 View view = inflate(R.layout.chat_item_new_messages, p);
                 return new NewMessagesVH(view, this);
             }
-            case VIEW_TYPE_WEB_PAGE:{
+            case VIEW_TYPE_WEB_PAGE: {
                 View view = inflate(R.layout.chat_item_webpage, p);
                 return new WebPagePreviewVH(view, this);
+            }
+            case VIEW_TYPE_BOT_INFO: {
+                View view = inflate(R.layout.chat_item_bot_info, p);
+                return new BotInfoVH(view, this);
             }
             default: {
                 View view = inflate(R.layout.chat_item_single_text_view, p);
@@ -223,35 +225,9 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     @Override
     public void onBindViewHolder(RealBaseVH holder, int position) {
         ChatListItem item1 = getItem(position);
-//        TdApi.Message item = (TdApi.Message) item1;
         holder.bind(item1, lastReadOutbox);
     }
 
-//    public void addHistory(Portion ms) {
-//        addAll(ms.ms);
-//        users.putAll(ms.us);
-//    }
-//
-//    public void insertNewMessage(Portion portion) {
-//        addFirst(portion.ms);
-//        users.putAll(portion.us);
-//    }
-
-//    public void updateMessageId(TdApi.UpdateMessageId upd) {
-//        List<TdApi.Message> ts = getTs();
-//        for (int i = 0; i < ts.size(); i++) {
-//            TdApi.Message message = ts.findSmallestBiggerThan(i);
-//            if (message.id == upd.oldId) {
-//                message.id = upd.newId;
-//                notifyItemChanged(i);
-//                return;
-//            }
-//        }
-//    }
-
-//    public Map<Integer, TdApi.User> getUsers() {
-//        return users;
-//    }
 
     public void setChat(RxChat chat) {
         this.chat = chat;
@@ -260,34 +236,6 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public UserHolder getUserHolder() {
         return chat;
     }
-
-
-    //    public Portion getPortion() {
-//        return new Portion(getData(), users);
-//    }
-
-//    public static class Portion {
-//        public final List<TdApi.Message> ms;
-//        public final Map<Integer, TdApi.User> us;
-//
-//        public Portion(List<TdApi.Message> ms, List<TdApi.User> us) {
-//            this.ms = ms;
-//            this.us = new HashMap<>();
-//            for (TdApi.User u : us) {
-//                this.us.put(u.id, u);
-//            }
-//        }
-//
-//        public Portion(List<TdApi.Message> ms, Map<Integer, TdApi.User> us) {
-//            this.ms = ms;
-//            this.us = us;
-//        }
-//
-//        public Portion(TdApi.Message msg) {
-//            this.ms = Collections.singletonList(msg);
-//            this.us = Collections.emptyMap();
-//        }
-//    }
 
     public Chat getChatPath() {
         return chatPath;

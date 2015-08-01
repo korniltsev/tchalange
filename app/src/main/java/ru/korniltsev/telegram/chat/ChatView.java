@@ -2,9 +2,13 @@ package ru.korniltsev.telegram.chat;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +20,9 @@ import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
+import ru.korniltsev.telegram.chat.adapter.TextMessageVH;
 import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
+import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
@@ -27,8 +33,10 @@ import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.recycler.CheckRecyclerViewSpan;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.DaySplitter;
+import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.items.BotInfoItem;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
@@ -37,6 +45,7 @@ import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
+import rx.Subscription;
 import rx.functions.Action1;
 
 import javax.inject.Inject;
@@ -53,6 +62,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     @Inject RxGlide picasso;
     @Inject DpCalculator calc;
     @Inject ActivityOwner activity;
+    @Inject EmojiParser emojiParser;
 
     private RecyclerView list;
     private MessagePanel messagePanel;
@@ -61,9 +71,24 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private AvatarView toolbarAvatar;
     private TextView toolbarTitle;
     private TextView toolbarSubtitle;
+    private View btnScrollDown;
+    private View emptyView;
+    private View customToolbarView;
+    private RecyclerView botsCommandList;
+    private View emptyViewBotInfo;
+    private TextView botInfoDescription;
+    private LinearLayout botReplyKeyboard;
 
     private Adapter adapter;
-    private final int toolbarAvatarSize;
+
+    private ListChoicePopup mutePopup;
+
+    private TdApi.BotInfoGeneral commands;
+    private BotCommandsAdapter botsCommandAdapter;
+
+    //    @Nullable private TdApi.BotInfoGeneral botInfo;
+    @Nullable BotInfoItem botInfoItem;
+    private boolean isBot;
 
     private Runnable viewSpanNotFilledAction = new Runnable() {
         @Override
@@ -71,22 +96,14 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             presenter.listScrolledToEnd();
         }
     };
-    private View btnScrollDown;
-    private View emptyView;
     private int myId;
-    private View customToolbarView;
-    private ListChoicePopup mutePopup;
-    private RecyclerView botsCommandList;
-
-
-    private TdApi.BotInfoGeneral commands;
-    private BotCommandsAdapter botsCommandAdapter;
-    private LinearLayout botReplyKeyboard;
+    private View botStartPanel;
+    private TextView btnBotStart;
+    private Subscription clickedSpansSubscription;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        toolbarAvatarSize = context.getResources().getDimensionPixelSize(R.dimen.toolbar_avatar_size);
     }
 
     @Override
@@ -148,12 +165,22 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             }
         });
         emptyView = findViewById(R.id.empty_view);
-        adapter.registerAdapterDataObserver(new EmptyViewHelper());
+        adapter.registerAdapterDataObserver(new EmptyViewHelper(new Runnable() {
+            @Override
+            public void run() {
+                updateEmptyView();
+            }
+        }));
         activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));
 
         botsCommandList = ((RecyclerView) findViewById(R.id.bot_commands_list));
         botsCommandList.setLayoutManager(new LinearLayoutManager(getContext()));
         botReplyKeyboard = ((LinearLayout) findViewById(R.id.bot_reply_keyboard));
+        emptyViewBotInfo = findViewById(R.id.bot_info_root);
+        botInfoDescription = ((TextView) findViewById(R.id.bot_info_description));
+
+        botStartPanel = findViewById(R.id.bot_start_panel);
+        btnBotStart = (TextView) findViewById(R.id.btn_bot_start);
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -171,12 +198,22 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         presenter.takeView(this);
+        clickedSpansSubscription = emojiParser.getClickedSpans()
+                .subscribe(new ObserverAdapter<String>() {
+                    @Override
+                    public void onNext(String response) {
+                        if (response.startsWith("/")) {
+                            presenter.textSpanCLicked(response);
+                        }
+                    }
+                });
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         presenter.dropView(this);
+        clickedSpansSubscription.unsubscribe();
     }
 
     public Adapter getAdapter() {
@@ -187,7 +224,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         boolean isGroupChat = groupChat.type instanceof TdApi.GroupChatInfo;
         if (isGroupChat) {
             final TdApi.GroupChatInfo group = (TdApi.GroupChatInfo) groupChat.type;
-            if (group.groupChat.left){
+            if (group.groupChat.left) {
                 toolbar.hideMenu(R.id.menu_mute_unmute);
                 toolbar.hideMenu(R.id.menu_leave_group);
             }
@@ -210,7 +247,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     public void setGroupChatTitle(final TdApi.GroupChat groupChat, final TdApi.Chat chat) {
         toolbarTitle.setText(
                 groupChat.title);
-        if (groupChat.left){
+        if (groupChat.left) {
             return;
         }
         customToolbarView.setOnClickListener(new OnClickListener() {
@@ -239,22 +276,21 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         String onlineStr = res.getQuantityString(R.plurals.group_chat_members_online, online, online);
         toolbarSubtitle.setText(
                 totalStr + ", " + onlineStr);
-
     }
 
-//    private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
+    //    private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
 
     //    private String lastSeenDaysAgo(int daysBetween) {
-//        return getResources().getQuantityString(R.plurals.user_status_last_seen_n_days_ago, daysBetween, daysBetween);
-//    }
-//
-//    private String lastSeenHoursAgo(int hoursBetween) {
-//        return getResources().getQuantityString(R.plurals.user_status_last_seen_n_hours_ago, hoursBetween, hoursBetween);
-//    }
-//
-//    private String lastSeenMinutesAgo(int minutesBetween) {
-//        return getResources().getQuantityString(R.plurals.user_status_last_seen_n_minutes_ago, minutesBetween,minutesBetween);
-//    }
+    //        return getResources().getQuantityString(R.plurals.user_status_last_seen_n_days_ago, daysBetween, daysBetween);
+    //    }
+    //
+    //    private String lastSeenHoursAgo(int hoursBetween) {
+    //        return getResources().getQuantityString(R.plurals.user_status_last_seen_n_hours_ago, hoursBetween, hoursBetween);
+    //    }
+    //
+    //    private String lastSeenMinutesAgo(int minutesBetween) {
+    //        return getResources().getQuantityString(R.plurals.user_status_last_seen_n_minutes_ago, minutesBetween,minutesBetween);
+    //    }
 
     public void initList(RxChat rxChat) {
         adapter.setChat(rxChat);
@@ -266,16 +302,14 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     private final DaySplitter splitter = new DaySplitter();
 
-//    public void setMessages( List<TdApi.Message> messages) {
-//        List<RxChat.ChatListItem> split = splitter.split(messages);
-//        adapter.setData(split);
-//    }
-
-
+    //    public void setMessages( List<TdApi.Message> messages) {
+    //        List<RxChat.ChatListItem> split = splitter.split(messages);
+    //        adapter.setData(split);
+    //    }
 
     @Override
     public boolean onBackPressed() {
-        if (mutePopup != null && mutePopup.isShowing()){
+        if (mutePopup != null && mutePopup.isShowing()) {
             mutePopup.dismiss();
             mutePopup = null;
             return true;
@@ -300,8 +334,6 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         messagePanel.hideAttachPannel();
     }
 
-
-
     public void addNewMessages(List<TdApi.Message> ms) {
         boolean scrollDown;
         int firstFullVisible = layout.findFirstCompletelyVisibleItemPosition();
@@ -318,37 +350,68 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         final List<ChatListItem> splitNewMessages = splitter.split(ms);
         List<ChatListItem> prepend = splitter.prepend(data, splitNewMessages);
 
-//        Collections.reverse(prepend);
         adapter.addFirst(prepend);
         if (scrollDown) {
             layout.scrollToPosition(0);
         }
+
+        addBotInfoItem();
+    }
+
+    private void addBotInfoItem() {
+        if (botInfoItem == null) {
+            return;
+        }
+        final List<ChatListItem> data = adapter.getData();
+        if (data.size() == 0) {
+            return;
+        }
+
+        final ChatListItem last = data.get(data.size() - 1);
+        if (last instanceof BotInfoItem) {
+            return;
+        }
+        adapter.add(botInfoItem);
     }
 
     public void addHistory(TdApi.Chat chat, RxChat.HistoryResponse history) {
+        removeBotItem();
+        final List<ChatListItem> data = adapter.getData();
+
         final List<ChatListItem> split = splitter.split(history.ms);
         if (history.showUnreadMessages) {
             final NewMessagesItem newItem = splitter.insertNewMessageItem(split, chat, myId);
             adapter.addAll(split);
-            final int i = adapter.getData()
+            final int i = data
                     .indexOf(newItem);
             if (i != -1) {
-//                if (list.get)
                 final int badgeHeight = calc.dp(26);
                 final int nicePadding = calc.dp(8);
                 layout.scrollToPositionWithOffset(i, list.getHeight() - badgeHeight - nicePadding);
-                if (i >= SHOW_SCROLL_DOWN_BUTTON_ITEMS_COUNT){
+                if (i >= SHOW_SCROLL_DOWN_BUTTON_ITEMS_COUNT) {
                     animateBtnScrollDown(true);
                 }
             }
         } else {
-
             adapter.addAll(split);
         }
+        addBotInfoItem();
+    }
+
+    @NonNull
+    private List<ChatListItem> removeBotItem() {
+        final List<ChatListItem> data = adapter.getData();
+        if (data.size() > 0) {
+            final ChatListItem last = data.get(data.size() - 1);
+            if (last instanceof BotInfoItem) {
+                adapter.remove(data.size() - 1);
+            }
+        }
+        return data;
     }
 
     public void deleteMessages(RxChat.DeletedMessages deleted) {
-        if (deleted.all){
+        if (deleted.all) {
             adapter.clearData();
         } else {
             for (TdApi.Message m : deleted.ms) {
@@ -366,13 +429,13 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                 final TdApi.Message msg = ((MessageItem) item).msg;
                 if (msg == deletedMsg) {
                     adapter.deleteItem(i);
-                    if (i != 0){//not first item
-                        final ChatListItem next = data.get(i-1);
+                    if (i != 0) {//not first item
+                        final ChatListItem next = data.get(i - 1);
                         //next item is not message
-                        if (!(next instanceof MessageItem)){
+                        if (!(next instanceof MessageItem)) {
                             if (i < data.size()) {
                                 final ChatListItem prev = data.get(i);
-                                if (prev instanceof DaySeparatorItem){
+                                if (prev instanceof DaySeparatorItem) {
                                     adapter.deleteItem(i);//delete separator
                                 }
                             }
@@ -380,7 +443,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                     } else {
                         if (i < data.size()) {
                             final ChatListItem prev = data.get(i);
-                            if (prev instanceof DaySeparatorItem){
+                            if (prev instanceof DaySeparatorItem) {
                                 adapter.deleteItem(i);//delete separator
                             }
                         }
@@ -390,11 +453,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             }
         }
 
-
-        if (!data.isEmpty()){
+        if (!data.isEmpty()) {
             if (data.get(0) instanceof NewMessagesItem) {
                 adapter.deleteItem(0);
-
             }
         }
     }
@@ -464,9 +525,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         });
     }
 
-
-    public void showKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
-        if (replyMarkup.rows == null){
+    public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
+        if (replyMarkup.rows == null) {
             return;
         }
         botReplyKeyboard.setVisibility(View.VISIBLE);
@@ -486,39 +546,54 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         }
     }
 
-    private class EmptyViewHelper extends RecyclerView.AdapterDataObserver {
-        @Override
-        public void onChanged() {
-            if (adapter.getItemCount() == 0) {
-                if (emptyView.getVisibility() == INVISIBLE) {
-                    emptyView.setVisibility(View.VISIBLE);
-                    emptyView.setAlpha(0f);
-                    emptyView.animate()
-                            .alpha(1);
+    public void addBotInfoHeader(TdApi.BotInfoGeneral botInfo, final TdApi.User user) {
+        final Spannable botDescriptionWithEmoji = emojiParser.parseEmoji(botInfo.description);
+        this.botInfoItem = new BotInfoItem(botInfo, botDescriptionWithEmoji);
+        addBotInfoItem();
+        adapter.notifyDataSetChanged();//to show emptyView with botinfo
+        botInfoDescription.setText(botInfoItem.descriptionWithEmoji);
+        botInfoDescription.setMovementMethod(LinkMovementMethod.getInstance());
+        TextMessageVH.applyTextStyle(botInfoDescription);
+        if (botInfo.commands.length != 0) {
+            final TdApi.BotCommand firstCommand = botInfo.commands[0];
+            btnBotStart.setText(firstCommand.command.toUpperCase());
+            btnBotStart.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    presenter.sendBotCommand(user, firstCommand);
                 }
+            });
+        }
+    }
+
+    private void updateEmptyView() {
+        final boolean shouldShowEmptyView = adapter.getItemCount() == 0;
+        if (isBot) {
+            emptyView.setVisibility(View.INVISIBLE);
+            if (shouldShowEmptyView && botInfoItem != null) {
+                emptyViewBotInfo.setVisibility(View.VISIBLE);
+                if (botInfoItem.botInfo.commands.length == 0) {
+                    botStartPanel.setVisibility(View.INVISIBLE);
+                } else {
+                    botStartPanel.setVisibility(View.VISIBLE);
+                }
+            } else {
+                botStartPanel.setVisibility(View.INVISIBLE);
+                emptyViewBotInfo.setVisibility(View.INVISIBLE);
+            }
+        } else {
+            emptyViewBotInfo.setVisibility(View.INVISIBLE);
+            botStartPanel.setVisibility(View.VISIBLE);
+
+            if (shouldShowEmptyView) {
+                emptyView.setVisibility(View.VISIBLE);
             } else {
                 emptyView.setVisibility(View.INVISIBLE);
             }
         }
+    }
 
-        @Override
-        public void onItemRangeChanged(int positionStart, int itemCount) {
-            onChanged();
-        }
-
-        @Override
-        public void onItemRangeInserted(int positionStart, int itemCount) {
-            onChanged();
-        }
-
-        @Override
-        public void onItemRangeRemoved(int positionStart, int itemCount) {
-            onChanged();
-        }
-
-        @Override
-        public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-            onChanged();
-        }
+    public void setBot(boolean isBot) {
+        this.isBot = isBot;
     }
 }

@@ -1,5 +1,6 @@
 package org.drinkless.td.libcore.telegram;
 
+import android.text.Spannable;
 import android.text.TextUtils;
 
 import java.io.Serializable;
@@ -1213,7 +1214,7 @@ public class TdApi {
 
     public static class MessageText extends MessageContent {
         public String text;
-        public transient CharSequence textWithSmilesAndUserRefs;
+        public transient Spannable textWithSmilesAndUserRefs;
 
         public MessageText() {
         }

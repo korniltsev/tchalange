@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.chat.adapter;
 
+import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.View;
 import android.widget.TextView;
@@ -9,13 +10,15 @@ import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
 
-class TextMessageVH extends BaseAvatarVH {
+public class TextMessageVH extends BaseAvatarVH {
 
     private final TextView message;
 
     public TextMessageVH(View itemView, Adapter adapter) {
         super(itemView, adapter);
         message = ((TextView) itemView.findViewById(R.id.message));
+        message.setMovementMethod(LinkMovementMethod.getInstance());
+
         applyTextStyle(message);
 
 

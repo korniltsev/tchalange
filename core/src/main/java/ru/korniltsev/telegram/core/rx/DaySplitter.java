@@ -69,7 +69,8 @@ public class DaySplitter {
 
     private final Map<DateTime, DaySeparatorItem> cache = new HashMap<>();
     public static final long ID_NEW_MESSAGES = -1;
-    private int counter = -5;
+    public static final long ID_BOT_INFO = -2;
+    private int counter = -10;
 
     public DaySeparatorItem createSeparator(TdApi.Message msg) {
         DateTime time = localTime(timInMillis(msg))

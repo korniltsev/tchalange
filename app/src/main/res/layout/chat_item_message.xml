@@ -14,5 +14,6 @@
             android:textColor="#ff252525"
             android:textColorLink="@color/textColorLink"
             style="@style/item_content_with_margins"
+            android:autoLink="all"
             />
 </RelativeLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/bot_info_root"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+        >
+    <ImageView android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:src="@drawable/ic_help"
+               android:padding="17dp"/>
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:paddingRight="6dp"
+                  android:paddingLeft="6dp"
+                  android:orientation="vertical">
+        <ru.korniltsev.telegram.core.views.RobotoMediumTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/what_the_bot_can_do"
+                android:textColor="#333333"
+                android:paddingBottom="4dp"/>
+        <TextView
+                android:id="@+id/bot_info_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#333333"
+                />
+    </LinearLayout>
+
+</LinearLayout>

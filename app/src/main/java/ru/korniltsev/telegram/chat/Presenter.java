@@ -93,11 +93,17 @@ public class Presenter extends ViewPresenter<ChatView>
             final TdApi.PrivateChatInfo info = (TdApi.PrivateChatInfo) chat.type;
             userFullRequest = client.getUserFull(info.user.id)
                     .observeOn(mainThread());
+//            if (info.user.type instanceof TdApi.UserTypeBot) {
+//                getView().setBot(assertTrue());
+//            }
         }
     }
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {
+        if (!isGroupChat && ((TdApi.PrivateChatInfo) chat.type).user.type instanceof TdApi.UserTypeBot) {
+            getView().setBot(true);
+        }
         if (path.firstLoad) {
             path.firstLoad = false;
             rxChat.clear();
@@ -135,6 +141,7 @@ public class Presenter extends ViewPresenter<ChatView>
                 if (response.botInfo instanceof TdApi.BotInfoGeneral) {
                     final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
                     getView().setCommands(response.user, i);
+                    getView().addBotInfoHeader(i, response.user);
                 }
             }
         });
@@ -318,7 +325,7 @@ public class Presenter extends ViewPresenter<ChatView>
         } else if (replyMarkup instanceof TdApi.ReplyMarkupHideKeyboard) {
             return true;
         } else if (replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
-            getView().showKeyboard(((TdApi.ReplyMarkupShowKeyboard) replyMarkup));
+            getView().showBotKeyboard(((TdApi.ReplyMarkupShowKeyboard) replyMarkup));
             return true;
         } else if (replyMarkup instanceof TdApi.ReplyMarkupNone) {
             return false;
@@ -481,7 +488,7 @@ public class Presenter extends ViewPresenter<ChatView>
             public void run() {
                 rxChat.sendMessage(text);
             }
-        }, 32);
+        }, 16);
     }
 
     public void sendSticker(final String stickerFilePath, final TdApi.Sticker sticker) {
@@ -576,5 +583,9 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void sendBotCommand(TdApi.User bot, TdApi.BotCommand cmd) {
         rxChat.sendMessage("/" + cmd.command);
+    }
+
+    public void textSpanCLicked(String response) {
+        sendText(response);
     }
 }

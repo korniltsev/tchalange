@@ -23,8 +23,6 @@
             android:layout_gravity="center"
             />
 
-
-
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:layout_marginTop="56dp"
@@ -117,4 +115,29 @@
             android:background="@drawable/ic_scroll"
 
             />
+
+    <include layout="@layout/chat_item_bot_info"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_vertical"
+            />
+
+    <FrameLayout
+            android:id="@+id/bot_start_panel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom">
+        <TextView
+                android:id="@+id/btn_bot_start"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#fff"
+                android:textColor="#599BCC"
+                android:textStyle="bold"
+                android:gravity="center"/>
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="#ededed"/>
+
+    </FrameLayout>
 </ru.korniltsev.telegram.chat.ChatView>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.core.rx.items.BotInfoItem;
 import ru.korniltsev.telegram.core.utils.Preconditions;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends
     public BaseAdapter(Context ctx) {
         this(ctx, new ArrayList<T>());
     }
+
     public BaseAdapter(Context ctx, List<T> ts) {
         this.ctx = ctx;
         this.ts = ts;
@@ -96,5 +98,15 @@ public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends
     public void deleteItem(int position) {
         ts.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void add(T botInfoItem) {
+        ts.add(botInfoItem);
+        notifyItemInserted(ts.size() - 1);
+    }
+
+    public void remove(int i) {
+        ts.remove(i);
+        notifyItemRemoved(i);
     }
 }
