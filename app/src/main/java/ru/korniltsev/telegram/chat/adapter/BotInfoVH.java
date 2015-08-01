@@ -20,6 +20,7 @@ public class BotInfoVH extends RealBaseVH {
         final DpCalculator calc = ObjectGraphService.getObjectGraph(itemView.getContext())
                 .get(DpCalculator.class);
         botInfoRoot.setPadding(0,calc.dp(16), 0, 0);
+        TextMessageVH.applyTextStyle(botInfo);
     }
 
     @Override

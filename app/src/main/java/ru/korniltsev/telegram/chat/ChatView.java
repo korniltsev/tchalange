@@ -555,16 +555,14 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         botInfoDescription.setText(botInfoItem.descriptionWithEmoji);
         botInfoDescription.setMovementMethod(LinkMovementMethod.getInstance());
         TextMessageVH.applyTextStyle(botInfoDescription);
-        if (botInfo.commands.length != 0) {
-            final TdApi.BotCommand firstCommand = botInfo.commands[0];
-            btnBotStart.setText(firstCommand.command.toUpperCase());
-            btnBotStart.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    presenter.sendBotCommand(user, firstCommand);
-                }
-            });
-        }
+
+        btnBotStart.setText("START");//todo l10n
+        btnBotStart.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.sendText("/start");
+            }
+        });
     }
 
     private void updateEmptyView() {
@@ -584,7 +582,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             }
         } else {
             emptyViewBotInfo.setVisibility(View.INVISIBLE);
-            botStartPanel.setVisibility(View.VISIBLE);
+            botStartPanel.setVisibility(View.INVISIBLE);
 
             if (shouldShowEmptyView) {
                 emptyView.setVisibility(View.VISIBLE);
