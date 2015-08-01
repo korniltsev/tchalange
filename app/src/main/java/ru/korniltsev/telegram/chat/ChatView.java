@@ -517,6 +517,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                     } else {
                         newHeight = commandHeight * result;
                     }
+                    newHeight += botsCommandList.getPaddingTop();
                     final ViewGroup.LayoutParams lp = botsCommandList.getLayoutParams();
                     lp.height = newHeight;
                     botsCommandList.setLayoutParams(lp);

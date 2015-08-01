@@ -95,7 +95,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <ru.korniltsev.telegram.chat.bot.BotCommandsRecyclerView
             android:id="@+id/bot_commands_list"
             android:layout_width="match_parent"
             android:layout_height="128dp"
@@ -103,6 +103,7 @@
             android:layout_gravity="bottom"
             android:visibility="gone"
             android:layout_marginBottom="48dp"
+            android:paddingTop="2dp"
             />
 
     <View
