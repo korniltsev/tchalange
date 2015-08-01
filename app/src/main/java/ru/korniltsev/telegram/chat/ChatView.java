@@ -52,7 +52,6 @@ import rx.Subscription;
 import rx.functions.Action1;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -88,7 +87,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     private ListChoicePopup mutePopup;
 
-    private TdApi.BotInfoGeneral commands;
+    //    private TdApi.BotInfoGeneral commands;
     private BotCommandsAdapter botsCommandAdapter;
 
     //    @Nullable private TdApi.BotInfoGeneral botInfo;
@@ -207,12 +206,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         super.onAttachedToWindow();
         presenter.takeView(this);
         clickedSpansSubscription = emojiParser.getClickedSpans()
-                .subscribe(new ObserverAdapter<String>() {
+                .subscribe(new ObserverAdapter<EmojiParser.BotCommand>() {
                     @Override
-                    public void onNext(String response) {
-                        if (response.startsWith("/")) {
-                            presenter.textSpanCLicked(response);
-                        }
+                    public void onNext(EmojiParser.BotCommand response) {
+                        presenter.textSpanCLicked(response);
                     }
                 });
     }
@@ -496,12 +493,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     boolean botCommandListVisible = false;
 
-    public void setCommands(TdApi.User user, TdApi.BotInfoGeneral i) {
-        this.commands = i;
-        List<BotCommandsAdapter.Record> cs = new ArrayList<>();
-        for (TdApi.BotCommand command : i.commands) {
-            cs.add(new BotCommandsAdapter.Record(user, command));
-        }
+    public void setCommands(List<BotCommandsAdapter.Record> cs) {
         botsCommandAdapter = new BotCommandsAdapter(cs, getContext(), new Action1<BotCommandsAdapter.Record>() {
             @Override
             public void call(BotCommandsAdapter.Record record) {
@@ -517,31 +509,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             public void afterTextChanged(Editable s) {
                 final int result = botsCommandAdapter.filter(s.toString());
                 if (result == 0) {
-                    if (botCommandListVisible) {
-
-                        botCommandsShadow.clearAnimation();
-                        botCommandsShadow.animate()
-                                .alpha(0f)
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        botCommandsShadow.setVisibility(View.GONE);
-                                    }
-                                });
-
-                        botsCommandList.clearAnimation();
-                        botsCommandList.animate()
-                                .setDuration(128)
-                                .setInterpolator(INTERPOLATOR)
-                                .translationY(botsCommandList.getHeight())
-                                .setListener(new AnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationEnd(Animator animation) {
-                                        botCommandsListConainer.setVisibility(View.GONE);
-                                    }
-                                });
-                    }
-                    botCommandListVisible = false;
+                    hideCommandList();
                 } else {
 
                     int newHeight;
@@ -554,30 +522,61 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                     newHeight += botsCommandList.getPaddingTop();
                     final ViewGroup.LayoutParams lp = botCommandsListConainer.getLayoutParams();
                     lp.height = newHeight;
-
-                    if (!botCommandListVisible) {
-                        botCommandsListConainer.setVisibility(View.VISIBLE);
-                        botsCommandList.clearAnimation();
-                        botsCommandList.setTranslationY(newHeight);
-                        botsCommandList.animate()
-                                .translationY(0)
-                                .setDuration(128)
-                                .setInterpolator(INTERPOLATOR)
-                                .setListener(null);
-
-
-                        botCommandsShadow.setVisibility(View.VISIBLE);
-                        botCommandsShadow.clearAnimation();
-                        botCommandsShadow.setAlpha(0f);
-                        botCommandsShadow.animate()
-                                .setListener(null)
-                                .alpha(0.4f);
-                    }
                     botCommandsListConainer.setLayoutParams(lp);
-                    botCommandListVisible = true;
+                    showCommandList(newHeight);
                 }
             }
         });
+    }
+
+    private void showCommandList(int newHeight) {
+        if (!botCommandListVisible) {
+            botCommandsListConainer.setVisibility(View.VISIBLE);
+            botsCommandList.clearAnimation();
+            botsCommandList.setTranslationY(newHeight);
+            botsCommandList.animate()
+                    .translationY(0)
+                    .setDuration(128)
+                    .setInterpolator(INTERPOLATOR)
+                    .setListener(null);
+
+            botCommandsShadow.setVisibility(View.VISIBLE);
+            botCommandsShadow.clearAnimation();
+            botCommandsShadow.setAlpha(0f);
+            botCommandsShadow.animate()
+                    .setListener(null)
+                    .alpha(0.4f);
+        }
+
+        botCommandListVisible = true;
+    }
+
+    private void hideCommandList() {
+        if (botCommandListVisible) {
+
+            botCommandsShadow.clearAnimation();
+            botCommandsShadow.animate()
+                    .alpha(0f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            botCommandsShadow.setVisibility(View.GONE);
+                        }
+                    });
+
+            botsCommandList.clearAnimation();
+            botsCommandList.animate()
+                    .setDuration(128)
+                    .setInterpolator(INTERPOLATOR)
+                    .translationY(botsCommandList.getHeight())
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            botCommandsListConainer.setVisibility(View.GONE);
+                        }
+                    });
+        }
+        botCommandListVisible = false;
     }
 
     public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
@@ -602,7 +601,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     }
 
     public void addBotInfoHeader(TdApi.BotInfoGeneral botInfo, final TdApi.User user) {
-        final Spannable botDescriptionWithEmoji = emojiParser.parseEmoji(botInfo.description);
+        final Spannable botDescriptionWithEmoji = emojiParser.parseEmoji(botInfo.description, user.id);
         this.botInfoItem = new BotInfoItem(botInfo, botDescriptionWithEmoji);
         addBotInfoItem();
         adapter.notifyDataSetChanged();//to show emptyView with botinfo
@@ -649,4 +648,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     public void setBot(boolean isBot) {
         this.isBot = isBot;
     }
+
+    //    public void setCommands(TdApi.ChatParticipant[] participants) {
+    //
+    //        setCommands(cs);
+    //    }
 }

@@ -15,12 +15,14 @@ import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
+import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
+import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxChat;
@@ -35,6 +37,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -63,6 +66,7 @@ public class Presenter extends ViewPresenter<ChatView>
     private final TdApi.Chat chat;
     private CompositeSubscription subscription;
     @Nullable private volatile TdApi.GroupChatFull mGroupChatFull;
+    private int botCount;
 
     public Chat getPath() {
         return path;
@@ -140,7 +144,11 @@ public class Presenter extends ViewPresenter<ChatView>
                 System.out.println();
                 if (response.botInfo instanceof TdApi.BotInfoGeneral) {
                     final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
-                    getView().setCommands(response.user, i);
+                    List<BotCommandsAdapter.Record> cs = new ArrayList<>();
+                    for (TdApi.BotCommand command : i.commands) {
+                        cs.add(new BotCommandsAdapter.Record(response.user, command));
+                    }
+                    getView().setCommands(cs);
                     getView().addBotInfoHeader(i, response.user);
                 }
             }
@@ -384,8 +392,10 @@ public class Presenter extends ViewPresenter<ChatView>
                                 public void onNext(TdApi.GroupChatFull groupChatFull) {
                                     mGroupChatFull = groupChatFull;
                                     assertNotNull(mGroupChatFull);
+
                                     showMessagePanel(mGroupChatFull.groupChat);
                                     updateGroupChatOnlineStatus(groupChatFull);
+                                    setBotCommands();
                                 }
 
                                 @Override
@@ -403,6 +413,21 @@ public class Presenter extends ViewPresenter<ChatView>
                         }
                     }));
         }
+    }
+
+    private void setBotCommands() {
+        botCount = 0;
+        List<BotCommandsAdapter.Record> cs = new ArrayList<>();
+        for (TdApi.ChatParticipant p : mGroupChatFull.participants) {
+            if (p.botInfo instanceof TdApi.BotInfoGeneral) {
+                botCount++;
+                final TdApi.BotCommand[] commands = ((TdApi.BotInfoGeneral) p.botInfo).commands;
+                for (TdApi.BotCommand cmd : commands) {
+                    cs.add(new BotCommandsAdapter.Record(p.user, cmd));
+                }
+            }
+        }
+        getView().setCommands(cs);
     }
 
     private void showMessagePanel(TdApi.GroupChat groupChat) {
@@ -582,10 +607,27 @@ public class Presenter extends ViewPresenter<ChatView>
     }
 
     public void sendBotCommand(TdApi.User bot, TdApi.BotCommand cmd) {
-        rxChat.sendMessage("/" + cmd.command);
+        if (isGroupChat){
+            sendText("/" + cmd.command + "@" + bot.username);
+        } else {
+            sendText("/" + cmd.command);
+        }
     }
 
-    public void textSpanCLicked(String response) {
-        sendText(response);
+    public void textSpanCLicked(EmojiParser.BotCommand cmd) {
+        if (isGroupChat){
+            if (path.me.id == cmd.userId){
+                sendText(cmd.cmd);
+            } else {
+                final TdApi.User user = rxChat.getUser(cmd.userId);
+                if (user == null){
+                    return;
+                }
+                sendText(cmd.cmd + "@" + user.username);
+            }
+
+        } else {
+            sendText(cmd.cmd);
+        }
     }
 }
