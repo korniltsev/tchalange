@@ -2,20 +2,15 @@ package ru.korniltsev.telegram.chat.adapter.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.drawable.LevelListDrawable;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -27,6 +22,7 @@ import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelControlle
 import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
@@ -124,12 +120,11 @@ public class MessagePanel extends FrameLayout {
             }
         });
         rightButtons = findViewById(R.id.right_buttons);
-        rightButtons.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+
+        AppUtils.executeOnPreDraw(rightButtons, new Runnable() {
             @Override
-            public boolean onPreDraw() {
+            public void run() {
                 rightButtons.setPivotX(rightButtons.getWidth());
-                rightButtons.getViewTreeObserver().removeOnPreDrawListener(this);
-                return true;
             }
         });
     }

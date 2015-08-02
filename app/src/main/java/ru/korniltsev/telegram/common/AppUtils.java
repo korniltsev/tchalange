@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 import flow.Flow;
 import flow.History;
@@ -203,5 +204,16 @@ public class AppUtils {
 
     public static void toastUnsupported(Context context) {
         Toast.makeText(context, R.string.feature_unsupported, Toast.LENGTH_LONG).show();
+    }
+
+    public  static void executeOnPreDraw( final View view, final Runnable run) {
+        view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                run.run();
+                view.getViewTreeObserver().removeOnPreDrawListener(this);
+                return true;
+            }
+        });
     }
 }
