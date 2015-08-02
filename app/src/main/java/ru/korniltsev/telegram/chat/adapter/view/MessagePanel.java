@@ -32,6 +32,7 @@ import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.ChatDB;
+import ru.korniltsev.telegram.core.rx.EmojiParser;
 
 import javax.inject.Inject;
 
@@ -54,6 +55,7 @@ public class MessagePanel extends LinearLayout {
     @Inject Presenter presenter;
     @Inject ActivityOwner activityOwner;
     @Inject Emoji emoji;
+//    @Inject EmojiParser emojiParser;
     @Inject DpCalculator calc;
     @Inject ChatDB chat;
 //    @Nullable private EmojiPopup emojiPopup;
@@ -204,7 +206,7 @@ public class MessagePanel extends LinearLayout {
     }
 
     public void initBottomFrame(TrickyBottomFrame bottomFrame, TrickyLinearyLayout tricky) {
-        this.bottomFrame = new FrameUnderMessagePanelController(bottomFrame, this, getObservableContainer(), tricky);
+        this.bottomFrame = new FrameUnderMessagePanelController(bottomFrame, this, getObservableContainer(), tricky, calc, emoji);
     }
 
     public interface OnSendListener {

@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.chat.keyboard.hack;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -22,33 +23,11 @@ public class TrickyBottomFrame extends FrameLayout {
         this.parent = l;
     }
 
-//    @Override
-//    protected void onDraw(Canvas canvas) {
-//        super.onDraw(canvas);
-//    }
-//
-//    @Override
-//    public void draw(Canvas canvas) {
-//        if (parent.getKeyboardHeight() == 0){
-//            super.draw(canvas);
-//        } else {
-//            Log.d("TrickyBottomFrame", "i am not drawing");
-//        }
-//    }
-//
-//    @Override
-//    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
-//        return super.drawChild(canvas, child, drawingTime);
-//
-//    }
 
     @Override
-    protected void dispatchDraw(Canvas canvas) {
+    protected void dispatchDraw(@NonNull Canvas canvas) {
         if (parent.getKeyboardHeight() == 0){
             super.dispatchDraw(canvas);
-        } else {
-            Log.d("TrickyBottomFrame", "i am not drawing");
-
         }
     }
 
