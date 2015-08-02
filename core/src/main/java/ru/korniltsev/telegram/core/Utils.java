@@ -137,8 +137,10 @@ public class Utils {
     }
 
     public static void showKeyboard(View anchor) {
-        Context c = anchor.getContext();
-        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+//        Context c = anchor.getContext();
+        InputMethodManager inputManager = (InputMethodManager)anchor.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.showSoftInput(anchor, InputMethodManager.SHOW_IMPLICIT);
+//        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.showS(InputMethodManager.SHOW_FORCED, 0);
     }
 }

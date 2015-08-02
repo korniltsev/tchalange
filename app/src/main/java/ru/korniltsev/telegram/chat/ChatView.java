@@ -531,6 +531,15 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                 }
             }
         });
+
+        messagePanel.setCommands(cs);
+        messagePanel.setOnAnyKeyboardShownListener(new Runnable(){
+            @Override
+            public void run() {
+                hideCommandList();
+            }
+        });
+
     }
 
     private void showCommandList(int newHeight) {
@@ -605,6 +614,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                 presenter.sendText("/start");
             }
         });
+
+
     }
 
     private void updateEmptyView() {

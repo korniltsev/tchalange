@@ -18,6 +18,7 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
 import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
+import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelController;
 import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
@@ -34,6 +35,9 @@ import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 
 import javax.inject.Inject;
 
+import java.util.List;
+
+import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 
 public class MessagePanel extends FrameLayout {
@@ -75,6 +79,11 @@ public class MessagePanel extends FrameLayout {
     @Nullable private ViewPropertyAnimator currentAnimation;
     @Nullable private ViewPropertyAnimator currentAnimation2;
 
+
+    @Nullable private List<BotCommandsAdapter.Record> botCommands;
+    private ImageView btnBotCommand;
+    private Runnable onAnyKeyboardShownListener;
+
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
@@ -102,13 +111,13 @@ public class MessagePanel extends FrameLayout {
             @Override
             public void onClick(View v) {
                 String text = textFrom(input);
-                if (text.length() == 0) {
-                    showAttachPopup();
-                } else {
-                    listener.sendText(
-                            text);
-                    input.setText("");
-                }
+                //                if (text.length() == 0) {
+                //                    showAttachPopup();
+                //                } else {
+                listener.sendText(
+                        text);
+                input.setText("");
+                //                }
             }
         });
 
@@ -121,13 +130,30 @@ public class MessagePanel extends FrameLayout {
         });
         rightButtons = findViewById(R.id.right_buttons);
 
-        AppUtils.executeOnPreDraw(rightButtons, new Runnable() {
+
+        findViewById(R.id.btn_attach).setOnClickListener(new OnClickListener() {
             @Override
-            public void run() {
-                rightButtons.setPivotX(rightButtons.getWidth());
+            public void onClick(View v) {
+                showAttachPopup();
             }
         });
+        btnBotCommand = (ImageView) findViewById(R.id.btn_bot);
+        btnBotCommand.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (botCommands != null) {
+                    final Editable text = input.getText();
+                    text.clear();
+                    text.insert(0, "/");
+                    input.requestFocus();
+                    showKeyboard(input);
+                    bottomFrame.dismisAnyKeyboard();
+                }
+            }
+        });
+
     }
+
 
     boolean lastInputIsEmpty = true;
 
@@ -149,7 +175,7 @@ public class MessagePanel extends FrameLayout {
                 currentAnimation2.cancel();
             }
             currentAnimation2 = rightButtons.animate()
-                    .scaleX(1f)
+                    .translationX(0f)
                     .alpha(1);
         }
         if (!inputIsEmpty && lastInputIsEmpty) {
@@ -173,7 +199,7 @@ public class MessagePanel extends FrameLayout {
             }
 
             currentAnimation2 = rightButtons.animate()
-                    .scaleX(0f)
+                    .translationX(rightButtons.getWidth())
                     .alpha(0f);
         }
         lastInputIsEmpty = inputIsEmpty;
@@ -212,6 +238,37 @@ public class MessagePanel extends FrameLayout {
 
     public void initBottomFrame(TrickyBottomFrame bottomFrame, TrickyLinearyLayout tricky) {
         this.bottomFrame = new FrameUnderMessagePanelController(bottomFrame, this, getObservableContainer(), tricky, calc, emoji);
+        this.bottomFrame.setListener(new Runnable() {
+            @Override
+            public void run() {
+                onAnyKeyboardShownListener.run();
+            }
+        });
+    }
+
+
+
+
+    public void setCommands(List<BotCommandsAdapter.Record> cs) {
+        this.botCommands = cs;
+        updateBotButtonState();
+    }
+
+    private void updateBotButtonState() {
+        if (botCommands == null){
+            btnBotCommand.setVisibility(View.GONE);
+        } else {
+            btnBotCommand.setVisibility(View.VISIBLE);
+            btnBotCommand.setImageResource(R.drawable.ic_slash);
+        }
+    }
+
+    public void setOnAnyKeyboardShownListener(Runnable onAnyKeyboardShownListener) {
+        this.onAnyKeyboardShownListener = onAnyKeyboardShownListener;
+    }
+
+    public Runnable getOnAnyKeyboardShownListener() {
+        return onAnyKeyboardShownListener;
     }
 
     public interface OnSendListener {

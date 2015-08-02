@@ -29,6 +29,7 @@ public class FrameUnderMessagePanelController {
     private int lastKeyboardHeight = 0;
     final DpCalculator calc;
     final Emoji emoji;
+    private Runnable listener;
 
     public FrameUnderMessagePanelController(final TrickyBottomFrame root, final MessagePanel messagePanel, final ObservableLinearLayout observableContainer, final TrickyLinearyLayout tricky, DpCalculator calc, Emoji emoji) {
         this.root = root;
@@ -82,12 +83,13 @@ public class FrameUnderMessagePanelController {
 
         if (keyboardHeight > 0) {
             root.addView(targetView, MATCH_PARENT, viewHeight);
-            tricky.fixHeight();
+            fixHeight();
             Utils.hideKeyboard(messagePanel.getInput());
         } else {
             root.addView(targetView, MATCH_PARENT, viewHeight);
             tricky.setTrickyMargin(viewHeight);
         }
+        listener.run();
     }
 
     @NonNull
@@ -196,12 +198,25 @@ public class FrameUnderMessagePanelController {
 
         if (keyboardHeight > 0) {
             root.addView(view, MATCH_PARENT, keyboardHeight);
-            tricky.fixHeight();
+            fixHeight();
             Utils.hideKeyboard(messagePanel.getInput());
         } else {
             final int height = observableContainer.guessKeyboardHeight();
             root.addView(view, MATCH_PARENT, height);
             tricky.setTrickyMargin(height);
         }
+        listener.run();
+    }
+
+    public void fixHeight() {
+        tricky.fixHeight();
+    }
+
+    public void setListener(Runnable listener) {
+        this.listener = listener;
+    }
+
+    public Runnable getListener() {
+        return listener;
     }
 }
