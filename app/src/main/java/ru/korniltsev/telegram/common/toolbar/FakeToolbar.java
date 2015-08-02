@@ -48,7 +48,7 @@ public class FakeToolbar extends FrameLayout {
 
     public FakeToolbar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this );
+        ObjectGraphService.inject(context, this);
     }
 
     @Override
@@ -72,20 +72,17 @@ public class FakeToolbar extends FrameLayout {
         int targetSize = dp4 * 10;
         int fullDiff = targetSize - initialAvatarSize;
         float diffRes = res * fullDiff;
-        float scaleResult = 1 + diffRes/initialAvatarSize;
-        image.setScaleX( scaleResult);
+        float scaleResult = 1 + diffRes / initialAvatarSize;
+        image.setScaleX(scaleResult);
         image.setScaleY(scaleResult);
 
         int dp16 = dp4 * 4;
         int avatarMargin = dp16;
         int avatarMargin2 = dp16 + calc.dp(27);
-        int ty = headerHeight - initialAvatarSize/2 - toolbarHeight /2 - avatarMargin2;
+        int ty = headerHeight - initialAvatarSize / 2 - toolbarHeight / 2 - avatarMargin2;
         image.setTranslationY(-avatarMargin2 - ty * res);
 
-
-
         image.setTranslationX(calc.dp(17) + res * dp4 * 7);
-
 
         //text
 
@@ -97,7 +94,7 @@ public class FakeToolbar extends FrameLayout {
         int diff = initialWidth - targetWidth;
         int finalWidth = (int) (initialWidth - res * diff);
         final ViewGroup.LayoutParams lp = title.getLayoutParams();
-        if (lp.width != finalWidth){//todo round!
+        if (lp.width != finalWidth) {//todo round!
             lp.width = finalWidth;
             title.setLayoutParams(lp);
         }
@@ -105,7 +102,7 @@ public class FakeToolbar extends FrameLayout {
         //text ypos
         final int titleParentHeight = titleParent.getLayoutParams().height;
         final int initialTranslationY = -avatarMargin2 + (initialAvatarSize - titleParentHeight) / 2;
-        final int targetTranslationY = - (headerHeight - titleParentHeight);
+        final int targetTranslationY = -(headerHeight - titleParentHeight);
         final int diff2 = targetTranslationY - initialTranslationY;
         final int absDiff2 = (int) (diff2 * res);
         titleParent.setTranslationY(initialTranslationY + absDiff2);
@@ -114,7 +111,6 @@ public class FakeToolbar extends FrameLayout {
         final int diff3 = targetTextX - initialTextX;
 
         titleParent.setTranslationX(initialTextX + res * diff3);
-
 
         //fab
 
@@ -127,7 +123,7 @@ public class FakeToolbar extends FrameLayout {
                     .alpha(0f)
                     .scaleX(0f)
                     .scaleY(0f)
-            .setDuration(128);
+                    .setDuration(128);
         }
         if (res < 0.65 && !fabVisible) {
             fabVisible = true;
@@ -138,7 +134,6 @@ public class FakeToolbar extends FrameLayout {
                     .scaleY(1f)
                     .setDuration(128);
         }
-
     }
 
     boolean fabVisible = true;
@@ -155,9 +150,14 @@ public class FakeToolbar extends FrameLayout {
     public void bindUser(TdApi.User user) {
         title.setText(
                 uiName(user, getContext()));
+
         image.loadAvatarFor(user);
-        subTitle.setText(
-                uiUserStatus(getContext(), chats.getUserStatus(user)));
+        if (user.type instanceof TdApi.UserTypeBot) {
+            subTitle.setText(R.string.user_status_bot);
+        } else {
+            subTitle.setText(
+                    uiUserStatus(getContext(), chats.getUserStatus(user)));
+        }
     }
 
     public void bindChat(ChatInfo chat) {
@@ -175,7 +175,7 @@ public class FakeToolbar extends FrameLayout {
         String onlineStr = res.getQuantityString(R.plurals.group_chat_members_online, online, online);
         subTitle.setText(
                 totalStr + ", " + onlineStr);
-//        subTitle.setText();
+        //        subTitle.setText();
     }
 
     public void bindFAB(int icon, final Runnable runnable) {
@@ -183,7 +183,7 @@ public class FakeToolbar extends FrameLayout {
         fabIcon.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (fabVisible){
+                if (fabVisible) {
                     runnable.run();
                 }
             }
@@ -202,20 +202,19 @@ public class FakeToolbar extends FrameLayout {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
             final int pos = listLayout.findFirstVisibleItemPosition();
-            float res ;
+            float res;
             if (pos == 0) {
                 final View childAt = list.getChildAt(0);
                 final int bottom = childAt.getBottom();
-                if (bottom <= toolbarHeight){
+                if (bottom <= toolbarHeight) {
                     res = 1f;
                 } else {
-                    res = 1f - (float) (bottom- toolbarHeight) / (realHeaderHeight - toolbarHeight);
+                    res = 1f - (float) (bottom - toolbarHeight) / (realHeaderHeight - toolbarHeight);
                 }
             } else {
                 res = 1f;
             }
             positionAvatar(res);
-
         }
     }
 }

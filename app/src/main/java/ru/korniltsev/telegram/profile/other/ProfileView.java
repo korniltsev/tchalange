@@ -123,12 +123,15 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         presenter.dropView(this);
     }
 
-    public void bindUser(@NonNull TdApi.User user) {
+    public void bindUser(@NonNull TdApi.UserFull userFill) {
+        final TdApi.User user = userFill.user;
         fakeToolbar.bindUser(user);
         List<ProfileAdapter.Item> items = new ArrayList<>();
         final boolean hasUserName = !isEmpty(user.username);
         final boolean hasPhoneNumber = !isEmpty(user.phoneNumber);
+        int firstSectionCount = 0;
         if (hasUserName) {
+            firstSectionCount++;
             items.add(new ProfileAdapter.Item(
                     R.drawable.ic_user,
                     "@" + user.username,
@@ -137,6 +140,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         }
 
         if (hasPhoneNumber) {
+            firstSectionCount++;
             final String phone = phoneFormat.format(
                     phoneNumberWithPlus(user));
             items.add(new ProfileAdapter.Item(
@@ -145,17 +149,39 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                     getContext().getString(R.string.item_type_mobile),
                     createPhoneActions(phone)));
         }
+        if (userFill.botInfo instanceof TdApi.BotInfoGeneral){
+            firstSectionCount++;
+            final TdApi.BotInfoGeneral botInfo = (TdApi.BotInfoGeneral) userFill.botInfo;
+//            final String description = botInfo.description;
+            items.add(new ProfileAdapter.Item(
+                    R.drawable.ic_about,
+                    botInfo.shareText,
+                    getContext().getString(R.string.bot_about),
+                    null
+            ));
+        }
 
         adapter.addAll(items);
-        if (hasPhoneNumber || hasUserName){
+        int itemsBeforeFirstSection = 1;//blue header
+        if (firstSectionCount >0){
             list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(15)));
-            if (hasPhoneNumber && hasUserName) {
-                list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, 1));
-                list.addItemDecoration(new BottomShadow(getContext(), calc, 2));
-            } else {
-                list.addItemDecoration(new BottomShadow(getContext(), calc, 1));
+            if (firstSectionCount > 1){
+                for (int i = 0; i < firstSectionCount; i++) {
+                    int pos = i + itemsBeforeFirstSection;
+                    list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, pos));
+                }
             }
+            list.addItemDecoration(new BottomShadow(getContext(), calc, firstSectionCount));
         }
+//        if (hasPhoneNumber || hasUserName){
+//
+//            if (hasPhoneNumber && hasUserName) {
+//
+//                list.addItemDecoration(new BottomShadow(getContext(), calc, 2));
+//            } else {
+//                list.addItemDecoration(new BottomShadow(getContext(), calc, 1));
+//            }
+//        }
     }
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {

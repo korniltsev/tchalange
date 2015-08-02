@@ -63,14 +63,14 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
 
     @NonNull
     private Observable<Boolean> blockInfo() {
-        final Observable<Boolean> getUserFull = client.sendCachedRXUI(new TdApi.GetUserFull(path.user.id))
+        final Observable<Boolean> getUserFull = client.sendCachedRXUI(new TdApi.GetUserFull(path.user.user.id))
                 .map(new Func1<TdApi.TLObject, Boolean>() {
                     @Override
                     public Boolean call(TdApi.TLObject tlObject) {
                         return ((TdApi.UserFull) tlObject).isBlocked;
                     }
                 });
-        final Observable<Boolean> updates = client.updateUserBlocked(path.user.id);
+        final Observable<Boolean> updates = client.updateUserBlocked(path.user.user.id);
         return Observable.concat(getUserFull, updates)
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -100,15 +100,15 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
 
     public void share() {
         Flow.get(getView())
-                .set(new ContactList(path.user));
+                .set(new ContactList(path.user.user));
 
     }
 
     public void block() {
         if (blocked){
-            client.sendSilently(new TdApi.UnblockUser(path.user.id));
+            client.sendSilently(new TdApi.UnblockUser(path.user.user.id));
         }   else {
-            client.sendSilently(new TdApi.BlockUser(path.user.id));
+            client.sendSilently(new TdApi.BlockUser(path.user.user.id));
         }
         blocked = !blocked;
         getView().bindBlockMenu(blocked);

@@ -135,7 +135,6 @@ public class Presenter extends ViewPresenter<ChatView>
             TdApi.GroupChatInfo g = (TdApi.GroupChatInfo) this.chat.type;
             showMessagePanel(g.groupChat);
         }
-
     }
 
     private void shareContact() {
@@ -586,18 +585,25 @@ public class Presenter extends ViewPresenter<ChatView>
     }
 
     public void open(TdApi.User user) {
-        Flow.get(getView())
-                .set(new ProfilePath(user, chat, path.me));
+        subscription.add(
+                userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
+                    @Override
+                    public void onNext(TdApi.UserFull response) {
+                        Flow.get(getView())
+                                .set(new ProfilePath(response, chat, path.me));
+                    }
+                }));
     }
 
     public void open(final TdApi.Chat groupChat) {
-        fullChatInfoRequest.subscribe(new ObserverAdapter<TdApi.GroupChatFull>() {
-            @Override
-            public void onNext(TdApi.GroupChatFull response) {
-                Flow.get(getView())
-                        .set(new ChatInfo(response, groupChat));
-            }
-        });
+        subscription.add(
+                fullChatInfoRequest.subscribe(new ObserverAdapter<TdApi.GroupChatFull>() {
+                    @Override
+                    public void onNext(TdApi.GroupChatFull response) {
+                        Flow.get(getView())
+                                .set(new ChatInfo(response, groupChat));
+                    }
+                }));
     }
 
     public void muteFor(int duration) {
