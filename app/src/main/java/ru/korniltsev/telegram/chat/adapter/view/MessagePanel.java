@@ -8,13 +8,17 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.LevelListDrawable;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
@@ -31,20 +35,14 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
-import ru.korniltsev.telegram.core.rx.ChatDB;
-import ru.korniltsev.telegram.core.rx.EmojiParser;
 
 import javax.inject.Inject;
 
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 
-public class MessagePanel extends LinearLayout {
-    public static final int LEVEL_SEND = 0;
-    public static final int LEVEL_ATTACH = 1;
+public class MessagePanel extends FrameLayout {
 
     public static final int LEVEL_SMILE = 0;
-    public static final int LEVEL_KB = 1;
-    public static final int LEVEL_ARROW = 2;
     private static final long SCALE_UP_DURAION = 80;
     private static final long SCALE_DOWN_DURATION = 80;
     private final int dip1;
@@ -55,12 +53,8 @@ public class MessagePanel extends LinearLayout {
     @Inject Presenter presenter;
     @Inject ActivityOwner activityOwner;
     @Inject Emoji emoji;
-//    @Inject EmojiParser emojiParser;
     @Inject DpCalculator calc;
-    @Inject ChatDB chat;
-//    @Nullable private EmojiPopup emojiPopup;
 
-    private boolean emojiPopupShowWithKeyboard;
     private EmojiKeyboardView.CallBack emojiKeyboardCallback = new EmojiKeyboardView.CallBack() {
         @Override
         public void backspaceClicked() {
@@ -79,9 +73,11 @@ public class MessagePanel extends LinearLayout {
             presenter.sendSticker(stickerFilePath, sticker);
         }
     };
-    private AnimatorSet currentAnimation;
     private AttachPanelPopup attachPanelPopup;
     private FrameUnderMessagePanelController bottomFrame;
+    private View rightButtons;
+    @Nullable private ViewPropertyAnimator currentAnimation;
+    @Nullable private ViewPropertyAnimator currentAnimation2;
 
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -98,16 +94,12 @@ public class MessagePanel extends LinearLayout {
         btnLeft = (ImageView) findViewById(R.id.btn_left);
         btnLeft.setImageLevel(LEVEL_SMILE);
         btnRight = (ImageView) findViewById(R.id.btn_right);
-        btnRight.setImageLevel(LEVEL_ATTACH);
+        //        btnRight.setImageLevel(LEVEL_ATTACH);
         input = (EditText) findViewById(R.id.input);
         input.addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() == 0) {
-                    animateLevel(LEVEL_ATTACH);
-                } else {
-                    animateLevel(LEVEL_SEND);
-                }
+                animateButtons(s.length() == 0);
             }
         });
         btnRight.setOnClickListener(new OnClickListener() {
@@ -131,45 +123,70 @@ public class MessagePanel extends LinearLayout {
                 bottomFrame.showEmoji(emojiKeyboardCallback);
             }
         });
-    }
-
-    private void animateLevel(final int level) {
-        LevelListDrawable drawable = (LevelListDrawable) btnRight.getDrawable();
-        if (drawable.getLevel() == level) {
-            return;
-        }
-        if (currentAnimation != null) {
-            currentAnimation.cancel();
-        }
-
-
-        AnimatorSet scaleDown = new AnimatorSet()
-                .setDuration(SCALE_DOWN_DURATION);
-        scaleDown.playTogether(
-                ObjectAnimator.ofFloat(btnRight, View.SCALE_X, 1f, 0.1f),
-                ObjectAnimator.ofFloat(btnRight, View.SCALE_Y, 1f, 0.1f))
-        ;
-        scaleDown.addListener(new AnimatorListenerAdapter() {
+        rightButtons = findViewById(R.id.right_buttons);
+        rightButtons.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                btnRight.setImageLevel(level);
+            public boolean onPreDraw() {
+                rightButtons.setPivotX(rightButtons.getWidth());
+                rightButtons.getViewTreeObserver().removeOnPreDrawListener(this);
+                return true;
             }
         });
-        AnimatorSet scaleUp = new AnimatorSet()
-                .setDuration(SCALE_UP_DURAION);
-        scaleUp.playTogether(
-                ObjectAnimator.ofFloat(btnRight, View.SCALE_X, 0.1f, 1f),
-                ObjectAnimator.ofFloat(btnRight, View.SCALE_Y, 0.1f, 1f));
-        currentAnimation = new AnimatorSet();
-        currentAnimation.playSequentially(scaleDown, scaleUp);
-        currentAnimation.start();
+    }
 
+    boolean lastInputIsEmpty = true;
+
+    private void animateButtons(boolean inputIsEmpty) {
+        if (inputIsEmpty && !lastInputIsEmpty) {
+            if (currentAnimation != null) {
+                currentAnimation.cancel();
+            }
+            currentAnimation = btnRight.animate()
+                    .scaleX(0.1f)
+                    .scaleY(0.1f)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            btnRight.setVisibility(View.GONE);
+                        }
+                    });
+            if (currentAnimation2 != null) {
+                currentAnimation2.cancel();
+            }
+            currentAnimation2 = rightButtons.animate()
+                    .scaleX(1f)
+                    .alpha(1);
+        }
+        if (!inputIsEmpty && lastInputIsEmpty) {
+            //show send button
+            if (currentAnimation != null) {
+                currentAnimation.cancel();
+            }
+            btnRight.setVisibility(View.VISIBLE);
+            if (btnRight.getScaleX() == 1f) {
+                btnRight.setScaleX(0.1f);
+                btnRight.setScaleY(0.1f);
+            }
+
+            currentAnimation = btnRight.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setListener(null);
+
+            if (currentAnimation2 != null) {
+                currentAnimation2.cancel();
+            }
+
+            currentAnimation2 = rightButtons.animate()
+                    .scaleX(0f)
+                    .alpha(0f);
+        }
+        lastInputIsEmpty = inputIsEmpty;
     }
 
     private ObservableLinearLayout getObservableContainer() {
         return (ObservableLinearLayout) getParent().getParent();
     }
-
 
     private void showAttachPopup() {
         attachPanelPopup = RecentImagesBottomSheet.create(activityOwner.expose(), presenter);
@@ -188,13 +205,6 @@ public class MessagePanel extends LinearLayout {
             return true;
         }
         attachPanelPopup = null;
-//        if ()
-//        if (emojiPopup != null) {
-//            emojiPopup.dismiss();
-//            emojiPopup = null;
-//            Utils.hideKeyboard(input);
-//            return true;
-//        }
         return bottomFrame.dismisAnyKeyboard();
     }
 
