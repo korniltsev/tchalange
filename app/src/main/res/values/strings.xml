@@ -145,6 +145,7 @@
     <string name="user_status_bot">bot</string>
     <string name="what_the_bot_can_do">What this bot can do?</string>
     <string name="bot_about">About</string>
+    <string name="bot_add_to_group">Add to group</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

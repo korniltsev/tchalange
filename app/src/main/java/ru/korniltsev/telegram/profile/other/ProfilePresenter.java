@@ -82,7 +82,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     @Override
-    public void clicked(ProfileAdapter.Item item) {
+    public void clicked(ProfileAdapter.KeyValueItem item) {
         if (item.bottomSheetActions != null) {
             popup = ListChoicePopup.create(owner.expose(), item.bottomSheetActions);
         }
@@ -138,6 +138,10 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
                 }, Flow.Direction.FORWARD
         );
 
+
+    }
+
+    public void addBotToGroup() {
 
     }
 }

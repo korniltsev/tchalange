@@ -21,7 +21,9 @@ import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.DividerItemDecorator;
+import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
 import ru.korniltsev.telegram.profile.decorators.MyWhiteRectTopPaddingDecorator;
+import ru.korniltsev.telegram.profile.decorators.TopShadow;
 
 import javax.inject.Inject;
 
@@ -56,7 +58,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
     protected void onFinishInflate() {
         super.onFinishInflate();
         adapter = new ProfileAdapter(getContext(), presenter);
-        adapter.addFirst(new ProfileAdapter.Item(0, "", "", null));//header
+        adapter.addFirst(new ProfileAdapter.KeyValueItem(0, "", "", null));//header
         listLayout = new LinearLayoutManager(getContext());
         list = ((RecyclerView) findViewById(R.id.list));
         list.setLayoutManager(listLayout);
@@ -132,7 +134,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         int firstSectionCount = 0;
         if (hasUserName) {
             firstSectionCount++;
-            items.add(new ProfileAdapter.Item(
+            items.add(new ProfileAdapter.KeyValueItem(
                     R.drawable.ic_user,
                     "@" + user.username,
                     getContext().getString(R.string.item_type_username),
@@ -143,23 +145,36 @@ public class ProfileView extends FrameLayout implements HandlesBack {
             firstSectionCount++;
             final String phone = phoneFormat.format(
                     phoneNumberWithPlus(user));
-            items.add(new ProfileAdapter.Item(
+            items.add(new ProfileAdapter.KeyValueItem(
                     R.drawable.phone_grey,
                     phone,
                     getContext().getString(R.string.item_type_mobile),
                     createPhoneActions(phone)));
         }
+        List<Integer> singleSections = new ArrayList<>();
         if (userFill.botInfo instanceof TdApi.BotInfoGeneral){
             firstSectionCount++;
             final TdApi.BotInfoGeneral botInfo = (TdApi.BotInfoGeneral) userFill.botInfo;
-//            final String description = botInfo.description;
-            items.add(new ProfileAdapter.Item(
+            items.add(new ProfileAdapter.KeyValueItem(
                     R.drawable.ic_about,
                     botInfo.shareText,
                     getContext().getString(R.string.bot_about),
                     null
             ));
+
+            items.add(new ProfileAdapter.ButtonItem(
+                    R.drawable.ic_add,
+                    getContext().getString(R.string.bot_add_to_group),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            presenter.addBotToGroup();
+                        }
+                    }
+            ));
+            singleSections.add(items.size());
         }
+
 
         adapter.addAll(items);
         int itemsBeforeFirstSection = 1;//blue header
@@ -173,15 +188,24 @@ public class ProfileView extends FrameLayout implements HandlesBack {
             }
             list.addItemDecoration(new BottomShadow(getContext(), calc, firstSectionCount));
         }
-//        if (hasPhoneNumber || hasUserName){
-//
-//            if (hasPhoneNumber && hasUserName) {
-//
-//                list.addItemDecoration(new BottomShadow(getContext(), calc, 2));
-//            } else {
-//                list.addItemDecoration(new BottomShadow(getContext(), calc, 1));
-//            }
-//        }
+
+        Context ctx = getContext();
+        for (Integer integer : singleSections) {
+            list.addItemDecoration(new InsetDecorator(integer, calc.dp(6)));
+            list.addItemDecoration(new TopShadow(ctx, calc, integer));
+            list.addItemDecoration(new BottomShadow(ctx, calc, integer));
+        }
+    }
+
+    private List<ListChoicePopup.Item> crateteAddBotToGroupAction() {
+        final ArrayList<ListChoicePopup.Item> items = new ArrayList<>();
+        items.add(new ListChoicePopup.Item("unused", new Runnable() {
+            @Override
+            public void run() {
+                presenter.addBotToGroup();
+            }
+        }));
+        return items;
     }
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {
