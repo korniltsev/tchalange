@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ru.korniltsev.telegram.profile.chatselection.SelectChatView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        style="@style/PathRoot"
+        >
+
+    <LinearLayout
+            android:id="@+id/root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+        <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:theme="@style/ToolBarStyle"
+                app:popupTheme="@style/Theme.AppCompat.Light"
+                android:elevation="4dp"
+                android:background="?attr/colorPrimary"
+                android:paddingRight="4dp"
+                />
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                style="@style/ToolbarShadow"
+                >
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    />
+        </FrameLayout>
+
+    </LinearLayout>
+
+</ru.korniltsev.telegram.profile.chatselection.SelectChatView>

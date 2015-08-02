@@ -15,6 +15,7 @@ import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.profile.chatselection.SelectChatPath;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -142,6 +143,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void addBotToGroup() {
-
+        Flow.get(getView())
+                .set(new SelectChatPath(path.user, path.me));
     }
 }

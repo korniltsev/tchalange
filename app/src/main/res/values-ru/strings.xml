@@ -163,4 +163,5 @@
     <string name="what_the_bot_can_do">What this bot can do?</string>
     <string name="bot_about">About</string>
     <string name="bot_add_to_group">Add to group</string>
+    <string name="select_group">Select group</string>
 </resources>

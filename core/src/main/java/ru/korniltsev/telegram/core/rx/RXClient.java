@@ -21,6 +21,10 @@ import rx.subjects.PublishSubject;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 /**
@@ -517,6 +521,20 @@ public class RXClient {
     public Observable<TdApi.Chats> getChats(int offset, int limit) {
         return sendRx(new TdApi.GetChats(offset, limit))
                 .map(CAST_TO_CHATS);
+    }
+
+    public Observable<List<TdApi.Chat>> getChatsList(int offset, int limit) {
+        return getChats(offset, limit).map(new Func1<TdApi.Chats, List<TdApi.Chat>>() {
+            @Override
+            public List<TdApi.Chat> call(TdApi.Chats chats) {
+                final ArrayList<TdApi.Chat> res = new ArrayList<>();
+                Collections.addAll(res, chats.chats);
+                return res;
+            }
+        });
+
+        //        return sendRx(new TdApi.GetChats(offset, limit))
+        //                .map(CAST_TO_CHATS);
     }
 
     public Observable<TdApi.User> getMe() {
