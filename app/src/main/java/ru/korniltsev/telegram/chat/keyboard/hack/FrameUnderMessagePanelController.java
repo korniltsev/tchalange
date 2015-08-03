@@ -65,7 +65,6 @@ public class FrameUnderMessagePanelController {
         });
     }
 
-
     public void showRegularKeyboard() {
         if (root.getChildCount() == 0) {
             throw new IllegalStateException();
@@ -75,22 +74,19 @@ public class FrameUnderMessagePanelController {
         Utils.showKeyboard(messagePanel.getInput());
     }
 
-    public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
-//        if (replyMarkup.resizeKeyboard){
-//
-//        }
+    public void showBotKeyboard(TdApi.Message msg) {
+        TdApi.ReplyMarkupShowKeyboard replyMarkup = (TdApi.ReplyMarkupShowKeyboard) msg.replyMarkup;
         final int keyboardHeight = observableContainer.getKeyboardHeight();
         int viewHeight;
         if (keyboardHeight > 0) {
             viewHeight = keyboardHeight;
         } else {
-            viewHeight =observableContainer.guessKeyboardHeight();
+            viewHeight = observableContainer.guessKeyboardHeight();
         }
 
         removeViewsAndTrickyMargins();
 
-        View targetView = createBotKeyboardView(replyMarkup, viewHeight);
-
+        View targetView = createBotKeyboardView(replyMarkup, viewHeight, msg);
 
         if (keyboardHeight > 0) {
             root.addView(targetView, MATCH_PARENT, viewHeight);
@@ -104,7 +100,7 @@ public class FrameUnderMessagePanelController {
     }
 
     @NonNull
-    private View createBotKeyboardView(TdApi.ReplyMarkupShowKeyboard markup, int viewHeight) {
+    private View createBotKeyboardView(final TdApi.ReplyMarkupShowKeyboard markup, int viewHeight, final TdApi.Message msg) {
         String[][] rows = markup.rows;
         if (rows == null) {//todo delete
             rows = createRandomKeyboard();
@@ -113,7 +109,7 @@ public class FrameUnderMessagePanelController {
         int rowHeight = calc.dp(56);
         int leftRightPadding = calc.dp(15);
         int topBottomPadding = calc.dp(6);
-        boolean scrollable = rows.length  * rowHeight > viewHeight;
+        boolean scrollable = rows.length * rowHeight > viewHeight;
         final Context ctx = root.getContext();
         LinearLayout botReplyKeyboard = new LinearLayout(ctx);
         botReplyKeyboard.setPadding(leftRightPadding, topBottomPadding, leftRightPadding, topBottomPadding);
@@ -125,7 +121,7 @@ public class FrameUnderMessagePanelController {
             row.setPadding(0, dp5, 0, dp5);
             row.setOrientation(LinearLayout.HORIZONTAL);
             for (int i = 0, rowStrLength = rowStr.length; i < rowStrLength; i++) {
-                String s = rowStr[i];
+                final String s = rowStr[i];
                 final Button button = new Button(ctx);
                 button.setText(
                         emoji.replaceEmoji(s));
@@ -139,19 +135,25 @@ public class FrameUnderMessagePanelController {
                 button.setBackgroundResource(R.drawable.btn_bot_reply);
                 int leftPadding;
                 int rightPadding;
-                if (i == 0 ) {
+                if (i == 0) {
                     leftPadding = 0;
                 } else {
                     leftPadding = dp5;
                 }
-                if (i == rowStrLength - 1){
+                if (i == rowStrLength - 1) {
                     rightPadding = 0;
                 } else {
                     rightPadding = dp5;
                 }
                 lp.leftMargin = leftPadding;
                 lp.rightMargin = rightPadding;
-//                button.setPadding(leftPadding, 0, rightPadding, 0);
+                //                button.setPadding(leftPadding, 0, rightPadding, 0);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendBotCommand(s, msg, markup);
+                    }
+                });
                 row.addView(button, lp);
             }
             if (scrollable) {
@@ -178,11 +180,18 @@ public class FrameUnderMessagePanelController {
         return new String[][]{
                 {"A", "B"},
                 {"C", "D"},
-                {"A", "B","A", "B"},
-                {"C", "D","D"},
-//                {"A", "B"},
-//                {"C", "D"},
+                {"A", "B", "A", "B"},
+                {"C", "D", "D"},
+                //                {"A", "B"},
+                //                {"C", "D"},
         };
+    }
+
+    void sendBotCommand(String cmd, TdApi.Message msg, TdApi.ReplyMarkupShowKeyboard markup){
+        if (markup.oneTime) {
+            dismisAnyKeyboard();
+        }
+        botCommandClickListener.cmdClicked(cmd, msg);
     }
 
     public boolean dismisAnyKeyboard() {
@@ -233,16 +242,24 @@ public class FrameUnderMessagePanelController {
         this.listener = listener;
     }
 
-
-    public boolean isBotKeyboardShown(){
-        if (root.getChildCount() == 0){
+    public boolean isBotKeyboardShown() {
+        if (root.getChildCount() == 0) {
             return false;
         }
         final View childAt = root.getChildAt(0);
-        if (childAt instanceof EmojiKeyboardView){
+        if (childAt instanceof EmojiKeyboardView) {
             return false;
         } else {
             return true;
         }
+    }
+    private BotCommandClickListener botCommandClickListener;
+
+    public void setBotCommandClickListener(BotCommandClickListener botCommandClickListener) {
+        this.botCommandClickListener = botCommandClickListener;
+    }
+
+    public interface BotCommandClickListener{
+        void cmdClicked(String cmd, TdApi.Message msg);
     }
 }

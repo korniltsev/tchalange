@@ -31,6 +31,7 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
+import ru.korniltsev.telegram.core.rx.ChatDB;
 
 import javax.inject.Inject;
 
@@ -82,7 +83,8 @@ public class MessagePanel extends FrameLayout {
     @Nullable private List<BotCommandsAdapter.Record> botCommands;
     private ImageView btnBotCommand;
     private Runnable onAnyKeyboardShownListener;
-    @Nullable private TdApi.ReplyMarkupShowKeyboard replyMarkup;
+    @Nullable TdApi.Message replyMarkup;
+//    @Nullable private TdApi.ReplyMarkupShowKeyboard replyMarkup;
 
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -303,7 +305,7 @@ public class MessagePanel extends FrameLayout {
     }
 
 
-    public void setReplyMarkup(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
+    public void setReplyMarkup(TdApi.Message replyMarkup) {
         this.replyMarkup = replyMarkup;
         updateBotButtonState();
     }

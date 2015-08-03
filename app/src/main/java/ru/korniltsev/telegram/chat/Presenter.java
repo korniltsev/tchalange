@@ -136,10 +136,12 @@ public class Presenter extends ViewPresenter<ChatView>
             showMessagePanel(g.groupChat);
         }
 
-        final TdApi.ReplyMarkup currentMarkup = getRxChat().getCurrentMarkup();
+        final ChatDB.UpdateReplyMarkupWithData currentMarkup = getRxChat().getCurrentMarkup();
 
-        showBotKeyboardForMessage(currentMarkup);
-//        if (currentMarkup instanceof TdApi.ReplyMarkupShowKeyboard){
+        if (currentMarkup != null) {
+            showBotKeyboardForMessage(currentMarkup);
+        }
+        //        if (currentMarkup instanceof TdApi.ReplyMarkupShowKeyboard){
 //
 //        }
     }
@@ -316,9 +318,9 @@ public class Presenter extends ViewPresenter<ChatView>
                     }
                 }));
         subscription.add(
-                rxChat.getMarkup().subscribe(new ObserverAdapter<TdApi.ReplyMarkup>() {
+                rxChat.getMarkup().subscribe(new ObserverAdapter<ChatDB.UpdateReplyMarkupWithData>() {
                     @Override
-                    public void onNext(TdApi.ReplyMarkup response) {
+                    public void onNext(ChatDB.UpdateReplyMarkupWithData response) {
                         showBotKeyboardForMessage(response);
                     }
                 }));
@@ -333,18 +335,17 @@ public class Presenter extends ViewPresenter<ChatView>
 //        }
 //    }
 
-    private void showBotKeyboardForMessage(TdApi.ReplyMarkup markup) {
-        final TdApi.ReplyMarkup replyMarkup = markup;//msg.replyMarkup;
-        if (replyMarkup instanceof TdApi.ReplyMarkupNone) {
+    private void showBotKeyboardForMessage(@NonNull ChatDB.UpdateReplyMarkupWithData markup) {
+        if (markup.msg == null){
+            getView().hideReplyKeyboard();
             return;
         }
-        if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
-            return;//unsupported yet
-        }
-        if (replyMarkup instanceof TdApi.ReplyMarkupHideKeyboard) {
-            getView().hideReplyKeyboard();
-        } else if (replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
-            getView().showBotKeyboard(((TdApi.ReplyMarkupShowKeyboard) replyMarkup));
+        //todo
+//        if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
+//            return;//unsupported yet
+//        }
+        if (markup.msg.replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
+            getView().showBotKeyboard(markup.msg);
         }
     }
 
@@ -640,5 +641,9 @@ public class Presenter extends ViewPresenter<ChatView>
         } else {
             sendText(cmd.cmd);
         }
+    }
+
+    public void sendBotKeyboardCommand(String cmd, TdApi.Message msg) {
+
     }
 }

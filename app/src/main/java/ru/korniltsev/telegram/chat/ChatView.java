@@ -23,6 +23,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.adapter.TextMessageVH;
 import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
+import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelController;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
@@ -196,7 +197,12 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             @Override
             public void run() {
                 hideCommandList();
-
+            }
+        });
+        messagePanel.getBottomFrame().setBotCommandClickListener(new FrameUnderMessagePanelController.BotCommandClickListener() {
+            @Override
+            public void cmdClicked(String cmd, TdApi.Message msg) {
+                presenter.sendBotKeyboardCommand(cmd, msg);
             }
         });
     }
@@ -594,9 +600,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         botCommandListVisible = false;
     }
 
-    public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
-        messagePanel.getBottomFrame().showBotKeyboard(replyMarkup);
-        messagePanel.setReplyMarkup(replyMarkup);
+    public void showBotKeyboard(TdApi.Message msg) {
+        final TdApi.ReplyMarkupShowKeyboard markup = (TdApi.ReplyMarkupShowKeyboard) msg.replyMarkup;
+        messagePanel.getBottomFrame().showBotKeyboard( msg);
+        messagePanel.setReplyMarkup(msg);
     }
 
     public void hideReplyKeyboard() {

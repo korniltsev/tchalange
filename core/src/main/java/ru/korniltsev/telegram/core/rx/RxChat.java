@@ -529,9 +529,9 @@ public class RxChat implements UserHolder {
         }
     }
 
-    @Nullable TdApi.ReplyMarkup currentMarkup;
-    private PublishSubject<TdApi.ReplyMarkup> markup = PublishSubject.create();
-    public void handleReplyMarkup(TdApi.ReplyMarkup response) {
+    @Nullable ChatDB.UpdateReplyMarkupWithData currentMarkup;
+    private PublishSubject<ChatDB.UpdateReplyMarkupWithData> markup = PublishSubject.create();
+    public void handleReplyMarkup(ChatDB.UpdateReplyMarkupWithData response) {
         //save
         currentMarkup = response;//.replyMarkup;
         //todo serialize async
@@ -539,13 +539,13 @@ public class RxChat implements UserHolder {
         markup.onNext(response);
     }
 
-    public Observable<TdApi.ReplyMarkup> getMarkup() {
+    public Observable<ChatDB.UpdateReplyMarkupWithData> getMarkup() {
         return markup
                 .observeOn(mainThread());
     }
 
     @Nullable
-    public TdApi.ReplyMarkup getCurrentMarkup() {
+    public ChatDB.UpdateReplyMarkupWithData getCurrentMarkup() {
         return currentMarkup;
     }
 

@@ -114,17 +114,17 @@ public class ChatDB implements UserHolder {
                     @Override
                     public Observable<UpdateReplyMarkupWithData> call(TdApi.UpdateChatReplyMarkup u) {
                         if (u.replyMarkupMessageId == 0) {//hide
-                            final TdApi.ReplyMarkupHideKeyboard markup = new TdApi.ReplyMarkupHideKeyboard();
+//                            final TdApi.ReplyMarkupHideKeyboard markup = new TdApi.ReplyMarkupHideKeyboard();
                             return Observable.just(
-                                    new UpdateReplyMarkupWithData(u.chatId, markup));
+                                    new UpdateReplyMarkupWithData(u.chatId, null));
                         }
                         return client.sendRx(new TdApi.GetMessage(u.chatId, u.replyMarkupMessageId))
                                 .map(new Func1<TdApi.TLObject, UpdateReplyMarkupWithData>() {
                                     @Override
                                     public UpdateReplyMarkupWithData call(TdApi.TLObject tlObject) {
                                         final TdApi.Message msg = (TdApi.Message) tlObject;
-                                        final TdApi.ReplyMarkup replyMarkup = msg.replyMarkup;
-                                        return new UpdateReplyMarkupWithData(msg.chatId, replyMarkup);
+//                                        final TdApi.ReplyMarkup replyMarkup = msg.replyMarkup;
+                                        return new UpdateReplyMarkupWithData(msg.chatId, msg);
                                     }
                                 });
                     }
@@ -133,18 +133,18 @@ public class ChatDB implements UserHolder {
                     @Override
                     public void onNext(UpdateReplyMarkupWithData response) {
                         getRxChat(response.chatId)
-                                .handleReplyMarkup(response.markup);
+                                .handleReplyMarkup(response);
                     }
                 });
     }
 
-    static final class UpdateReplyMarkupWithData {
-        final long chatId;
-        final TdApi.ReplyMarkup markup;
-
-        public UpdateReplyMarkupWithData(long chatId, TdApi.ReplyMarkup markup) {
+    public static final class UpdateReplyMarkupWithData {
+        public final long chatId;
+//        final TdApi.ReplyMarkup markup;
+        public final TdApi.Message msg;
+        public UpdateReplyMarkupWithData(long chatId, TdApi.Message msg) {
             this.chatId = chatId;
-            this.markup = markup;
+            this.msg = msg;
         }
     }
 
