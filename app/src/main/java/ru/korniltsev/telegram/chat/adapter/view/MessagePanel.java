@@ -151,7 +151,7 @@ public class MessagePanel extends FrameLayout {
                         text.clear();
                         text.insert(0, "/");
                         input.requestFocus();
-                        showKeyboard(input);
+//                        showKeyboard(input);
                         bottomFrame.dismisAnyKeyboard();
                     }
                 }

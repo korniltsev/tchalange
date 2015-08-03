@@ -362,7 +362,10 @@ public class RxChat implements UserHolder {
     }
 
     private void sendMessageImpl(TdApi.InputMessageContent content) {
-        client.sendRx(new TdApi.SendMessage(id, 0, true, null, content))
+        sendMessageImpl(content, null);
+    }
+    private void sendMessageImpl(TdApi.InputMessageContent content, TdApi.ReplyMarkup markup) {
+        client.sendRx(new TdApi.SendMessage(id, 0, true, markup, content))
                 .map(CAST_TO_MESSAGE_AND_PARSE_EMOJI)
                 .observeOn(mainThread())
                 .subscribe(HANDLE_NEW_MESSAGE);
@@ -547,6 +550,10 @@ public class RxChat implements UserHolder {
     @Nullable
     public ChatDB.UpdateReplyMarkupWithData getCurrentMarkup() {
         return currentMarkup;
+    }
+
+    public void sendBotCommand(String cmd, TdApi.Message msg) {
+        sendMessageImpl(new TdApi.InputMessageText(cmd), null);
     }
 
     private class GetUsers implements Func1<TdApi.Messages, Observable<? extends ChatDB.Portion>> {

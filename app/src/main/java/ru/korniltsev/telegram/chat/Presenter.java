@@ -644,6 +644,6 @@ public class Presenter extends ViewPresenter<ChatView>
     }
 
     public void sendBotKeyboardCommand(String cmd, TdApi.Message msg) {
-
+        rxChat.sendBotCommand(cmd, msg);
     }
 }
