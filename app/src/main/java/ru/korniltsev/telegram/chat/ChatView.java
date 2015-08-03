@@ -40,6 +40,7 @@ import ru.korniltsev.telegram.core.rx.DaySplitter;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.rx.items.BotInfoItem;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
@@ -67,6 +68,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     @Inject DpCalculator calc;
     @Inject ActivityOwner activity;
     @Inject EmojiParser emojiParser;
+    @Inject UserHolder userHodler;
 
     private RecyclerView list;
     private MessagePanel messagePanel;
@@ -107,6 +109,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
     private Subscription clickedSpansSubscription;
     private View botCommandsShadow;
 
+
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
@@ -139,7 +142,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
         layout = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         myId = presenter.getPath().me.id;
-        adapter = new Adapter(getContext(), picasso, presenter.getPath().chat.lastReadOutboxMessageId, myId, presenter.getPath());
+        adapter = new Adapter(getContext(), picasso, presenter.getPath().chat.lastReadOutboxMessageId, myId, presenter.getPath(), userHodler);
         list.setLayoutManager(layout);
         list.setAdapter(adapter);
         btnScrollDown.setAlpha(0f);

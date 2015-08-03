@@ -79,11 +79,11 @@ public class RXAuthState {
 
     public static class StateAuthorized extends AuthState{
         public final int id;
-        @Nullable
+        @NonNull
         public final TdApi.User user;
         public final boolean fresh;
 
-        public StateAuthorized(int id, @Nullable TdApi.User user, boolean fresh) {
+        public StateAuthorized(int id, @NonNull TdApi.User user, boolean fresh) {
             this.id = id;
             this.user = user;
             this.fresh = fresh;
@@ -111,7 +111,11 @@ public class RXAuthState {
         if (authorized) {
             int uid = prefs.getInt(ME_UID, -1);
             TdApi.User user = getCurrentUser();
-            state = new StateAuthorized(uid, user, false);
+            if (user == null) {
+                state = new StateLogout();
+            } else {
+                state = new StateAuthorized(uid, user, false);
+            }
         } else {
             state = new StateLogout();
         }

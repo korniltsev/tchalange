@@ -17,6 +17,7 @@ import ru.korniltsev.telegram.core.recycler.CheckRecyclerViewSpan;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.chat.R;
@@ -35,6 +36,7 @@ public class ChatListView extends DrawerLayout {
     @Inject RXClient client;
     @Inject ChatDB chatDb;
     @Inject PhoneFormat phoneFormat;
+    @Inject UserHolder userHolder;
 
     private RecyclerView list;
     private ChatListAdapter adapter;
@@ -77,7 +79,7 @@ public class ChatListView extends DrawerLayout {
             public void call(TdApi.Chat chat) {
                 presenter.openChat(chat);
             }
-        }, chatDb);
+        }, chatDb, userHolder);
         layout = new LinearLayoutManager(getContext());
         list.setLayoutManager(layout);
         list.setAdapter(adapter);

@@ -24,7 +24,7 @@ public abstract class RealBaseVH extends RecyclerView.ViewHolder {
         int fromId = item.fromId;
         assertTrue(fromId != 0);
         TdApi.User user = uh.getUser(fromId);
-        return AppUtils.uiName(user, uh.getContext());
+        return AppUtils.uiName(user, uh.getCtx());
     }
 
 

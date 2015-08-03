@@ -21,6 +21,7 @@ import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.ChatDB;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.DividerItemDecorator;
@@ -41,6 +42,7 @@ import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
 
 public class SelectChatView extends FrameLayout {
     @Inject SelectChatPresenter presenter;
+    @Inject UserHolder userHolder;
 
     private RecyclerView list;
     private LinearLayoutManager listLayout;
@@ -89,7 +91,7 @@ public class SelectChatView extends FrameLayout {
             public void call(TdApi.Chat chat) {
                 presenter.chatSelected(chat);
             }
-        }, chats);
+        }, chats, userHolder);
         list.setAdapter(adapter);
         list.setOnScrollListener(
                 new EndlessOnScrollListener(listLayout, adapter, new Runnable() {

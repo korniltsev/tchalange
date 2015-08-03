@@ -42,12 +42,14 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     RxChat chat;
     public final int myId;
+    final UserHolder userHodler;
 
-    public Adapter(Context ctx, RxGlide picasso, long lastReadOutbox, int myId, Chat chat) {
+    public Adapter(Context ctx, RxGlide picasso, long lastReadOutbox, int myId, Chat chat, UserHolder userHodler) {
         super(ctx);
         this.picasso = picasso;
         this.lastReadOutbox = lastReadOutbox;
         this.myId = myId;
+        this.userHodler = userHodler;
         setHasStableIds(true);
         this.chatPath = chat;
     }
@@ -234,7 +236,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     }
 
     public UserHolder getUserHolder() {
-        return chat;
+        return userHodler;
     }
 
     public Chat getChatPath() {

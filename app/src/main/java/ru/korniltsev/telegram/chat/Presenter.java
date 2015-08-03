@@ -27,6 +27,7 @@ import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.ChatDB;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
 import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
@@ -74,14 +75,16 @@ public class Presenter extends ViewPresenter<ChatView>
 
     private final ActivityOwner owner;
     private final Stickers stickers;
+    final UserHolder uerHolder;
 
     @Inject
-    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, Stickers stickers) {
+    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, Stickers stickers, UserHolder uerHolder) {
         path = c;
         this.client = client;
         this.nm = nm;
         this.owner = owner;
         this.stickers = stickers;
+        this.uerHolder = uerHolder;
         this.chat = path.chat;
         rxChat = chatDB.getRxChat(chat.id);
 
@@ -632,7 +635,7 @@ public class Presenter extends ViewPresenter<ChatView>
             if (path.me.id == cmd.userId) {
                 sendText(cmd.cmd);
             } else {
-                final TdApi.User user = rxChat.getUser(cmd.userId);
+                final TdApi.User user = uerHolder.getUser(cmd.userId);
                 if (user == null) {
                     return;
                 }

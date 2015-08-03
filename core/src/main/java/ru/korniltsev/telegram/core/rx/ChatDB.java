@@ -34,7 +34,7 @@ import static ru.korniltsev.telegram.core.utils.Preconditions.checkNotMainThread
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
-public class ChatDB implements UserHolder {
+public class ChatDB {
 
     public static final long IMMEDIATE_BUFFER_INTERVAl = 128l + 64l;
     private final int chatLimit;
@@ -62,12 +62,15 @@ public class ChatDB implements UserHolder {
         });
     }
 
+    final UserHolder userHolder;
+
     @Inject
-    public ChatDB(final Context ctx, final RXClient client, EmojiParser parser, DpCalculator calc, NotificationManager nm, RXAuthState auth) {
+    public ChatDB(final Context ctx, final RXClient client, EmojiParser parser, DpCalculator calc, NotificationManager nm, RXAuthState auth, UserHolder userHolder) {
         this.ctx = ctx;
         this.client = client;
         this.parser = parser;
         this.nm = nm;
+        this.userHolder = userHolder;
         prepareForUpdates();
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -90,9 +93,6 @@ public class ChatDB implements UserHolder {
                     @Override
                     public void onNext(RXAuthState.AuthState authState) {
                         if (authState instanceof RXAuthState.StateLogout) {
-                            synchronized (userIdToUser) {
-                                userIdToUser.clear();
-                            }
                             chatIdToRxChat.clear();
                             chatsList.clear();
                             downloadedAllChats = false;
@@ -101,13 +101,6 @@ public class ChatDB implements UserHolder {
                     }
                 });
 
-        //todo try to cache all messages in hash map
-        //        client.updatesReplyMarkup().subscribe(new ObserverAdapter<TdApi.UpdateChatReplyMarkup>() {
-        //            @Override
-        //            public void onNext(TdApi.UpdateChatReplyMarkup response) {
-        //                super.onNext(response);
-        //            }
-        //        });
 
         client.updatesReplyMarkup()
                 .flatMap(new Func1<TdApi.UpdateChatReplyMarkup, Observable<UpdateReplyMarkupWithData>>() {
@@ -328,21 +321,19 @@ public class ChatDB implements UserHolder {
         }
     }
 
-    public void saveUsers(SparseArray<TdApi.User> us) {
-        for (int i = 0; i < us.size(); i++) {
-            TdApi.User obj = us.get(
-                    us.keyAt(i));
-            saveUser(obj);
-        }
-    }
+//    public void saveUsers(SparseArray<TdApi.User> us) {
+//        for (int i = 0; i < us.size(); i++) {
+//            TdApi.User obj = us.get(
+//                    us.keyAt(i));
+//            saveUser(obj);
+//        }
+//    }
 
     class ChatPortion {
         final TdApi.Chats cs;
-        final SparseArray<TdApi.User> us;
 
-        public ChatPortion(TdApi.Chats cs, SparseArray<TdApi.User> us) {
+        public ChatPortion(TdApi.Chats cs) {
             this.cs = cs;
-            this.us = us;
         }
     }
 
@@ -351,7 +342,7 @@ public class ChatDB implements UserHolder {
         requestImpl(chatsList.size(), chatLimit, true);
     }
 
-    final Set<Integer> tmpIds = new HashSet<>();
+//    final Set<Integer> tmpIds = new HashSet<>();
 
     private void requestImpl(int offset, int limit, final boolean historyRequest) {
         Assert.assertNull(chatsRequest);
@@ -359,33 +350,10 @@ public class ChatDB implements UserHolder {
                 .flatMap(new Func1<TdApi.Chats, Observable<ChatPortion>>() {
                     @Override
                     public Observable<ChatPortion> call(TdApi.Chats chats) {
-                        tmpIds.clear();
-                        checkNotMainThread();
                         for (TdApi.Chat chat : chats.chats) {
                             parser.parse(chat.topMessage);
-                            tmpIds.add(chat.topMessage.fromId);
-                            if (chat.topMessage.forwardFromId != 0) {
-                                tmpIds.add(chat.topMessage.fromId);
-                            }
                         }
-                        List<Observable<TdApi.User>> us = new ArrayList<Observable<TdApi.User>>();
-                        tmpIds.remove(0);//todo who ads it here
-                        for (Integer id : tmpIds) {
-                            us.add(client.getUser(id));
-                        }
-                        Observable<List<TdApi.User>> users = Observable.merge(us)
-                                .toList();
-                        return Observable.zip(users, Observable.just(chats), new Func2<List<TdApi.User>, TdApi.Chats, ChatPortion>() {
-                            @Override
-                            public ChatPortion call(List<TdApi.User> users, TdApi.Chats chats) {
-                                SparseArray<TdApi.User> us = new SparseArray<>();
-                                for (TdApi.User user : users) {
-                                    us.put(user.id, user);
-                                }
-                                ChatPortion chatPortion = new ChatPortion(chats, us);
-                                return chatPortion;
-                            }
-                        });
+                        return Observable.just(new ChatPortion(chats));
                     }
                 })
                 .observeOn(mainThread());
@@ -393,7 +361,6 @@ public class ChatDB implements UserHolder {
         chatsRequest.subscribe(new ObserverAdapter<ChatPortion>() {
             @Override
             public void onNext(ChatPortion p) {
-                saveUsers(p.us);
                 atLeastOneResponseReturned = true;
                 chatsRequest = null;
                 if (p.cs.chats.length == 0) {
@@ -439,45 +406,14 @@ public class ChatDB implements UserHolder {
     //guarded by ui thread
     private final LongSparseArray<RxChat> chatIdToRxChat = new LongSparseArray<>();
 
-    //guarded by userIdToUser
-    private final SparseArrayCompat<TdApi.User> userIdToUser = new SparseArrayCompat<>();
 
-    @Override
-    public boolean hasUserWith(int id) {
-        return getUser(id) != null;
-    }
-
-    @Override
-    public TdApi.User getUser(int id) {
-        synchronized (userIdToUser) {
-            return userIdToUser.get(id);
-        }
-    }
-
-    @Override
-    public void saveUser(TdApi.User u) {
-        synchronized (userIdToUser) {
-            userIdToUser.put(u.id, u);
-        }
-    }
-
-    @Override
-    public Context getContext() {
-        return ctx;
-    }
 
     public static class Portion {
         public final List<TdApi.Message> ms;
-        //        public final List<RxChat.ChatListItem> items;
-        public final SparseArray<TdApi.User> us;
 
-        public Portion(List<TdApi.Message> ms, List<TdApi.User> us) {
+        public Portion(List<TdApi.Message> ms) {
             this.ms = ms;
 
-            this.us = new SparseArray<>();
-            for (TdApi.User u : us) {
-                this.us.put(u.id, u);
-            }
         }
     }
 

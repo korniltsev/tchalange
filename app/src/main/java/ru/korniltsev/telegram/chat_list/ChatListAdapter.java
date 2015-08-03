@@ -19,6 +19,7 @@ import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.utils.Colors;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.chat.R;
@@ -39,13 +40,15 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
     private final Resources res;
     private ColorStateList COLOR_TEXT = ColorStateList.valueOf(0xff8a8a8a);
     final ChatDB chatDb;
+    final UserHolder userHolder;
 
-    public ChatListAdapter(Context ctx, int myId, Action1<TdApi.Chat> clicker, ChatDB chat) {
+    public ChatListAdapter(Context ctx, int myId, Action1<TdApi.Chat> clicker, ChatDB chat, UserHolder userHolder) {
         super(ctx);
         this.ctx = ctx;
         this.myId = myId;
         this.clicker = clicker;
         this.chatDb = chat;
+        this.userHolder = userHolder;
         setHasStableIds(true);
         res = ctx.getResources();
     }
@@ -170,12 +173,12 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         } else if (m instanceof TdApi.MessageContact) {
             return ctx.getString(R.string.contact);
         } else if (m instanceof TdApi.MessageChatChangePhoto) {
-            return ChatPhotoChangedVH.getTextFor(res, topMessage, chatDb);
+            return ChatPhotoChangedVH.getTextFor(res, topMessage, userHolder);
         } else if (m instanceof TdApi.MessageWebPage) {
             return ctx.getString(R.string.web_page);
         }
         else {
-            return SingleTextViewVH.getTextFor(ctx, topMessage, m, chatDb);
+            return SingleTextViewVH.getTextFor(ctx, topMessage, m, userHolder);
         }
 
 //        return null;

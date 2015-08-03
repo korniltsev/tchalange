@@ -581,4 +581,8 @@ public class RXClient {
     public Observable<TdApi.UpdateStickers> stickerUpdates() {
         return globalObservableWithBackPressure.compose(new FilterAndCastToClass<>(TdApi.UpdateStickers.class));
     }
+
+    public Observable<TLObject> getGlobalObservableWithBackPressure() {
+        return globalObservableWithBackPressure;
+    }
 }
