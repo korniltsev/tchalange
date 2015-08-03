@@ -135,6 +135,13 @@ public class Presenter extends ViewPresenter<ChatView>
             TdApi.GroupChatInfo g = (TdApi.GroupChatInfo) this.chat.type;
             showMessagePanel(g.groupChat);
         }
+
+        final TdApi.ReplyMarkup currentMarkup = getRxChat().getCurrentMarkup();
+
+        showBotKeyboardForMessage(currentMarkup);
+//        if (currentMarkup instanceof TdApi.ReplyMarkupShowKeyboard){
+//
+//        }
     }
 
     private void shareContact() {
@@ -217,7 +224,7 @@ public class Presenter extends ViewPresenter<ChatView>
                                        public void onNext(List<TdApi.Message> ms) {
                                            getView()
                                                    .addNewMessages(ms);
-                                           showBotKeyboard(ms);
+//                                           showBotKeyboard(ms);
                                            rxChat.hackToReadTheMessage(ms);
                                        }
                                    }
@@ -308,35 +315,37 @@ public class Presenter extends ViewPresenter<ChatView>
                         }
                     }
                 }));
+        subscription.add(
+                rxChat.getMarkup().subscribe(new ObserverAdapter<TdApi.ReplyMarkup>() {
+                    @Override
+                    public void onNext(TdApi.ReplyMarkup response) {
+                        showBotKeyboardForMessage(response);
+                    }
+                }));
     }
 
-    private void showBotKeyboard(List<TdApi.Message> ms) {
-        for (int i = ms.size() - 1; i >= 0; i--) {
-            final TdApi.Message msg = ms.get(i);
-            if (showKeyboardForMessage(msg)) {
-                break;
-            }
-        }
-    }
+//    private void showBotKeyboard(List<TdApi.Message> ms) {
+//        for (int i = ms.size() - 1; i >= 0; i--) {
+//            final TdApi.Message msg = ms.get(i);
+//            if (showKeyboardForMessage(msg)) {
+//                break;
+//            }
+//        }
+//    }
 
-    private boolean showKeyboardForMessage(TdApi.Message msg) {
-        //todo should save last shown, but not here - in RxChat
-        if (msg.fromId == path.me.id) {
-            return false;
+    private void showBotKeyboardForMessage(TdApi.ReplyMarkup markup) {
+        final TdApi.ReplyMarkup replyMarkup = markup;//msg.replyMarkup;
+        if (replyMarkup instanceof TdApi.ReplyMarkupNone) {
+            return;
         }
-        final TdApi.ReplyMarkup replyMarkup = msg.replyMarkup;
         if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
-            return true;
-        } else if (replyMarkup instanceof TdApi.ReplyMarkupHideKeyboard) {
+            return;//unsupported yet
+        }
+        if (replyMarkup instanceof TdApi.ReplyMarkupHideKeyboard) {
             getView().hideReplyKeyboard();
-            return true;
         } else if (replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
             getView().showBotKeyboard(((TdApi.ReplyMarkupShowKeyboard) replyMarkup));
-            return true;
-        } else if (replyMarkup instanceof TdApi.ReplyMarkupNone) {
-            return false;
         }
-        return false;
     }
 
     private Observable<TdApi.UpdateChatParticipantsCount> updatesChatsParticipantCount() {
@@ -387,13 +396,11 @@ public class Presenter extends ViewPresenter<ChatView>
                     fullChatInfoRequest.subscribe(
                             new ObserverAdapter<TdApi.GroupChatFull>() {
                                 @Override
-                                public void onNext(TdApi.GroupChatFull groupChatFull) {
+                                public void onNext(@NonNull TdApi.GroupChatFull groupChatFull) {
                                     mGroupChatFull = groupChatFull;
-                                    assertNotNull(mGroupChatFull);
-
-                                    showMessagePanel(mGroupChatFull.groupChat);
+                                    showMessagePanel(groupChatFull.groupChat);
                                     updateGroupChatOnlineStatus(groupChatFull);
-                                    setBotCommands();
+                                    setBotCommands(groupChatFull);
                                 }
 
                                 @Override
@@ -413,10 +420,10 @@ public class Presenter extends ViewPresenter<ChatView>
         }
     }
 
-    private void setBotCommands() {
+    private void setBotCommands(TdApi.GroupChatFull groupChatFull) {
         botCount = 0;
         List<BotCommandsAdapter.Record> cs = new ArrayList<>();
-        for (TdApi.ChatParticipant p : mGroupChatFull.participants) {
+        for (TdApi.ChatParticipant p : groupChatFull.participants) {
             if (p.botInfo instanceof TdApi.BotInfoGeneral) {
                 botCount++;
                 final TdApi.BotCommand[] commands = ((TdApi.BotInfoGeneral) p.botInfo).commands;

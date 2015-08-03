@@ -529,6 +529,26 @@ public class RxChat implements UserHolder {
         }
     }
 
+    @Nullable TdApi.ReplyMarkup currentMarkup;
+    private PublishSubject<TdApi.ReplyMarkup> markup = PublishSubject.create();
+    public void handleReplyMarkup(TdApi.ReplyMarkup response) {
+        //save
+        currentMarkup = response;//.replyMarkup;
+        //todo serialize async
+        //show to user
+        markup.onNext(response);
+    }
+
+    public Observable<TdApi.ReplyMarkup> getMarkup() {
+        return markup
+                .observeOn(mainThread());
+    }
+
+    @Nullable
+    public TdApi.ReplyMarkup getCurrentMarkup() {
+        return currentMarkup;
+    }
+
     private class GetUsers implements Func1<TdApi.Messages, Observable<? extends ChatDB.Portion>> {
         private final TdApi.Message initMessage;
 

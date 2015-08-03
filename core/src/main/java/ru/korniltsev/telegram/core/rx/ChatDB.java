@@ -100,6 +100,52 @@ public class ChatDB implements UserHolder {
                         }
                     }
                 });
+
+        //todo try to cache all messages in hash map
+        //        client.updatesReplyMarkup().subscribe(new ObserverAdapter<TdApi.UpdateChatReplyMarkup>() {
+        //            @Override
+        //            public void onNext(TdApi.UpdateChatReplyMarkup response) {
+        //                super.onNext(response);
+        //            }
+        //        });
+
+        client.updatesReplyMarkup()
+                .flatMap(new Func1<TdApi.UpdateChatReplyMarkup, Observable<UpdateReplyMarkupWithData>>() {
+                    @Override
+                    public Observable<UpdateReplyMarkupWithData> call(TdApi.UpdateChatReplyMarkup u) {
+                        if (u.replyMarkupMessageId == 0) {//hide
+                            final TdApi.ReplyMarkupHideKeyboard markup = new TdApi.ReplyMarkupHideKeyboard();
+                            return Observable.just(
+                                    new UpdateReplyMarkupWithData(u.chatId, markup));
+                        }
+                        return client.sendRx(new TdApi.GetMessage(u.chatId, u.replyMarkupMessageId))
+                                .map(new Func1<TdApi.TLObject, UpdateReplyMarkupWithData>() {
+                                    @Override
+                                    public UpdateReplyMarkupWithData call(TdApi.TLObject tlObject) {
+                                        final TdApi.Message msg = (TdApi.Message) tlObject;
+                                        final TdApi.ReplyMarkup replyMarkup = msg.replyMarkup;
+                                        return new UpdateReplyMarkupWithData(msg.chatId, replyMarkup);
+                                    }
+                                });
+                    }
+                }).observeOn(mainThread())
+                .subscribe(new ObserverAdapter<UpdateReplyMarkupWithData>() {
+                    @Override
+                    public void onNext(UpdateReplyMarkupWithData response) {
+                        getRxChat(response.chatId)
+                                .handleReplyMarkup(response.markup);
+                    }
+                });
+    }
+
+    static final class UpdateReplyMarkupWithData {
+        final long chatId;
+        final TdApi.ReplyMarkup markup;
+
+        public UpdateReplyMarkupWithData(long chatId, TdApi.ReplyMarkup markup) {
+            this.chatId = chatId;
+            this.markup = markup;
+        }
     }
 
     private void prepareForUpdates() {
@@ -223,7 +269,7 @@ public class ChatDB implements UserHolder {
                 .map(new Func1<List<TdApi.UpdateNewMessage>, List<TdApi.UpdateNewMessage>>() {
                     @Override
                     public List<TdApi.UpdateNewMessage> call(List<TdApi.UpdateNewMessage> updateNewMessages) {
-//                        Log.d("ImmediateBufferOperator", "handle  " + updateNewMessages.size());
+                        //                        Log.d("ImmediateBufferOperator", "handle  " + updateNewMessages.size());
                         for (TdApi.UpdateNewMessage msg : updateNewMessages) {
                             parser.parse(msg.message);
                         }

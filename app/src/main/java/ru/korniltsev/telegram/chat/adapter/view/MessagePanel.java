@@ -23,7 +23,6 @@ import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelControlle
 import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
-import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
@@ -83,6 +82,7 @@ public class MessagePanel extends FrameLayout {
     @Nullable private List<BotCommandsAdapter.Record> botCommands;
     private ImageView btnBotCommand;
     private Runnable onAnyKeyboardShownListener;
+    @Nullable private TdApi.ReplyMarkupShowKeyboard replyMarkup;
 
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -142,18 +142,32 @@ public class MessagePanel extends FrameLayout {
             @Override
             public void onClick(View v) {
                 if (botCommands != null) {
-                    final Editable text = input.getText();
-                    text.clear();
-                    text.insert(0, "/");
-                    input.requestFocus();
-                    showKeyboard(input);
-                    bottomFrame.dismisAnyKeyboard();
+                    if (replyMarkup != null){
+                        showOrHideBotCommands();
+                    } else {
+                        final Editable text = input.getText();
+                        text.clear();
+                        text.insert(0, "/");
+                        input.requestFocus();
+                        showKeyboard(input);
+                        bottomFrame.dismisAnyKeyboard();
+                    }
                 }
+                updateBotButtonState();
             }
         });
 
+
     }
 
+    private void showOrHideBotCommands() {
+        if (bottomFrame.isBotKeyboardShown()){
+            input.requestFocus();
+            bottomFrame.showRegularKeyboard();
+        } else {
+            bottomFrame.showBotKeyboard(replyMarkup);
+        }
+    }
 
     boolean lastInputIsEmpty = true;
 
@@ -255,20 +269,42 @@ public class MessagePanel extends FrameLayout {
     }
 
     private void updateBotButtonState() {
-        if (botCommands == null){
+        int icon = 0;
+        if (replyMarkup != null){
+            if (bottomFrame.observableContainer.getKeyboardHeight() >0){
+                icon = R.drawable.ic_msg_panel_kb;
+            } else {
+                icon =  R.drawable.ic_command;
+            }
+        } else if (botCommands != null){
+            icon = R.drawable.ic_slash;
+        }
+        if (icon == 0){
             btnBotCommand.setVisibility(View.GONE);
         } else {
             btnBotCommand.setVisibility(View.VISIBLE);
-            btnBotCommand.setImageResource(R.drawable.ic_slash);
+            btnBotCommand.setImageResource(icon);
         }
+//        if (botCommands == null){
+//            btnBotCommand.setVisibility(View.GONE);
+//        } else {
+//            btnBotCommand.setVisibility(View.VISIBLE);
+//            if (replyMarkup != null){
+//                btnBotCommand.setImageResource(R.drawable.ic_command);
+//            } else {
+//                btnBotCommand.setImageResource(R.drawable.ic_slash);
+//            }
+//        }
     }
 
     public void setOnAnyKeyboardShownListener(Runnable onAnyKeyboardShownListener) {
         this.onAnyKeyboardShownListener = onAnyKeyboardShownListener;
     }
 
-    public Runnable getOnAnyKeyboardShownListener() {
-        return onAnyKeyboardShownListener;
+
+    public void setReplyMarkup(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
+        this.replyMarkup = replyMarkup;
+        updateBotButtonState();
     }
 
     public interface OnSendListener {

@@ -192,6 +192,12 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         final TrickyBottomFrame bottomFrame = (TrickyBottomFrame) findViewById(R.id.frame_under_message_panel);
         final TrickyLinearyLayout tricky = (TrickyLinearyLayout) findViewById(R.id.list_and_message_panel);
         messagePanel.initBottomFrame(bottomFrame, tricky);
+        messagePanel.setOnAnyKeyboardShownListener(new Runnable() {
+            @Override
+            public void run() {
+                hideCommandList();
+            }
+        });
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -533,12 +539,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         });
 
         messagePanel.setCommands(cs);
-        messagePanel.setOnAnyKeyboardShownListener(new Runnable(){
-            @Override
-            public void run() {
-                hideCommandList();
-            }
-        });
+
 
     }
 
@@ -594,7 +595,13 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
 
     public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
         messagePanel.getBottomFrame().showBotKeyboard(replyMarkup);
-//        bottomFrame.showBotKeyboard(replyMarkup);
+        messagePanel.setReplyMarkup(replyMarkup);
+    }
+
+    public void hideReplyKeyboard() {
+        messagePanel.getBottomFrame()
+                .dismisAnyKeyboard();
+        messagePanel.setReplyMarkup(null);
 
     }
 
@@ -649,12 +656,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         this.isBot = isBot;
     }
 
-    public void hideReplyKeyboard() {
-        messagePanel.getBottomFrame()
-                .dismisAnyKeyboard();
-//        bottomFrame.hideAll();
 
-    }
 
     //    public void setCommands(TdApi.ChatParticipant[] participants) {
     //

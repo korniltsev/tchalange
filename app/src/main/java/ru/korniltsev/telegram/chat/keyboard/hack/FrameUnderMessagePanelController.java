@@ -24,7 +24,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class FrameUnderMessagePanelController {
     final TrickyBottomFrame root;
     final MessagePanel messagePanel;
-    private final ObservableLinearLayout observableContainer;
+    public final ObservableLinearLayout observableContainer;
     private final TrickyLinearyLayout tricky;
     private int lastKeyboardHeight = 0;
     final DpCalculator calc;
@@ -55,16 +55,24 @@ public class FrameUnderMessagePanelController {
                     return false;
                 }
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    tricky.fixHeight();
-                    removeViewsAndTrickyMargins();
-                    Utils.showKeyboard(messagePanel.getInput());
+                    showRegularKeyboard();
                 }
                 return false;
             }
         });
     }
 
+
+    public void showRegularKeyboard() {
+        tricky.fixHeight();
+        removeViewsAndTrickyMargins();
+        Utils.showKeyboard(messagePanel.getInput());
+    }
+
     public void showBotKeyboard(TdApi.ReplyMarkupShowKeyboard replyMarkup) {
+//        if (replyMarkup.resizeKeyboard){
+//
+//        }
         final int keyboardHeight = observableContainer.getKeyboardHeight();
         int viewHeight;
         if (keyboardHeight > 0) {
@@ -74,11 +82,8 @@ public class FrameUnderMessagePanelController {
         }
 
         removeViewsAndTrickyMargins();
-        String[][] rows = replyMarkup.rows;
-        if (rows == null) {//todo delete
-            rows = createRandomKeyboard();
-        }
-        View targetView = createBotKeyboardView(rows, viewHeight);
+
+        View targetView = createBotKeyboardView(replyMarkup, viewHeight);
 
 
         if (keyboardHeight > 0) {
@@ -93,7 +98,12 @@ public class FrameUnderMessagePanelController {
     }
 
     @NonNull
-    private View createBotKeyboardView(String[][] rows, int viewHeight) {
+    private View createBotKeyboardView(TdApi.ReplyMarkupShowKeyboard markup, int viewHeight) {
+        String[][] rows = markup.rows;
+        if (rows == null) {//todo delete
+            rows = createRandomKeyboard();
+        }
+
         int rowHeight = calc.dp(56);
         int leftRightPadding = calc.dp(15);
         int topBottomPadding = calc.dp(6);
@@ -218,5 +228,17 @@ public class FrameUnderMessagePanelController {
 
     public Runnable getListener() {
         return listener;
+    }
+
+    public boolean isBotKeyboardShown(){
+        if (root.getChildCount() == 0){
+            return false;
+        }
+        final View childAt = root.getChildAt(0);
+        if (childAt instanceof EmojiKeyboardView){
+            return false;
+        } else {
+            return true;
+        }
     }
 }

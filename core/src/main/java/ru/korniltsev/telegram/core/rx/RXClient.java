@@ -27,6 +27,7 @@ import java.util.List;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
+import static org.drinkless.td.libcore.telegram.TdApi.*;
 /**
  * Created by korniltsev on 21/04/15.
  */
@@ -219,6 +220,7 @@ public class RXClient {
                     //                        Log.e("RxClientError", "error: ", e);
                     //                    }
                 } else {
+                    Log.d("RxClient", "global event " + object);
                     globalSubject2.onNext(object);
                 }
 
@@ -478,6 +480,11 @@ public class RXClient {
 
     public void simulateNewMessage(TdApi.Message tlObject) {
         globalSubject2.onNext(new TdApi.UpdateNewMessage(tlObject));
+    }
+
+    public Observable<TdApi.UpdateChatReplyMarkup> updatesReplyMarkup() {
+        return globalObservableWithBackPressure
+                .compose(new FilterAndCastToClass<>(TdApi.UpdateChatReplyMarkup.class));
     }
 
     static class RxClientException extends Exception {
