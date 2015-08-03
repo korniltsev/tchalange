@@ -45,6 +45,9 @@ public class FrameUnderMessagePanelController {
                 if (keyboardHeight == 0 && lastKeyboardHeight != 0 && root.getChildCount() == 0) {
                     tricky.resetFixedheight();
                 }
+                if (keyboardHeight != 0 && lastKeyboardHeight == 0) {
+                    tricky.updateFixedHeight(keyboardHeight);
+                }
                 lastKeyboardHeight = keyboardHeight;
             }
         });
@@ -64,6 +67,9 @@ public class FrameUnderMessagePanelController {
 
 
     public void showRegularKeyboard() {
+        if (root.getChildCount() == 0) {
+            throw new IllegalStateException();
+        }
         tricky.fixHeight();
         removeViewsAndTrickyMargins();
         Utils.showKeyboard(messagePanel.getInput());
@@ -191,6 +197,7 @@ public class FrameUnderMessagePanelController {
         if (root.getChildCount() != 0) {
             root.removeAllViews();
             tricky.setTrickyMargin(0);
+            listener.run();
             return true;
         } else {
             tricky.setTrickyMargin(0);
@@ -226,9 +233,6 @@ public class FrameUnderMessagePanelController {
         this.listener = listener;
     }
 
-    public Runnable getListener() {
-        return listener;
-    }
 
     public boolean isBotKeyboardShown(){
         if (root.getChildCount() == 0){

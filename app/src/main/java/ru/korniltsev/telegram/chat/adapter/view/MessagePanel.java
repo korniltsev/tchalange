@@ -256,6 +256,7 @@ public class MessagePanel extends FrameLayout {
             @Override
             public void run() {
                 onAnyKeyboardShownListener.run();
+                updateBotButtonState();
             }
         });
     }

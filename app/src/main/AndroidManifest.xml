@@ -14,7 +14,7 @@
         <activity android:name='ru.korniltsev.telegram.main.MainActivity'
                   android:theme="@style/AppTheme"
                   android:launchMode="singleInstance"
-                  android:windowSoftInputMode="adjustResize"
+                  android:windowSoftInputMode="adjustResize|stateUnchanged"
                 >
             <intent-filter>
                 <action android:name='android.intent.action.MAIN' />

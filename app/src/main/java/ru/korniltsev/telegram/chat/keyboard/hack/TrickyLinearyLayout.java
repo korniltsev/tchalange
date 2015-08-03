@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 public class TrickyLinearyLayout extends LinearLayout {
     private int trickyMargin;
     private int fixedHeight = -1;
+    private int fixedMargin;
 
     public TrickyLinearyLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -52,6 +53,7 @@ public class TrickyLinearyLayout extends LinearLayout {
 
     public void fixHeight() {
         this.fixedHeight = getHeight();
+        this.fixedMargin = trickyMargin;
         requestLayout();
         log("fix height ");
     }
@@ -64,5 +66,18 @@ public class TrickyLinearyLayout extends LinearLayout {
             requestLayout();
         }
 
+    }
+
+    public void updateFixedHeight(int keyboardHeight) {
+        if (fixedHeight != -1
+                && fixedMargin != 0
+                && fixedMargin != keyboardHeight ){
+            int diff = fixedMargin - keyboardHeight;
+            fixedHeight += diff;
+            fixedMargin = keyboardHeight;
+            log("increase fixed height by " + diff );
+            requestLayout();
+
+        }
     }
 }

@@ -196,6 +196,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             @Override
             public void run() {
                 hideCommandList();
+
             }
         });
     }
