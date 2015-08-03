@@ -61,14 +61,14 @@ public class Stickers {
     }
 
     private void requestStickers() {
-        client.sendRx(new TdApi.GetStickers(""))
-                .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-                    @Override
-                    public void onNext(TdApi.TLObject response) {
-                        updateStickers((TdApi.Stickers) response);
-                    }
-                });
+//        client.sendRx(new TdApi.GetStickers(""))
+//                .observeOn(mainThread())
+//                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+//                    @Override
+//                    public void onNext(TdApi.TLObject response) {
+//                        updateStickers((TdApi.Stickers) response);
+//                    }
+//                });
     }
 
     private void updateStickers(TdApi.Stickers newStickers) {

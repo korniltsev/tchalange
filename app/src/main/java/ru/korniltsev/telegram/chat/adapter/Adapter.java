@@ -92,7 +92,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return VIEW_TYPE_PHOTO;
             } else if (message instanceof TdApi.MessageSticker) {
                 return VIEW_TYPE_STICKER;
-            } else if (message instanceof TdApi.MessageAudio) {
+            } else if (message instanceof TdApi.MessageVoice) {
                 return VIEW_TYPE_AUDIO;
             } else if (message instanceof TdApi.MessageLocation) {
                 return VIEW_TYPE_GEO;

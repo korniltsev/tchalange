@@ -38,7 +38,7 @@ public class AudioMessageView extends LinearLayout {
     @Inject RXClient client;
     @Inject RxDownloadManager downloader;
 
-    private TdApi.Audio audio;
+    private TdApi.Voice audio;
     private DownloadView download_view;
     private static final PeriodFormatter DURATION_FORMATTER = new PeriodFormatterBuilder()
             .printZeroAlways()
@@ -85,7 +85,7 @@ public class AudioMessageView extends LinearLayout {
         subscription.unsubscribe();
     }
 
-    public void setAudio(TdApi.Audio a) {
+    public void setAudio(TdApi.Voice a) {
         this.audio = a;
         progress.setProgress(0);
         long secs = a.duration;
@@ -94,8 +94,8 @@ public class AudioMessageView extends LinearLayout {
 
         this.duration.setText(DURATION_FORMATTER.print(p));
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
-        downloader.hook(a.audio, decodeAction);
-        download_view.bind(a.audio, cfg, new DownloadView.CallBack() {
+        downloader.hook(a.voice, decodeAction);
+        download_view.bind(a.voice, cfg, new DownloadView.CallBack() {
             @Override
             public void onProgress(TdApi.UpdateFileProgress p) {
 
