@@ -271,7 +271,7 @@ public class MessagePanel extends FrameLayout {
     private void updateBotButtonState() {
         int icon = 0;
         if (replyMarkup != null){
-            if (bottomFrame.observableContainer.getKeyboardHeight() >0){
+            if (bottomFrame.isBotKeyboardShown()){
                 icon = R.drawable.ic_msg_panel_kb;
             } else {
                 icon =  R.drawable.ic_command;

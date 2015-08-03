@@ -19,6 +19,7 @@ import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.utils.Colors;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
@@ -214,7 +215,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
                     clicker.call(getItem(getPosition()));
                 }
             });
-
+            message.setLinkTextColor(Colors.USER_NAME_COLOR);
 
         }
     }
