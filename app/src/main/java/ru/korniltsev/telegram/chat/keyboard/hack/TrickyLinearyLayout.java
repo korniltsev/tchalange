@@ -77,7 +77,8 @@ public class TrickyLinearyLayout extends LinearLayout {
             fixedMargin = keyboardHeight;
             log("increase fixed height by " + diff );
             requestLayout();
-
+        } else {
+            requestLayout();
         }
     }
 }

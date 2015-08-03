@@ -288,16 +288,13 @@ public class MessagePanel extends FrameLayout {
             btnBotCommand.setVisibility(View.VISIBLE);
             btnBotCommand.setImageResource(icon);
         }
-//        if (botCommands == null){
-//            btnBotCommand.setVisibility(View.GONE);
-//        } else {
-//            btnBotCommand.setVisibility(View.VISIBLE);
-//            if (replyMarkup != null){
-//                btnBotCommand.setImageResource(R.drawable.ic_command);
-//            } else {
-//                btnBotCommand.setImageResource(R.drawable.ic_slash);
-//            }
-//        }
+
+        if (bottomFrame.isEmojiKeyboardShown()){
+            btnLeft.setImageResource(R.drawable.ic_msg_panel_kb);
+        } else {
+            btnLeft.setImageResource(R.drawable.ic_smiles);
+        }
+
     }
 
     public void setOnAnyKeyboardShownListener(Runnable onAnyKeyboardShownListener) {

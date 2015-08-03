@@ -188,9 +188,9 @@ public class FrameUnderMessagePanelController {
     }
 
     void sendBotCommand(String cmd, TdApi.Message msg, TdApi.ReplyMarkupShowKeyboard markup){
-        if (markup.oneTime) {
-            dismisAnyKeyboard();
-        }
+//        if (markup.oneTime) {
+//            dismisAnyKeyboard();
+//        }
         botCommandClickListener.cmdClicked(cmd, msg);
     }
 
@@ -252,6 +252,14 @@ public class FrameUnderMessagePanelController {
         } else {
             return true;
         }
+    }
+
+    public boolean isEmojiKeyboardShown() {
+        if (root.getChildCount() == 0) {
+            return false;
+        }
+        final View childAt = root.getChildAt(0);
+        return childAt instanceof EmojiKeyboardView;
     }
     private BotCommandClickListener botCommandClickListener;
 

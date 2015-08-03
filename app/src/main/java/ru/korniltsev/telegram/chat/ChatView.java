@@ -205,6 +205,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         messagePanel.getBottomFrame().setBotCommandClickListener(new FrameUnderMessagePanelController.BotCommandClickListener() {
             @Override
             public void cmdClicked(String cmd, TdApi.Message msg) {
+                final TdApi.ReplyMarkupShowKeyboard replyMarkup = (TdApi.ReplyMarkupShowKeyboard) msg.replyMarkup;
+                if (replyMarkup.oneTime){
+                    hideReplyKeyboard();
+                }
                 presenter.sendBotKeyboardCommand(cmd, msg);
             }
         });
