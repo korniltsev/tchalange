@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.text.method.PasswordTransformationMethod;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
@@ -71,6 +72,7 @@ public class PasscodeView extends FrameLayout implements HandlesBack {
         });
         passcodeField.setSingleLine(true);
         passcodeField.requestFocus();
+        passcodeField.setTransformationMethod(PasswordTransformationMethod.getInstance());
         showKeyboard(passcodeField);
     }
 

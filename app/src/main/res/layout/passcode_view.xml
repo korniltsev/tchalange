@@ -49,7 +49,6 @@
             android:textColor="#fff"
             android:textCursorDrawable="@null"
             android:inputType="textPassword"
-
             android:imeOptions="actionDone"
 
             />
