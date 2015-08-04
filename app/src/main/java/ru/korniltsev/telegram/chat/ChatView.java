@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -33,6 +34,7 @@ import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.adapter.Adapter;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.flow.pathview.TraversalAware;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.recycler.CheckRecyclerViewSpan;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
@@ -60,7 +62,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
-public class ChatView extends ObservableLinearLayout implements HandlesBack {
+public class ChatView extends ObservableLinearLayout implements HandlesBack , TraversalAware{
     public static final int SHOW_SCROLL_DOWN_BUTTON_ITEMS_COUNT = 10;
     public static final DecelerateInterpolator INTERPOLATOR = new DecelerateInterpolator(1.5f);
     @Inject Presenter presenter;
@@ -206,7 +208,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
             @Override
             public void cmdClicked(String cmd, TdApi.Message msg) {
                 final TdApi.ReplyMarkupShowKeyboard replyMarkup = (TdApi.ReplyMarkupShowKeyboard) msg.replyMarkup;
-                if (replyMarkup.oneTime){
+                if (replyMarkup.oneTime) {
                     hideReplyKeyboard();
                 }
                 presenter.sendBotKeyboardCommand(cmd, msg);
@@ -672,7 +674,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
         this.isBot = isBot;
     }
 
-
+    @Override
+    public void onTraversalCompleted() {
+        list.setItemAnimator(new DefaultItemAnimator());
+    }
 
     //    public void setCommands(TdApi.ChatParticipant[] participants) {
     //

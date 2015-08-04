@@ -112,6 +112,9 @@ public class SimplePathContainer extends PathContainer {
       public void onAnimationEnd(Animator animation) {
         container.removeView(from);
         callback.onTraversalCompleted();
+        if (to instanceof TraversalAware){
+          ((TraversalAware) to).onTraversalCompleted();
+        }
       }
     };
 
