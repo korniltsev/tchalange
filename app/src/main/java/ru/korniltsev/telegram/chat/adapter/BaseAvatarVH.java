@@ -95,7 +95,7 @@ abstract class BaseAvatarVH extends RealBaseVH {
         long timeInMillis = Utils.dateToMillis(msg.date);
         long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
         if (Locale.getDefault().getCountry().equals("RU")){
-            return fuckRuFormatter.format(local);
+            return fuckRuFormatter.format(local);//todo wtf
         } else {
             return MESSAGE_TIME_FORMAT.print(local);
         }

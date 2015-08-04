@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              style="@style/Item.Root"
+<ru.korniltsev.telegram.chat.debug.CustomCeilLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         >
 
-    <include layout="@layout/chat_item_avatar"/>
+    <!--<include layout="@layout/chat_item_avatar"/>-->
 
-    <include layout="@layout/chat_item_nick_and_time"/>
+    <!--<include layout="@layout/chat_item_nick_and_time"/>-->
 
-    <ru.korniltsev.telegram.core.emoji.EmojiTextView
-            android:id="@+id/message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#ff000000"
-            style="@style/item_content_with_margins"
-            />
-</RelativeLayout>
+    <!--<ru.korniltsev.telegram.core.emoji.EmojiTextView-->
+    <!--android:id="@+id/message"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:textColor="#ff000000"-->
+    <!--style="@style/item_content_with_margins"-->
+    <!--/>-->
+</ru.korniltsev.telegram.chat.debug.CustomCeilLayout>

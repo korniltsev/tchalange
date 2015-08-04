@@ -22,6 +22,22 @@ public class AvatarView extends ImageView {
 
     public final RxGlide picasso2;
 
+
+    public AvatarView(Context context, int size) {
+        super(context);
+        picasso2 = ObjectGraphService.getObjectGraph(context)
+                .get(RxGlide.class);
+
+//        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AvatarView);
+//        size = a.getDimensionPixelSize(R.styleable.AvatarView_size, -1);
+//        a.recycle();
+        this.size = size;
+        Assert.assertTrue(size != -1 && size > 0);
+
+
+        setScaleType(ScaleType.CENTER_CROP);
+    }
+
     public AvatarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         picasso2 = ObjectGraphService.getObjectGraph(context)

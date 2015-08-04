@@ -22,6 +22,11 @@ public class EmojiTextView extends TextView{
 
     }
 
+    public EmojiTextView(Context context) {
+        super(context);
+        ObjectGraphService.inject(context, this);
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();

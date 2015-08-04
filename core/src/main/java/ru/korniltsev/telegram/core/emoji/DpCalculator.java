@@ -13,4 +13,8 @@ public class DpCalculator {
     public int dp(float value) {
         return (int)Math.ceil(density * value);
     }
+
+    public float dpFloat(float value) {
+        return (float) Math.ceil(density * value);
+    }
 }

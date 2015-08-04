@@ -212,6 +212,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack {
                 presenter.sendBotKeyboardCommand(cmd, msg);
             }
         });
+        list.setItemAnimator(null);
     }
 
     boolean scrollDownButtonIsVisible = false;

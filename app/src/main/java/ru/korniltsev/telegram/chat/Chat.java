@@ -11,6 +11,7 @@ import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
 import ru.korniltsev.telegram.chat.adapter.view.StickerView;
 import ru.korniltsev.telegram.chat.adapter.view.VideoView;
+import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
@@ -50,6 +51,7 @@ public class Chat extends BasePath implements Serializable {
                     StickerView.class ,
                     MessagePanel.class ,
                     ForwardedMessageView.class ,
+                    CustomCeilLayout.class,
 
             },
             addsTo = RootModule.class)
