@@ -127,7 +127,11 @@ public class MessagePanel extends FrameLayout {
             @Override
             public void onClick(View v) {
 
-                bottomFrame.showEmoji(emojiKeyboardCallback);
+                if (bottomFrame.isEmojiKeyboardShown()){
+                    bottomFrame.showRegularKeyboard();
+                } else {
+                    bottomFrame.showEmoji(emojiKeyboardCallback);
+                }
             }
         });
         rightButtons = findViewById(R.id.right_buttons);
