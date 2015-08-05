@@ -17,6 +17,7 @@ import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.flow.pathview.NoAnimationTraversal;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 
 import javax.inject.Inject;
@@ -25,7 +26,7 @@ import static ru.korniltsev.telegram.core.Utils.hideKeyboard;
 import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 
-public class PasscodeView extends FrameLayout implements HandlesBack {
+public class PasscodeView extends FrameLayout implements HandlesBack , NoAnimationTraversal {
     @Inject PasscodePresenter presenter;
     private ToolbarUtils toolbar;
     private EditText passcodeField;
@@ -147,5 +148,11 @@ public class PasscodeView extends FrameLayout implements HandlesBack {
 
     public void hideKeyboard() {
         Utils.hideKeyboard(passcodeField);
+    }
+
+    @Override
+    public boolean shouldSkipAnimation() {
+        return presenter.path.type == PasscodePath.TYPE_LOCK
+                || presenter.path.type == PasscodePath.TYPE_LOCK_TO_CHANGE;
     }
 }

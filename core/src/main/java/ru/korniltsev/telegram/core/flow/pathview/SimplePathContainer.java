@@ -76,7 +76,14 @@ public class SimplePathContainer extends PathContainer {
     }
     traversalState.restoreViewState(newView);
 
-    if (fromView == null || direction == REPLACE) {
+    boolean skipAnimation;
+    if (newView instanceof NoAnimationTraversal) {
+      skipAnimation = ((NoAnimationTraversal) newView).shouldSkipAnimation();
+    } else {
+      skipAnimation = false;
+    }
+
+    if (fromView == null || direction == REPLACE || skipAnimation) {
       containerView.removeAllViews();
       containerView.addView(newView);
       oldPath.destroyNotIn(context, contextFactory);
