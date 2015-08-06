@@ -22,7 +22,7 @@ import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelController;
 import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
-import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
+import ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
@@ -31,13 +31,11 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
-import ru.korniltsev.telegram.core.rx.ChatDB;
 
 import javax.inject.Inject;
 
 import java.util.List;
 
-import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 
 public class MessagePanel extends FrameLayout {
@@ -226,7 +224,7 @@ public class MessagePanel extends FrameLayout {
     }
 
     private ObservableLinearLayout getObservableContainer() {
-        return (ObservableLinearLayout) getParent().getParent();
+        return (ObservableLinearLayout) getParent().getParent().getParent();
     }
 
     private void showAttachPopup() {
@@ -256,7 +254,7 @@ public class MessagePanel extends FrameLayout {
         }
     }
 
-    public void initBottomFrame(TrickyBottomFrame bottomFrame, TrickyLinearyLayout tricky) {
+    public void initBottomFrame(TrickyBottomFrame bottomFrame, TrickyFrameLayout tricky) {
         this.bottomFrame = new FrameUnderMessagePanelController(bottomFrame, this, getObservableContainer(), tricky, calc, emoji);
         this.bottomFrame.setListener(new Runnable() {
             @Override

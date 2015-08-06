@@ -16,7 +16,6 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
 import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
-import ru.korniltsev.telegram.core.rx.EmojiParser;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -25,13 +24,13 @@ public class FrameUnderMessagePanelController {
     final TrickyBottomFrame root;
     final MessagePanel messagePanel;
     public final ObservableLinearLayout observableContainer;
-    private final TrickyLinearyLayout tricky;
+    private final TrickyFrameLayout tricky;
     private int lastKeyboardHeight = 0;
     final DpCalculator calc;
     final Emoji emoji;
     private Runnable listener;
 
-    public FrameUnderMessagePanelController(final TrickyBottomFrame root, final MessagePanel messagePanel, final ObservableLinearLayout observableContainer, final TrickyLinearyLayout tricky, DpCalculator calc, Emoji emoji) {
+    public FrameUnderMessagePanelController(final TrickyBottomFrame root, final MessagePanel messagePanel, final ObservableLinearLayout observableContainer, final TrickyFrameLayout tricky, DpCalculator calc, Emoji emoji) {
         this.root = root;
         this.calc = calc;
         this.emoji = emoji;

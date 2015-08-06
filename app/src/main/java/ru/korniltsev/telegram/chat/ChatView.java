@@ -26,7 +26,7 @@ import ru.korniltsev.telegram.chat.adapter.TextMessageVH;
 import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelController;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
-import ru.korniltsev.telegram.chat.keyboard.hack.TrickyLinearyLayout;
+import ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
@@ -110,7 +110,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     private TextView btnBotStart;
     private Subscription clickedSpansSubscription;
     private View botCommandsShadow;
-
+    private VoiceRecordingOverlay voiceOverlay;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -196,7 +196,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         botCommandsListConainer = findViewById(R.id.bot_commands_list_container);
 
         final TrickyBottomFrame bottomFrame = (TrickyBottomFrame) findViewById(R.id.frame_under_message_panel);
-        final TrickyLinearyLayout tricky = (TrickyLinearyLayout) findViewById(R.id.list_and_message_panel);
+        final TrickyFrameLayout tricky = (TrickyFrameLayout) findViewById(R.id.list_and_message_panel);
         messagePanel.initBottomFrame(bottomFrame, tricky);
         messagePanel.setOnAnyKeyboardShownListener(new Runnable() {
             @Override
@@ -215,6 +215,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
             }
         });
         list.setItemAnimator(null);
+//        final VoiceRecordingOverlay view = new VoiceRecordingOverlay(getContext());
+//        view.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+//        tricky.getOverlay().add(view);
+        voiceOverlay = ((VoiceRecordingOverlay) findViewById(R.id.voice_recording_overlay));
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -537,8 +541,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
                 final int result = botsCommandAdapter.filter(s.toString());
                 if (result == 0) {
                     hideCommandList();
+                    voiceOverlay.setStateEnabled(true);
                 } else {
-
+                    voiceOverlay.setStateEnabled(false);
                     int newHeight;
                     final int commandHeight = calc.dp(36);
                     if (result > 3) {

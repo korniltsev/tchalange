@@ -4,14 +4,15 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-public class TrickyLinearyLayout extends LinearLayout {
+public class TrickyFrameLayout extends FrameLayout {
     private int trickyMargin;
     private int fixedHeight = -1;
     private int fixedMargin;
 
-    public TrickyLinearyLayout(Context context, AttributeSet attrs) {
+    public TrickyFrameLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
