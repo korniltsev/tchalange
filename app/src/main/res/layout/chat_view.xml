@@ -159,6 +159,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="Slide to Cancel"
+                        android:drawableLeft="@drawable/ic_arrow_left"
                         />
 
             </FrameLayout>

@@ -52,6 +52,7 @@ public class Chat extends BasePath implements Serializable {
                     MessagePanel.class ,
                     ForwardedMessageView.class ,
                     CustomCeilLayout.class,
+                    VoiceRecordingOverlay.class,
 
             },
             addsTo = RootModule.class)
