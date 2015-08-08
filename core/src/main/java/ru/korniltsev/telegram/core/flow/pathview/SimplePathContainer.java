@@ -20,6 +20,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,7 +52,7 @@ public class SimplePathContainer extends PathContainer {
   @Override protected void performTraversal(final ViewGroup containerView,
       final TraversalState traversalState, final Flow.Direction direction,
       final Flow.TraversalCallback callback) {
-
+//    Debug.startMethodTracing("traversal");
     final PathContext context;
     final PathContext oldPath;
     if (containerView.getChildCount() > 0) {
@@ -88,6 +89,7 @@ public class SimplePathContainer extends PathContainer {
       containerView.addView(newView);
       oldPath.destroyNotIn(context, contextFactory);
       callback.onTraversalCompleted();
+//      Debug.stopMethodTracing();
     } else {
       containerView.addView(newView);
       final View finalFromView = fromView;
@@ -100,6 +102,7 @@ public class SimplePathContainer extends PathContainer {
               containerView.removeView(finalFromView);
               oldPath.destroyNotIn(context, contextFactory);
               callback.onTraversalCompleted();
+//              Debug.stopMethodTracing();
             }
           });
         }
