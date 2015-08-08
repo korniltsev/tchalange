@@ -1,13 +1,9 @@
 package ru.korniltsev.telegram.core.rx;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import org.drinkless.td.libcore.telegram.TdApi;
-import org.joda.time.DateTime;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.audio.AudioPlayer;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import rx.Observable;
 import rx.Subscription;
@@ -16,7 +12,6 @@ import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.Subscriptions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -54,6 +49,7 @@ public class RxChat  {
     //    });
 
     final List<TdApi.Message> data = new ArrayList<>();
+    public final DaySplitter daySplitter;
     //    todo
 
 
@@ -96,12 +92,13 @@ public class RxChat  {
 
     private boolean downloadedAll;
     private Subscription subscription = Subscriptions.empty();
-    private Observable<ChatDB.Portion> request;
+    private Observable<Portion> request;
 
     public RxChat(long id, RXClient client, ChatDB holder) {
         this.id = id;
         this.client = client;
         this.holder = holder;
+        daySplitter = new DaySplitter();
     }
 
     public Observable<List<TdApi.Message>> getNewMessage() {
@@ -111,54 +108,6 @@ public class RxChat  {
     public boolean isRequestInProgress() {
         return request != null;
     }
-
-    //    public void requestNewPotion() {
-    //        List<TdApi.Message> messages = getMessages();
-    //        TdApi.Message lastMessage = messages.get(messages.size() - 1);
-    //        requestImpl(lastMessage, null, true, holder.getMessageLimit(), 0);
-    //    }
-
-    //    private void requestImpl(TdApi.Message lastMessage, final TdApi.Message initMessage, final boolean historyRequest, int limit, int offset) {
-    //        assertNull(request);
-    //        request = client.getMessages(id, lastMessage.id, offset, limit)
-    //                .flatMap(new GetUsers(initMessage))
-    //                .observeOn(mainThread());
-    //
-    //        subscription = request.subscribe(new ObserverAdapter<ChatDB.Portion>() {
-    //            @Override
-    //            public void onNext(ChatDB.Portion portion) {
-    //                checkMainThread();
-    //                request = null;
-    //                if (portion.ms.isEmpty()) {
-    //                    downloadedAll = true;
-    //                } else {
-    //
-    //                    SparseArray<TdApi.User> us = portion.us;
-    //                    holder.saveUsers(us);
-    //                    if (!historyRequest) {
-    //                        ms.clear();
-    //                    }
-    //                    ms.addAll(portion.ms);
-    //                    subject.onNext(getMessages());
-    //                }
-    //            }
-    //        });
-    //    }
-
-    @NonNull
-    private Observable<List<TdApi.User>> requestUsers(Set<Integer> ids) {
-        Observable<List<TdApi.User>> allUsers;
-        List<Observable<TdApi.User>> os = new ArrayList<>();
-        for (Integer uid : ids) {
-            os.add(client.getUser(uid));
-        }
-        //request missing users and zip
-        allUsers = Observable.merge(os)
-                .toList();
-        return allUsers;
-    }
-
-//
 
 
     public List<TdApi.Message> getMessages() {
@@ -174,31 +123,11 @@ public class RxChat  {
 
 
     public void handleNewMessage(final List<TdApi.Message> ms) {
-//        final Set<Integer> tmpSet = tmpUIDs.get();
-//        tmpSet.clear();
-
-        for (TdApi.Message m : ms) {
+        for (int i = 0, msSize = ms.size(); i < msSize; i++) {
+            TdApi.Message m = ms.get(i);
             sentPhotoHack(m);
         }
-
-
-
-//        if (tmpSet.isEmpty()) {
-            addNewMessageAndDispatch(ms);
-//        } else {
-//            requestUsers(tmpSet)
-//                    .observeOn(mainThread())
-//                    .subscribe(new ObserverAdapter<List<TdApi.User>>() {
-//                        @Override
-//                        public void onNext(List<TdApi.User> response) {
-////                            for (int i = 0; i < response.size(); i++) {
-////                                TdApi.User user = response.get(i);
-////                                holder.saveUser(user);
-////                            }
-//                            addNewMessageAndDispatch(ms);
-//                        }
-//                    });
-//        }
+        addNewMessageAndDispatch(ms);
     }
 
     //hack to prevent reloading of newly added image
@@ -507,7 +436,7 @@ public class RxChat  {
         });
     }
 
-    private class GetUsers implements Func1<TdApi.Messages, Observable<? extends ChatDB.Portion>> {
+    private class GetUsers implements Func1<TdApi.Messages, Observable<? extends Portion>> {
         private final TdApi.Message initMessage;
 
         public GetUsers(TdApi.Message initMessage) {
@@ -515,18 +444,8 @@ public class RxChat  {
         }
 
         @Override
-        public Observable<? extends ChatDB.Portion> call(TdApi.Messages portion) {
-
+        public Observable<? extends Portion> call(TdApi.Messages portion) {
             checkNotMainThread();
-            TdApi.Message[] messages = portion.messages;
-//            final Set<Integer> tmpSet = tmpUIDs.get();
-//            tmpSet.clear();
-//            for (TdApi.Message message : messages) {
-//                getUIDs(message, tmpSet);
-//            }
-//            if (initMessage != null) {
-//                getUIDs(initMessage, tmpSet);
-//            }
 
             final List<TdApi.Message> messageList = new ArrayList<>();
             if (initMessage != null) {
@@ -537,16 +456,9 @@ public class RxChat  {
             for (TdApi.Message message : messageList) {
                 holder.parser.parse(message);
             }
-//            tmpSet.remove(0);//todo find who asks a user with id 0
-//            if (tmpSet.isEmpty()) {
-                ChatDB.Portion res = new ChatDB.Portion(messageList);
-                return Observable.just(res);
-//            } else {
-//                Observable<List<TdApi.User>> allUsers = requestUsers(tmpSet);
-//
-//                Observable<List<TdApi.Message>> messagesCopy = Observable.just(messageList);
-//                return allUsers.zipWith(messagesCopy, ZIPPER);
-//            }
+            final List<ChatListItem> split = daySplitter.split(messageList);
+            Portion res = new Portion(messageList, split);
+            return Observable.just(res);
         }
     }
 
@@ -560,14 +472,16 @@ public class RxChat  {
          * true если зашли в чат с непрочитанными сообщениями
          */
         public final boolean showUnreadMessages;
+        public final List<ChatListItem> split;
 
-        public HistoryResponse(List<TdApi.Message> ms, boolean showUnreadMessages) {
+        public HistoryResponse(List<TdApi.Message> ms, boolean showUnreadMessages, List<ChatListItem> split) {
             this.ms = ms;
             this.showUnreadMessages = showUnreadMessages;
+            this.split = split;
         }
     }
 
-    private class GetUsers2 implements Observable.Transformer<TdApi.Messages, ChatDB.Portion> {
+    private class GetUsers2 implements Observable.Transformer<TdApi.Messages, Portion> {
         private final TdApi.Message topMessage;
 
         public GetUsers2(TdApi.Message topMessage) {
@@ -575,13 +489,13 @@ public class RxChat  {
         }
 
         @Override
-        public Observable<ChatDB.Portion> call(Observable<TdApi.Messages> original) {
+        public Observable<Portion> call(Observable<TdApi.Messages> original) {
             return original.flatMap(new GetUsers(topMessage))
                     .observeOn(mainThread());
         }
     }
 
-    private class HistoryObserver extends ObserverAdapter<ChatDB.Portion> {
+    private class HistoryObserver extends ObserverAdapter<Portion> {
         final boolean unreadRequest;
 
         public HistoryObserver(boolean unreadRequest) {
@@ -589,14 +503,14 @@ public class RxChat  {
         }
 
         @Override
-        public void onNext(ChatDB.Portion response) {
+        public void onNext(Portion response) {
             checkMainThread();
             request = null;
             if (response.ms.isEmpty()) {
                 downloadedAll = true;
             } else {
                 data.addAll(response.ms);
-                historySubject.onNext(new HistoryResponse(response.ms, unreadRequest));
+                historySubject.onNext(new HistoryResponse(response.ms, unreadRequest, response.split));
             }
         }
         //todo on error

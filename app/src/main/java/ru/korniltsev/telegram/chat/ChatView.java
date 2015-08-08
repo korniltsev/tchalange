@@ -111,6 +111,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     private Subscription clickedSpansSubscription;
     private View botCommandsShadow;
     private VoiceRecordingOverlay voiceOverlay;
+    private DaySplitter splitter;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -219,9 +220,6 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
             }
         });
         list.setItemAnimator(null);
-//        final VoiceRecordingOverlay view = new VoiceRecordingOverlay(getContext());
-//        view.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-//        tricky.getOverlay().add(view);
         voiceOverlay = ((VoiceRecordingOverlay) findViewById(R.id.voice_recording_overlay));
         messagePanel.getInput().addTextChangedListener(new TextWatcherAdapter(){
             @Override
@@ -229,6 +227,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
                 voiceOverlay.setStateEnabled(s.length() == 0);
             }
         });
+        splitter = presenter.getRxChat().daySplitter;
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -346,7 +345,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         CheckRecyclerViewSpan.check(list, viewSpanNotFilledAction);
     }
 
-    private final DaySplitter splitter = new DaySplitter();
+//    private final DaySplitter splitter = new DaySplitter();
 
     //    public void setMessages( List<TdApi.Message> messages) {
     //        List<RxChat.ChatListItem> split = splitter.split(messages);
@@ -424,7 +423,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         removeBotItem();
         final List<ChatListItem> data = adapter.getData();
 
-        final List<ChatListItem> split = splitter.split(history.ms);
+        final List<ChatListItem> split = history.split;//splitter.split(history.ms);
         if (history.showUnreadMessages) {
             final NewMessagesItem newItem = splitter.insertNewMessageItem(split, chat, myId);
             adapter.addAll(split);

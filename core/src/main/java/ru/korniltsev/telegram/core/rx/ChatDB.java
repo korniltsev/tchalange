@@ -406,17 +406,6 @@ public class ChatDB {
     //guarded by ui thread
     private final LongSparseArray<RxChat> chatIdToRxChat = new LongSparseArray<>();
 
-
-
-    public static class Portion {
-        public final List<TdApi.Message> ms;
-
-        public Portion(List<TdApi.Message> ms) {
-            this.ms = ms;
-
-        }
-    }
-
     public boolean isDownloadedAllChats() {
         checkMainThread();
         return downloadedAllChats;

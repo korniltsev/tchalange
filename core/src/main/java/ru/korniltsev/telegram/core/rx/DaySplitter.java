@@ -18,6 +18,16 @@ import static junit.framework.Assert.assertTrue;
 
 public class DaySplitter {
 
+    public static final long ID_NEW_MESSAGES = -1;
+    public static final long ID_BOT_INFO = -2;
+    //guarded by lock
+    private final Map<DateTime, DaySeparatorItem> cache = new HashMap<>();
+    //guarded by lock
+    private int counter = -10;
+
+    public final Object lock = new Object();
+
+
     public boolean hasTheSameDay(TdApi.Message a, TdApi.Message b) {
         return hasTheSameDay(timInMillis(a), timInMillis(b));
     }
@@ -67,22 +77,23 @@ public class DaySplitter {
         return res;
     }
 
-    private final Map<DateTime, DaySeparatorItem> cache = new HashMap<>();
-    public static final long ID_NEW_MESSAGES = -1;
-    public static final long ID_BOT_INFO = -2;
-    private int counter = -10;
+
+
 
     public DaySeparatorItem createSeparator(TdApi.Message msg) {
         DateTime time = localTime(timInMillis(msg))
                 .withTimeAtStartOfDay();
-        DaySeparatorItem cached = cache.get(time);
-        if (cached != null) {
-            return cached;
-        } else {
-            DaySeparatorItem newSeparator = new DaySeparatorItem(counter--, time);
-            cache.put(time, newSeparator);
-            return newSeparator;
+        synchronized (lock){
+            DaySeparatorItem cached = cache.get(time);
+            if (cached != null) {
+                return cached;
+            } else {
+                DaySeparatorItem newSeparator = new DaySeparatorItem(counter--, time);
+                cache.put(time, newSeparator);
+                return newSeparator;
+            }
         }
+
     }
 
     public List<ChatListItem> prepend(List<ChatListItem> data, List<ChatListItem> newMessages) {
