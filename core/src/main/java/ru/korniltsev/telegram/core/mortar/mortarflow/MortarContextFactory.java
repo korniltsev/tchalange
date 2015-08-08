@@ -22,8 +22,8 @@ public final class MortarContextFactory implements PathContextFactory {
   @Override public Context setUpContext(Path path, Context parentContext) {
     MortarScope screenScope =
         screenScoper.getScreenScope(parentContext, path.getClass().getSimpleName(), path);
-    CrashlyticsCore.getInstance()
-            .log(Log.DEBUG, "MortarContextFactory", "setUpContext " + screenScope);
+//    CrashlyticsCore.getInstance()
+//            .log(Log.DEBUG, "MortarContextFactory", "setUpContext " + screenScope);
     return new TearDownContext(parentContext, screenScope);
   }
 
@@ -38,10 +38,10 @@ public final class MortarContextFactory implements PathContextFactory {
 
     static void destroyScope(Context context) {
       MortarScope scope = MortarScope.getScope(context);
-      StringWriter sw = new StringWriter();
-      new Throwable().printStackTrace(new PrintWriter(sw));
-      CrashlyticsCore.getInstance()
-              .log(Log.DEBUG, "MortarContextFactory", "destroy " + scope + "\n" + sw.toString());
+//      StringWriter sw = new StringWriter();
+//      new Throwable().printStackTrace(new PrintWriter(sw));
+//      CrashlyticsCore.getInstance()
+//              .log(Log.DEBUG, "MortarContextFactory", "destroy " + scope + "\n" + sw.toString());
 
       scope.destroy();
     }
