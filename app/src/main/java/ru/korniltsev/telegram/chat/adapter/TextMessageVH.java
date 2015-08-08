@@ -18,11 +18,8 @@ import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
 
 public class TextMessageVH extends RealBaseVH {
-    public static final int STATE_IC_UNREAD = 0;
-    public static final int STATE_IC_CLOCK = 1;
-    public static final int STATE_IC_NULL = 2;
+
     private final CustomCeilLayout root;
-    private final int myId;
     private final EmojiTextView message;
 
     //    private final TextView message;
@@ -31,7 +28,6 @@ public class TextMessageVH extends RealBaseVH {
         super(itemView, adapter);
         root = ((CustomCeilLayout) itemView);
 
-        myId = adapter.myId;
         message = new EmojiTextView(itemView.getContext());
         message.setTextColor(Color.BLACK);
         message.setPadding(0, 0, root.calc.dp(8), 0);
@@ -44,14 +40,13 @@ public class TextMessageVH extends RealBaseVH {
         ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
         ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
         ds[STATE_IC_NULL] = null;
-
         root.iconRight2.init(ds);
 
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        newBind(item, lastReadOutbox);
+        newBind(root, adapter, item, lastReadOutbox);
         //        super.bind(item, lastReadOutbox);
         TdApi.Message rawMsg = ((MessageItem) item).msg;
         //
@@ -60,7 +55,7 @@ public class TextMessageVH extends RealBaseVH {
         message.setText(text.textWithSmilesAndUserRefs);
     }
 
-    private void newBind(ChatListItem item, long lastReadOutbox) {
+    public static void newBind(CustomCeilLayout root, Adapter adapter, ChatListItem item, long lastReadOutbox) {
         TdApi.Message msg = ((MessageItem) item).msg;
         TdApi.User user = adapter.getUserHolder().getUser(msg.fromId);
         String print = BaseAvatarVH.format(msg);
@@ -69,7 +64,7 @@ public class TextMessageVH extends RealBaseVH {
         if (user != null) {
             //            avatar.loadAvatarFor(user);
             root.avatarView.loadAvatarFor(user);
-            String name = AppUtils.uiName(user, itemView.getContext());
+            String name = AppUtils.uiName(user, root.getContext());
 //            root.nick.setText(name);
             root.setNick(name);
         } else {
@@ -82,7 +77,7 @@ public class TextMessageVH extends RealBaseVH {
 
 //        root.time.setText(print);
 
-        switch (adapter.chat.getMessageState(msg, lastReadOutbox, myId)) {
+        switch (adapter.chat.getMessageState(msg, lastReadOutbox, adapter.myId)) {
             case RxChat.MESSAGE_STATE_READ:
                 root.iconRight2.setSate(STATE_IC_NULL);
 

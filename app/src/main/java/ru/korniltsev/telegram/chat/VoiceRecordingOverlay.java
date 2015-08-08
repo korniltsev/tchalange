@@ -35,7 +35,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import static android.view.MotionEvent.*;
@@ -44,6 +43,7 @@ import static junit.framework.Assert.assertNotNull;
 public class VoiceRecordingOverlay extends FrameLayout {
 
     public static final Interpolator INTERPOLATOR = new DecelerateInterpolator(1.5f);
+    public static final int SLIDE_DURATION = 256;
     private View anchor;
     private TextView time;
     private View voicePanel;
@@ -63,13 +63,15 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private int redDotBottomPadding;
     private Drawable microphone;
-
-
+    private boolean stopCancelled;
+    private boolean ignoreUpAndMove;
+    private View slideToCanel;
 
     public VoiceRecordingOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         setWillNotDraw(false);
+//        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     @Override
@@ -81,16 +83,15 @@ public class VoiceRecordingOverlay extends FrameLayout {
         voicePanel.setVisibility(View.INVISIBLE);
         anchor.setVisibility(View.INVISIBLE);
         redDot = findViewById(R.id.red_dot);
+        slideToCanel = findViewById(R.id.slide_to_cancel);
         dp48 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics());
         everySecond = Observable.timer(0, 1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread());
 
-
         redDotAnimation = ObjectAnimator.ofFloat(redDot, ALPHA, 1f, 0.2f);
         redDotAnimation.setRepeatCount(ObjectAnimator.INFINITE);
         redDotAnimation.setRepeatMode(ValueAnimator.REVERSE);
-        redDotAnimation.setDuration(500);
-
+        redDotAnimation.setDuration(250);
 
         timeFormatter = new PeriodFormatterBuilder()
                 .printZeroAlways()
@@ -125,20 +126,42 @@ public class VoiceRecordingOverlay extends FrameLayout {
                 return true;
             }
         }
-        if (actionMasked == ACTION_UP) {
-            stop();
+        if (actionMasked == ACTION_UP
+                && !ignoreUpAndMove) {
+            stop(false);
         }
-        if (actionMasked == ACTION_MOVE) {
+        if (actionMasked == ACTION_MOVE
+                & !ignoreUpAndMove) {
             positionRedButton(event);
         }
         return false;
     }
 
     private void positionRedButton(MotionEvent event) {
-        if (!started)
+        if (!started) {
             return;
-        if (animating){
+        }
+        if (animating) {
             return;
+        }
+        final int pointerCount = event.getPointerCount();
+        if (pointerCount != 1) {
+            return;
+        }
+
+        int newPadding = (int) (getRight() - event.getX());
+        if (newPadding > getWidth() / 2) {
+            stop(true);
+        } else {
+            setRedDotRightPadding(
+                    Math.max(redDotInitRightPadding, newPadding));
+
+            int tx = getRedDotRightPadding() - redDotInitRightPadding;
+            slideToCanel.setTranslationX(-tx);
+
+            float alpha = 1f - (float) tx / (getWidth() / 2);
+            slideToCanel.setAlpha(alpha);
+
         }
     }
 
@@ -152,30 +175,54 @@ public class VoiceRecordingOverlay extends FrameLayout {
         this.stateEnabled = stateEnabled;
     }
 
-    private void stop() {
+    private void stop(boolean cancel) {
         if (!started) {
             return;
         }
         if (animating) {
             stopOnEndOfAnimation = true;
+            stopCancelled = cancel;
         } else {
-            stopImpl();
+            ignoreUpAndMove = true;
+            stopImpl(cancel);
             animating = true;
             subscription.unsubscribe();
             redDotAnimation.cancel();
             slideOut();
-            scaleOutRedButton();
+//            scaleOutRedButton();
+            animateRedButtonPadding();
         }
     }
 
-    private void stopImpl() {
-        //todo cancel
+    private void animateRedButtonPadding() {
+        int diff = Math.abs(getRedDotRightPadding() - redDotInitRightPadding);
+        final int maxDiff = getWidth() / 2 - redDotInitRightPadding;
+        float ready = diff / maxDiff;
+
+        final ObjectAnimator slideRedbutton = ObjectAnimator.ofInt(this, RED_DOT_RIGHT_PADDING,
+                getRedDotRightPadding(), redDotInitRightPadding);
+        slideRedbutton.setDuration((long) (SLIDE_DURATION * ready));
+        slideRedbutton.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                scaleOutRedButton();
+            }
+        });
+        slideRedbutton.start();
+    }
+
+    private void stopImpl(boolean cancel) {
         final Observable<VoiceRecorder.Record> stop = recorder.stop();
-        presenter.sendVoice(stop);
+        if (cancel) {
+
+        } else {
+            presenter.sendVoice(stop);
+        }
     }
 
     private void slideOut() {
-        voicePanel.animate().translationX(-voicePanel.getWidth())
+        voicePanel.animate().translationX(voicePanel.getWidth())
+                .setDuration(SLIDE_DURATION)
                 .setInterpolator(INTERPOLATOR)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
@@ -196,7 +243,11 @@ public class VoiceRecordingOverlay extends FrameLayout {
         startImpl();
         started = true;
         animating = true;
+        ignoreUpAndMove = false;
         setTime(0l);
+        slideToCanel.setTranslationX(0);
+        slideToCanel.setAlpha(1f);
+        redDotRightPadding = redDotInitRightPadding;
         subscription = everySecond.subscribe(new ObserverAdapter<Long>() {
             @Override
             public void onNext(Long response) {
@@ -213,19 +264,23 @@ public class VoiceRecordingOverlay extends FrameLayout {
     }
 
     private void scaleInRedButton() {
-        if (redButtonAnimation != null){
+        if (redButtonAnimation != null) {
             redButtonAnimation.cancel();
         }
 
-        redButtonAnimation = ObjectAnimator.ofFloat(this, RADIUS, getRedButtonRadius(),  1f);
-        redButtonAnimation.setInterpolator(new DecelerateInterpolator());
+        redButtonAnimation = ObjectAnimator.ofFloat(this, RADIUS, getRedButtonRadius(), 1f);
+        redButtonAnimation.setInterpolator(INTERPOLATOR);
+        redButtonAnimation.setDuration(SLIDE_DURATION);
         redButtonAnimation.start();
     }
+
     private void scaleOutRedButton() {
-        if (redButtonAnimation != null){
+        if (redButtonAnimation != null) {
             redButtonAnimation.cancel();
         }
-        redButtonAnimation = ObjectAnimator.ofFloat(this, RADIUS, getRedButtonRadius(),  0f);
+        redButtonAnimation = ObjectAnimator.ofFloat(this, RADIUS, getRedButtonRadius(), 0f);
+        redButtonAnimation.setInterpolator(INTERPOLATOR);
+        redButtonAnimation.setDuration(500);
         redButtonAnimation.start();
     }
 
@@ -234,13 +289,14 @@ public class VoiceRecordingOverlay extends FrameLayout {
         voicePanel.setTranslationX(voicePanel.getWidth());
         voicePanel.animate()
                 .translationX(0)
+                .setDuration(SLIDE_DURATION)
                 .setInterpolator(INTERPOLATOR)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         animating = false;
                         if (stopOnEndOfAnimation) {
-                            stop();
+                            stop(stopCancelled);
                         }
                         redDotAnimation.start();
                         stopOnEndOfAnimation = false;
@@ -253,14 +309,14 @@ public class VoiceRecordingOverlay extends FrameLayout {
                 .toPeriod();
         time.setText(timeFormatter.print(p));
     }
-    final RectF rectF = new RectF();
-//    final Rect rect = new Rect();
 
+    final RectF rectF = new RectF();
+    //    final Rect rect = new Rect();
 
     @Override
     public void draw(@NonNull Canvas canvas) {
         super.draw(canvas);
-        if (redDotRadius != 0f){
+        if (redDotRadius != 0f) {
             final float radius = getRedButtonRadius() * redButtonFinalRadius;
             int centerX = getRight() - redDotRightPadding;
             int centerY = getBottom() - redDotBottomPadding;
@@ -273,15 +329,12 @@ public class VoiceRecordingOverlay extends FrameLayout {
             rectF.set(l, t, r, b);
             canvas.drawOval(rectF, paint);
 
-            l = centerX - microphone.getIntrinsicWidth()/2;
-            t = centerY - microphone.getIntrinsicHeight()/2;
+            l = centerX - microphone.getIntrinsicWidth() / 2;
+            t = centerY - microphone.getIntrinsicHeight() / 2;
             canvas.save();
             canvas.translate(l, t);
             microphone.draw(canvas);
             canvas.restore();
-
-
-
         }
     }
 
@@ -297,7 +350,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         }
     };
 
-    float redDotRadius; // [0;1]
+    float redDotRadius;
 
     public float getRedButtonRadius() {
         return redDotRadius;
@@ -314,4 +367,25 @@ public class VoiceRecordingOverlay extends FrameLayout {
         super.onDetachedFromWindow();
         subscription.unsubscribe();
     }
+
+    public int getRedDotRightPadding() {
+        return redDotRightPadding;
+    }
+
+    public void setRedDotRightPadding(int redDotRightPadding) {
+        this.redDotRightPadding = redDotRightPadding;
+        invalidate();
+    }
+
+    public static Property<VoiceRecordingOverlay, Integer> RED_DOT_RIGHT_PADDING = new Property<VoiceRecordingOverlay, Integer>(Integer.class, "RED_DOT_RIGHT_PADDING") {
+        @Override
+        public Integer get(VoiceRecordingOverlay object) {
+            return object.getRedDotRightPadding();
+        }
+
+        @Override
+        public void set(VoiceRecordingOverlay object, Integer value) {
+            object.setRedDotRightPadding(value);
+        }
+    };
 }

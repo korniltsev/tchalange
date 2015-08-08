@@ -176,6 +176,8 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             return ChatPhotoChangedVH.getTextFor(res, topMessage, userHolder);
         } else if (m instanceof TdApi.MessageWebPage) {
             return ctx.getString(R.string.web_page);
+        } else if (m instanceof TdApi.MessageVoice) {
+            return ctx.getString(R.string.message_voice);
         }
         else {
             return SingleTextViewVH.getTextFor(ctx, topMessage, m, userHolder);

@@ -140,6 +140,18 @@
                     android:layout_height="47dp"
                     android:background="#fff"
                     android:layout_gravity="bottom">
+                <ru.korniltsev.telegram.core.views.RobotoMediumTextView
+                        android:id="@+id/slide_to_cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="@string/slide_to_cancel"
+                        android:drawableLeft="@drawable/ic_arrow_left"
+                        />
+                <View android:layout_width="74dp"
+                      android:layout_height="match_parent"
+                      android:background="@drawable/bg_time_white_shadow"/>
+
                 <View
                         android:id="@+id/red_dot"
                         android:layout_width="8dp"
@@ -154,13 +166,7 @@
                         android:layout_gravity="center_vertical|left"
                         android:layout_marginLeft="32dp"/>
 
-                <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:text="Slide to Cancel"
-                        android:drawableLeft="@drawable/ic_arrow_left"
-                        />
+
 
             </FrameLayout>
             <View

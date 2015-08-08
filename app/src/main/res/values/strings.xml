@@ -147,6 +147,8 @@
     <string name="bot_about">About</string>
     <string name="bot_add_to_group">Add to group</string>
     <string name="select_group">Select group</string>
+    <string name="slide_to_cancel">Slide to Cancel</string>
+    <string name="message_voice">Voice</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

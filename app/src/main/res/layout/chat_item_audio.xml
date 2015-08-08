@@ -1,47 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                style="@style/Item.Root"
+<ru.korniltsev.telegram.chat.adapter.view.AudioMessageView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/audio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/item_content_with_margins"
+        android:layout_marginTop="8dp"
         >
-
-    <include layout="@layout/chat_item_avatar"/>
-
-    <include layout="@layout/chat_item_nick_and_time"/>
-
-    <ru.korniltsev.telegram.chat.adapter.view.AudioMessageView
-            android:id="@+id/audio"
-            android:layout_width="match_parent"
+    <ru.korniltsev.telegram.core.views.DownloadView
+            android:id="@+id/download_view"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/item_content_with_margins"
-            android:layout_marginTop="3dp"
-            >
-        <ru.korniltsev.telegram.core.views.DownloadView
-                android:id="@+id/download_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+            />
 
+    <SeekBar
+            android:id="@+id/progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:thumb="@drawable/chat_seekbar_thumb"
+            android:maxHeight="100dp"
+            android:thumbOffset="0dp"
+            android:progressDrawable="@drawable/chat_seekbar_progress"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp"
+            />
+    <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="8dp"
+            />
 
-        <SeekBar
-                android:id="@+id/progress"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="center_vertical"
-                android:thumb="@drawable/chat_seekbar_thumb"
-                android:maxHeight="100dp"
-                android:thumbOffset="0dp"
-                android:progressDrawable="@drawable/chat_seekbar_progress"
-                android:paddingLeft="14dp"
-                android:paddingRight="14dp"
-                />
-        <TextView
-                android:id="@+id/duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-
-                />
-
-    </ru.korniltsev.telegram.chat.adapter.view.AudioMessageView>
-</RelativeLayout>
+</ru.korniltsev.telegram.chat.adapter.view.AudioMessageView>
+        <!--</RelativeLayout>-->

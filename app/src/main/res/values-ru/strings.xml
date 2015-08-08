@@ -164,4 +164,6 @@
     <string name="bot_about">About</string>
     <string name="bot_add_to_group">Add to group</string>
     <string name="select_group">Select group</string>
+    <string name="slide_to_cancel">Slide to Cancel</string>
+    <string name="message_voice">Voice</string>
 </resources>
