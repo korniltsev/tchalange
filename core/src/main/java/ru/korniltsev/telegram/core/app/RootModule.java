@@ -36,6 +36,7 @@ import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.views.DownloadView;
 
@@ -43,9 +44,7 @@ import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Defines app-wide singletons.
- */
+
 @Module(
         injects = {
                 RXClient.class,
@@ -63,7 +62,6 @@ import java.util.concurrent.Executors;
 
 
                 EmojiKeyboardView.class,
-//                EmojiPopup.class,
 
                 DownloadView.class,
                 EmojiTextView.class,
@@ -71,6 +69,7 @@ import java.util.concurrent.Executors;
                 PasscodeManager.class,
                 ObservableLinearLayout.class,
                 UserHolder.class ,
+                StaticLayoutCache.class
         },
         library = true)
 public class RootModule {

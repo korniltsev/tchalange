@@ -20,6 +20,7 @@ import android.widget.TextView;
 import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.utils.Colors;
 import ru.korniltsev.telegram.core.views.AvatarView;
 
@@ -34,6 +35,7 @@ import static android.view.View.MeasureSpec.makeMeasureSpec;
 public class CustomCeilLayout extends ViewGroup {
     //staff
     public @Inject DpCalculator calc;
+    public @Inject StaticLayoutCache layoutCache;
     private final int screenWidth;
     private final int paddingTopBottom;
     private final int unspecifiedMeasureSpec;
@@ -174,20 +176,47 @@ public class CustomCeilLayout extends ViewGroup {
     public void setTime(@NonNull String time) {
         if (!time.equals(this.time)) {
             this.time = time;
-            timeLayout = new StaticLayout(time, timePaint, 500, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+            timeLayout = getStaticLayoutForTime(time);
             timeWidth = (int) (timeLayout.getLineWidth(0) + timePadding * 2);
         }
     }
+
+    @NonNull
+    private StaticLayout getStaticLayoutForTime(@NonNull String time) {
+        final int width = 700;
+        final StaticLayoutCache.Key key = new StaticLayoutCache.Key(time, width);
+        final StaticLayout check = layoutCache.check(key);
+        if (check != null){
+            return check;
+        }
+        final StaticLayout res = new StaticLayout(time, timePaint, width, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        layoutCache.put(key, res);
+        return res;
+    }
+
     public void setNick(@NonNull String nick){
         if (!nick.equals(this.nick)){
             this.nick = nick;
             final int spaceLeftForNick = screenWidth - avatarSize - avatarMarginLeft - avatarMarginRight
                     - timeWidth - iconRightSize - iconRightMarginRight;
             CharSequence str2 = TextUtils.ellipsize(nick, nickPaint, spaceLeftForNick, TextUtils.TruncateAt.END);
-            this.nickLayout = new StaticLayout(str2, nickPaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+            this.nickLayout = getStaticLayoutForNick(spaceLeftForNick, str2);
             nickWidth = (int) nickLayout.getLineWidth(0);
             nickHeight = nickLayout.getHeight();
         }
+    }
+
+    @NonNull
+    private StaticLayout getStaticLayoutForNick(int spaceLeftForNick, CharSequence str2) {
+        final StaticLayoutCache.Key key = new StaticLayoutCache.Key(str2.toString(), spaceLeftForNick);
+
+        StaticLayout fromCache = layoutCache.check(key);
+        if (fromCache != null) {
+            return fromCache;
+        }
+        final StaticLayout staticLayout = new StaticLayout(str2, nickPaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        layoutCache.put(key, staticLayout);
+        return staticLayout;
     }
 
     @Override
