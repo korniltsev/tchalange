@@ -125,7 +125,8 @@ public class MessagePanel extends FrameLayout {
             @Override
             public void onClick(View v) {
 
-                if (bottomFrame.isEmojiKeyboardShown()){
+                if (bottomFrame.isEmojiKeyboardShown()) {
+                    input.requestFocus();
                     bottomFrame.showRegularKeyboard();
                 } else {
                     bottomFrame.showEmoji(emojiKeyboardCallback);
