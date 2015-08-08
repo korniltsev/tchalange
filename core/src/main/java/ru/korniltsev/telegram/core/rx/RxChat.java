@@ -498,9 +498,11 @@ public class RxChat  {
             @Override
             public void onNext(VoiceRecorder.Record response) {
                 VoiceRecorder.log("send voice");
-                int duration = response.duration;
-                final String file = response.file.getAbsolutePath();
-                sendMessageImpl(new TdApi.InputMessageVoice(new TdApi.InputFileLocal(file), duration));
+                float duration = response.duration;
+                if (duration > 0.4f){
+                    final String file = response.file.getAbsolutePath();
+                    sendMessageImpl(new TdApi.InputMessageVoice(new TdApi.InputFileLocal(file), (int) duration));
+                }
             }
         });
     }

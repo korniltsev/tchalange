@@ -115,7 +115,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
-        Log.d("VoiceRecordingOverlay", event.toString());
+//        Log.d("VoiceRecordingOverlay", event.toString());
         final int actionMasked = event.getActionMasked();
         if (actionMasked == ACTION_DOWN) {
             final int right = getRight();
@@ -270,7 +270,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
 
         redButtonAnimation = ObjectAnimator.ofFloat(this, RADIUS, getRedButtonRadius(), 1f);
         redButtonAnimation.setInterpolator(INTERPOLATOR);
-        redButtonAnimation.setDuration(SLIDE_DURATION);
+        redButtonAnimation.setDuration(SLIDE_DURATION/2);
         redButtonAnimation.start();
     }
 
@@ -280,7 +280,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         }
         redButtonAnimation = ObjectAnimator.ofFloat(this, RADIUS, getRedButtonRadius(), 0f);
         redButtonAnimation.setInterpolator(INTERPOLATOR);
-        redButtonAnimation.setDuration(500);
+        redButtonAnimation.setDuration(SLIDE_DURATION/2);
         redButtonAnimation.start();
     }
 

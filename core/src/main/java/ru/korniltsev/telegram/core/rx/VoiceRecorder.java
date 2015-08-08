@@ -6,6 +6,7 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Vibrator;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import ru.korniltsev.OpusToolsWrapper;
@@ -26,8 +27,9 @@ public class VoiceRecorder {
     private final File tmpFilesDir;
     private final Vibrator vibrator;
     private int playerBufferSize;
-    private AudioRecord audioRecord;
-    private Reader reader;
+
+    @Nullable private AudioRecord audioRecord;
+    @Nullable private Reader reader;
 
     @Inject
     public VoiceRecorder(Context ctx) {
@@ -43,6 +45,9 @@ public class VoiceRecorder {
     }
 
     public void record() {
+        if (audioRecord != null){
+            return;
+        }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, AudioPlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
         audioRecord.startRecording();
         reader = new Reader(audioRecord, getTemporaryFile(), playerBufferSize);
@@ -68,9 +73,16 @@ public class VoiceRecorder {
     public Observable<Record> stop() {
         vibrate();
         try {
-            audioRecord.stop();
-            audioRecord.release();
-            return reader.recordedAndEncodedFile;
+            if (audioRecord == null || reader == null) {
+                return Observable.empty();
+            } else {
+                audioRecord.stop();
+                audioRecord.release();
+                final PublishSubject<Record> result = reader.recordedAndEncodedFile;
+                audioRecord = null;
+                reader = null;
+                return result;
+            }
         } catch (IllegalStateException e) {
             CrashlyticsCore.getInstance().logException(e);
             return Observable.empty();
@@ -116,7 +128,7 @@ public class VoiceRecorder {
                 fos.close();
 
                 int samples = readTotal/2;
-                float duration = samples / AudioPlayer.SAMPLE_RATE_IN_HZ;
+                float duration = (float)samples / AudioPlayer.SAMPLE_RATE_IN_HZ;
 
                 final File ogg = new File(targetFile.getParent(), "encoded_" + targetFile.getName() + ".ogg");
                 ogg.delete();
@@ -126,7 +138,7 @@ public class VoiceRecorder {
                 final boolean opusenc = OpusToolsWrapper.encode(targetFile.getAbsolutePath(), ogg.getAbsolutePath());
                 log("opusenc = " + opusenc);
                 if (opusenc) {
-                    recordedAndEncodedFile.onNext(new Record(ogg, (int)duration));
+                    recordedAndEncodedFile.onNext(new Record(ogg, duration));
                     recordedAndEncodedFile.onCompleted();
                 } else {
                     recordedAndEncodedFile.onError(new RuntimeException("failed to decode"));
@@ -156,9 +168,9 @@ public class VoiceRecorder {
 
     public static class Record {
         final File file;
-        final int duration;
+        final float duration;//secs
 
-        public Record(File file, int duration) {
+        public Record(File file, float duration) {
             this.file = file;
             this.duration = duration;
         }
