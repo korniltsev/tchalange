@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.MediaRecorder;
+import android.os.Vibrator;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import ru.korniltsev.OpusToolsWrapper;
@@ -23,6 +24,7 @@ import java.io.IOException;
 public class VoiceRecorder {
     private final Context ctx;
     private final File tmpFilesDir;
+    private final Vibrator vibrator;
     private int playerBufferSize;
     private AudioRecord audioRecord;
     private Reader reader;
@@ -37,6 +39,7 @@ public class VoiceRecorder {
         if (playerBufferSize <= 0) {
             playerBufferSize = 3840;
         }
+        vibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public void record() {
@@ -45,6 +48,14 @@ public class VoiceRecorder {
         reader = new Reader(audioRecord, getTemporaryFile(), playerBufferSize);
         new Thread(reader)
                 .start();
+        vibrate();
+    }
+
+    private void vibrate() {
+        try {
+            vibrator.vibrate(32);
+        } catch (Exception e) {
+        }
     }
 
     int counter;
@@ -55,7 +66,7 @@ public class VoiceRecorder {
     }
 
     public Observable<Record> stop() {
-
+        vibrate();
         try {
             audioRecord.stop();
             audioRecord.release();
