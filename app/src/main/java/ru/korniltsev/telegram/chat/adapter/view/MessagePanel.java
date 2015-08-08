@@ -177,8 +177,6 @@ public class MessagePanel extends FrameLayout {
                 updateBotButtonState();
             }
         });
-
-
     }
 
     private void showOrHideBotCommands() {
@@ -280,13 +278,16 @@ public class MessagePanel extends FrameLayout {
                 updateBotButtonState();
             }
         });
+        updateBotButtonState();
     }
 
 
 
 
     public void setCommands(List<BotCommandsAdapter.Record> cs) {
-        this.botCommands = cs;
+        if (!cs.isEmpty()){
+            this.botCommands = cs;
+        }
         updateBotButtonState();
     }
 
@@ -298,7 +299,7 @@ public class MessagePanel extends FrameLayout {
             } else {
                 icon =  R.drawable.ic_command;
             }
-        } else if (botCommands != null){
+        } else if (botCommands != null ){
             icon = R.drawable.ic_slash;
         }
         if (icon == 0){
