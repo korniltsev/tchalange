@@ -75,6 +75,10 @@ public class CustomCeilLayout extends ViewGroup {
     //content
     private View contentView;
 
+    public CustomCeilLayout(Context ctx) {
+        this(ctx, null);
+    }
+
     public CustomCeilLayout(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         //todo all dp lazy

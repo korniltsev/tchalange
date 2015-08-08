@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
@@ -174,8 +175,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new VideoVH(view, this);
             }
             case VIEW_TYPE_TEXT: {
-                View view = inflate(R.layout.chat_item_message, p);
-                return new TextMessageVH(view, this);
+                return new TextMessageVH(new CustomCeilLayout(getCtx()), this);
             }
             case VIEW_TYPE_TEXT_FORWARD: {
                 View view = inflate(R.layout.chat_item_message_forward, p);
@@ -222,6 +222,10 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new SingleTextViewVH(view, this);
             }
         }
+    }
+
+    private View inflateRootCeil() {
+        return new CustomCeilLayout(getCtx());
     }
 
     @Override
