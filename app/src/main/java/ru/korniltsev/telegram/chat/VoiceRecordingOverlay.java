@@ -28,6 +28,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -52,6 +53,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private ObjectAnimator redDotAnimation;
     private PeriodFormatter timeFormatter;
     @Inject DpCalculator calc;
+    @Inject VoiceRecorder recorder;
     private int redDotInitRightPadding;
     private int redDotRightPadding;
     private ObjectAnimator redButtonAnimation;
@@ -59,6 +61,8 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private int redDotBottomPadding;
     private Drawable microphone;
+
+
 
     public VoiceRecordingOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -153,6 +157,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         if (animating) {
             stopOnEndOfAnimation = true;
         } else {
+            stopImpl();
             animating = true;
             subscription.unsubscribe();
             redDotAnimation.cancel();
@@ -161,7 +166,9 @@ public class VoiceRecordingOverlay extends FrameLayout {
         }
     }
 
-
+    private void stopImpl() {
+        recorder.stop();
+    }
 
     private void slideOut() {
         voicePanel.animate().translationX(-voicePanel.getWidth())
@@ -182,6 +189,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         if (started || animating) {
             return;
         }
+        startImpl();
         started = true;
         animating = true;
         setTime(0l);
@@ -196,6 +204,9 @@ public class VoiceRecordingOverlay extends FrameLayout {
         slideInPanel();
     }
 
+    private void startImpl() {
+        recorder.record();
+    }
 
     private void scaleInRedButton() {
         if (redButtonAnimation != null){
@@ -293,5 +304,10 @@ public class VoiceRecordingOverlay extends FrameLayout {
         microphone.setAlpha((int) (redDotRadius * 255));
         invalidate();
     }
-    //    public static
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        subscription.unsubscribe();
+    }
 }
