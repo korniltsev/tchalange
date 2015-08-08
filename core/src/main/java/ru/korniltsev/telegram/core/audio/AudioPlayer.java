@@ -10,8 +10,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import junit.framework.Assert;
-import opus.OpusSupport;
+//import opus.OpusSupport;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.OpusToolsWrapper;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import rx.Observable;
@@ -89,14 +90,20 @@ public class AudioPlayer {
 
     public Observable<TrackState> play(TdApi.File file){
 
-        if (OpusSupport.nativeIsOpusFile(file.path)){
+//        if (OpusSupport.nativeIsOpusFile(file.path)){
+        try {
             return playOpus(file.path);
-        } else {
+        } catch (Exception e) {
             CrashlyticsCore.getInstance()
-                    .logException(new IllegalStateException("unsupported"));
+                                .logException(e);
             return Observable.empty();
-
         }
+        //        } else {
+//            CrashlyticsCore.getInstance()
+//                    .logException(new IllegalStateException("unsupported"));
+//            return Observable.empty();
+//
+//        }
 
     }
 
@@ -225,7 +232,7 @@ public class AudioPlayer {
         }
     }
 
-    private int log(String msg) {
+    public static int log(String msg) {
         return Log.d("AudioPlayer", msg);
     }
 
@@ -292,29 +299,37 @@ public class AudioPlayer {
     private File decodeOpusFileUnsafe(String filePath) throws IOException {
         File src = new File(filePath);
         File dst = new File(decodeCacheDir, src.getName());
+        if (!src.exists()) {
+            throw new RuntimeException("asd");
+        }
         if (dst.exists()){
             return dst;
         }
-        boolean opened = OpusSupport.nativeOpenOpusFile(filePath);
-        Assert.assertTrue(opened);
-        ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 1024);
-
-
-        FileOutputStream out = new FileOutputStream(dst);
-        while (true){
-            OpusSupport.nativeReadOpusFile(buffer, buffer.capacity(), mOutArgs);
-            int size = mOutArgs[0];
-            int pcmOffset = mOutArgs[1];
-            int finished = mOutArgs[2];
-            out.write(buffer.array(), 0, size);
-
-            if (finished == 1){
-                break;
-            }
+        final boolean decode = OpusToolsWrapper.decode(filePath, dst.getAbsolutePath());
+        if (!decode) {
+            throw new IOException("failed to decode srcFilePath");
         }
-        out.flush();
-        out.close();
         return dst;
+//        boolean opened = OpusSupport.nativeOpenOpusFile(filePath);
+//        Assert.assertTrue(opened);
+//        ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 1024);
+//
+//
+//        FileOutputStream out = new FileOutputStream(dst);
+//        while (true){
+//            OpusSupport.nativeReadOpusFile(buffer, buffer.capacity(), mOutArgs);
+//            int size = mOutArgs[0];
+//            int pcmOffset = mOutArgs[1];
+//            int finished = mOutArgs[2];
+//            out.write(buffer.array(), 0, size);
+//
+//            if (finished == 1){
+//                break;
+//            }
+//        }
+//        out.flush();
+//        out.close();
+//        return dst;
     }
 
 

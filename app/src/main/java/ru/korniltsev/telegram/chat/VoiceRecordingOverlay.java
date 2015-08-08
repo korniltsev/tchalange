@@ -35,6 +35,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import static android.view.MotionEvent.*;
@@ -52,6 +53,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private Subscription subscription = Subscriptions.empty();
     private ObjectAnimator redDotAnimation;
     private PeriodFormatter timeFormatter;
+    @Inject Presenter presenter;
     @Inject DpCalculator calc;
     @Inject VoiceRecorder recorder;
     private int redDotInitRightPadding;
@@ -167,7 +169,9 @@ public class VoiceRecordingOverlay extends FrameLayout {
     }
 
     private void stopImpl() {
-        recorder.stop();
+        //todo cancel
+        final Observable<VoiceRecorder.Record> stop = recorder.stop();
+        presenter.sendVoice(stop);
     }
 
     private void slideOut() {

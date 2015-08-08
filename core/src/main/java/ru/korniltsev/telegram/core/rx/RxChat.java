@@ -7,6 +7,7 @@ import android.util.SparseArray;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.audio.AudioPlayer;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import rx.Observable;
 import rx.Subscription;
@@ -15,6 +16,7 @@ import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.Subscriptions;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -489,6 +491,18 @@ public class RxChat  {
 
     public void sendBotCommand(String cmd, TdApi.Message msg) {
         sendMessageImpl(new TdApi.InputMessageText(cmd), null);
+    }
+
+    public void sendVoice(Observable<VoiceRecorder.Record> stop) {
+        stop.subscribe(new ObserverAdapter<VoiceRecorder.Record>() {
+            @Override
+            public void onNext(VoiceRecorder.Record response) {
+                VoiceRecorder.log("send voice");
+                int duration = response.duration;
+                final String file = response.file.getAbsolutePath();
+                sendMessageImpl(new TdApi.InputMessageVoice(new TdApi.InputFileLocal(file), duration));
+            }
+        });
     }
 
     private class GetUsers implements Func1<TdApi.Messages, Observable<? extends ChatDB.Portion>> {

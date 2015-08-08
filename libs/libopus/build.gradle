@@ -1,10 +1,37 @@
-//configurations.create("default")
-//artifacts.add("default", file('webp-android-backport-library-release.aar'))
 apply plugin: 'com.android.library'
 
 android {
+
     sourceSets.main {
         jniLibs.srcDir 'src/libs'
         jni.srcDirs = [] //disable automatic ndk-build call
     }
+//    compileSdkVersion 19
+//    buildToolsVersion "19.1.0"
+//    defaultConfig {
+//        minSdkVersion 14
+//        targetSdkVersion 19
+//        ndk {
+//            def CFlags = []
+//            moduleName = "opustoolswrapper"
+//            def localPath = file('src/main/jni')
+//            CFlags += "-I${localPath}/opus/include/".toString()
+//            CFlags += "-I${localPath}/opus/celt/".toString()
+//            CFlags += "-I${localPath}/opus/silk/".toString()
+//            CFlags += "-I${localPath}/opus/silk/fixed/".toString()
+//            CFlags += "-I${localPath}/opusfile/include/".toString()
+//            CFlags += "-I${localPath}/opus-tools/include/".toString()
+//            CFlags += "-I${localPath}/opus-tools/src/".toString()
+//            CFlags += "-I${localPath}/ogg/include/".toString()
+//            CFlags += ["-Drestrict=''", "-D__EMX__", "-DOPUS_BUILD", "-DFIXED_POINT", "-DUSE_ALLOCA", "-DHAVE_LRINT", "-DHAVE_LRINTF"]
+//            CFlags += ["-O3", "-fno-math-errno"]
+//
+//            cFlags = CFlags.join(" ")
+//
+//            ldLibs =  [ "log" ]
+//
+//            abiFilters = ["x86","armeabi-v7a"]
+//
+//        }
+//    }
 }

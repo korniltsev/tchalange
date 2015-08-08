@@ -28,6 +28,7 @@ import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
 import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
@@ -648,5 +649,9 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void sendBotKeyboardCommand(String cmd, TdApi.Message msg) {
         rxChat.sendBotCommand(cmd, msg);
+    }
+
+    public void sendVoice(Observable<VoiceRecorder.Record> stop) {
+        rxChat.sendVoice(stop);
     }
 }

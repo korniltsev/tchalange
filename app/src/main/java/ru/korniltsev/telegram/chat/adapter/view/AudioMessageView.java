@@ -51,7 +51,7 @@ public class AudioMessageView extends LinearLayout {
     private final Action1<TdApi.UpdateFile> decodeAction = new Action1<TdApi.UpdateFile>() {
         @Override
         public void call(TdApi.UpdateFile updateFile) {
-            player.decode(updateFile);
+//            player.decode(updateFile);
         }
     };
 
@@ -94,7 +94,7 @@ public class AudioMessageView extends LinearLayout {
 
         this.duration.setText(DURATION_FORMATTER.print(p));
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
-        downloader.hook(a.voice, decodeAction);
+//        downloader.hook(a.voice, decodeAction);
         download_view.bind(a.voice, cfg, new DownloadView.CallBack() {
             @Override
             public void onProgress(TdApi.UpdateFileProgress p) {
