@@ -82,7 +82,8 @@ public class MessagePanel extends FrameLayout {
     private ImageView btnBotCommand;
     private Runnable onAnyKeyboardShownListener;
     @Nullable TdApi.Message replyMarkup;
-//    @Nullable private TdApi.ReplyMarkupShowKeyboard replyMarkup;
+    public boolean doNotHideCommandsOnce;
+    //    @Nullable private TdApi.ReplyMarkupShowKeyboard replyMarkup;
 
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -150,12 +151,27 @@ public class MessagePanel extends FrameLayout {
                     if (replyMarkup != null){
                         showOrHideBotCommands();
                     } else {
+
+
                         final Editable text = input.getText();
                         text.clear();
                         text.insert(0, "/");
                         input.requestFocus();
+
+                        if (bottomFrame.isBotKeyboardShown()
+                                || bottomFrame.isEmojiKeyboardShown()){
+                            doNotHideCommandsOnce = true;//quick dirty hack
+                            bottomFrame.showRegularKeyboard();
+                        }
+
+
+//                        if (bottomFrame.isEmojiKeyboardShown()){
+//
+//                        } else {
+//                            bottomFrame.dismisAnyKeyboard();
+//                        }
 //                        showKeyboard(input);
-                        bottomFrame.dismisAnyKeyboard();
+
                     }
                 }
                 updateBotButtonState();

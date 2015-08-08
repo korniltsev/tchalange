@@ -201,7 +201,11 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         messagePanel.setOnAnyKeyboardShownListener(new Runnable() {
             @Override
             public void run() {
-                hideCommandList();
+                if (messagePanel.doNotHideCommandsOnce){
+                    messagePanel.doNotHideCommandsOnce = false;//todo quick hack. delete when have time
+                } else {
+                    hideCommandList();
+                }
             }
         });
         messagePanel.getBottomFrame().setBotCommandClickListener(new FrameUnderMessagePanelController.BotCommandClickListener() {
@@ -552,9 +556,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
                         newHeight = commandHeight * result;
                     }
                     newHeight += botsCommandList.getPaddingTop();
-                    final ViewGroup.LayoutParams lp = botCommandsListConainer.getLayoutParams();
+                    final ViewGroup.LayoutParams lp = botsCommandList.getLayoutParams();
                     lp.height = newHeight;
-                    botCommandsListConainer.setLayoutParams(lp);
+                    botsCommandList.setLayoutParams(lp);
                     showCommandList(newHeight);
                 }
             }

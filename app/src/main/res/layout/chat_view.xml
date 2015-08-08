@@ -128,6 +128,31 @@
             </ru.korniltsev.telegram.chat.adapter.view.MessagePanel>
 
         </LinearLayout>
+        <FrameLayout
+                android:id="@+id/bot_commands_list_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:visibility="gone"
+                android:layout_marginBottom="48dp">
+            <View
+                    android:id="@+id/bot_command_shadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#000000"
+                    android:visibility="gone"
+
+                    />
+
+
+            <ru.korniltsev.telegram.chat.bot.BotCommandsRecyclerView
+                    android:id="@+id/bot_commands_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="2dp"
+                    android:layout_gravity="bottom"
+                    />
+        </FrameLayout>
         <ru.korniltsev.telegram.chat.VoiceRecordingOverlay
                 android:id="@+id/voice_recording_overlay"
                 android:layout_width="match_parent"
@@ -179,29 +204,9 @@
         </ru.korniltsev.telegram.chat.VoiceRecordingOverlay>
     </ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout>
 
-    <View
-            android:id="@+id/bot_command_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#000000"
-            android:visibility="gone"
-            android:layout_marginBottom="48dp"
-            />
+
     <!-- frame to create translate animations-->
-    <FrameLayout
-            android:id="@+id/bot_commands_list_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:visibility="gone"
-            android:layout_marginBottom="48dp">
-        <ru.korniltsev.telegram.chat.bot.BotCommandsRecyclerView
-                android:id="@+id/bot_commands_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="2dp"
-                />
-    </FrameLayout>
+
 
     <View
             android:id="@+id/scroll_down"
