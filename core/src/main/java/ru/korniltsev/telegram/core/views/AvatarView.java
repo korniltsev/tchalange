@@ -11,6 +11,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.utils.R;
 
@@ -23,10 +24,10 @@ public class AvatarView extends ImageView {
     public final RxGlide picasso2;
 
 
-    public AvatarView(Context context, int size) {
+    public AvatarView(Context context, int size, MyApp app) {
         super(context);
-        picasso2 = ObjectGraphService.getObjectGraph(context)
-                .get(RxGlide.class);
+        picasso2 = app.rxGlide;//ObjectGraphService.getObjectGraph(context)
+                //.get(RxGlide.class);
 
 //        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AvatarView);
 //        size = a.getDimensionPixelSize(R.styleable.AvatarView_size, -1);

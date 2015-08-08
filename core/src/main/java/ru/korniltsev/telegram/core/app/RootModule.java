@@ -74,9 +74,11 @@ import java.util.concurrent.Executors;
         library = true)
 public class RootModule {
     private Context ctx;
+    private final DpCalculator dpCalculator;
 
-    public RootModule(Context ctx) {
+    public RootModule(Context ctx, DpCalculator dpCalculator) {
         this.ctx = ctx;
+        this.dpCalculator = dpCalculator;
     }
 
     @Singleton
@@ -92,11 +94,12 @@ public class RootModule {
         return new PhoneFormat(ctx);
     }
 
+
+
     @Singleton
     @Provides
     DpCalculator provideDpCalc(){
-        float density = ctx.getResources().getDisplayMetrics().density;
-        return new DpCalculator(density);
+        return dpCalculator;
     }
 
     @Singleton

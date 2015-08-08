@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.utils.Colors;
@@ -34,8 +35,8 @@ import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public class CustomCeilLayout extends ViewGroup {
     //staff
-    public @Inject DpCalculator calc;
-    public @Inject StaticLayoutCache layoutCache;
+    public/* @Inject */DpCalculator calc;
+    public/* @Inject */StaticLayoutCache layoutCache;
     private final int screenWidth;
     private final int paddingTopBottom;
     private final int unspecifiedMeasureSpec;
@@ -82,16 +83,20 @@ public class CustomCeilLayout extends ViewGroup {
     public CustomCeilLayout(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         //todo all dp lazy
-        ObjectGraphService.inject(ctx, this);
-        final WindowManager systemService = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
-        screenWidth = systemService.getDefaultDisplay().getWidth();
+//        ObjectGraphService.inject(ctx, this);
+
+        final MyApp app = MyApp.from(ctx);
+        screenWidth = app.displayWidth;
+        calc = app.dpCalculator;
+        layoutCache = app.staticLayoutCache;
+
         paddingTopBottom = calc.dp(8);
         unspecifiedMeasureSpec = makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
 
         //avatar
         avatarSize = calc.dp(41);
         avatarMeasureSpec = makeMeasureSpec(avatarSize, EXACTLY);
-        avatarView = new AvatarView(ctx, avatarSize);
+        avatarView = new AvatarView(ctx,  avatarSize, app);
         avatarView.setId(R.id.avatar);
         avatarMarginLeft = calc.dp(9);
         avatarMarginRight = calc.dp(11);

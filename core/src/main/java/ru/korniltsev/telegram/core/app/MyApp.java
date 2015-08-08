@@ -1,6 +1,8 @@
 package ru.korniltsev.telegram.core.app;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -13,7 +15,10 @@ import io.fabric.sdk.android.services.concurrency.PriorityThreadPoolExecutor;
 import mortar.MortarScope;
 import mortar.dagger1support.ObjectGraphService;
 import net.danlew.android.joda.JodaTimeAndroid;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
+import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.ThreadFactory;
@@ -26,6 +31,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class MyApp extends Application {
     private MortarScope rootScope;
+    public int displayWidth;
+//    public DpCalculator dpCalculator;
+//    public RxGlide rxGlide;
+    public StaticLayoutCache staticLayoutCache;
+    public DpCalculator dpCalculator;
+    public RxGlide rxGlide;
 
     @Override
     public void onCreate() {
@@ -41,7 +52,23 @@ public class MyApp extends Application {
                         .kits(new CrashlyticsCore(), new Answers())
                         .build());
         JodaTimeAndroid.init(this);
+
+        refreshDisplay();
+
+
+        float density = getResources().getDisplayMetrics().density;
+        staticLayoutCache = new StaticLayoutCache();
+        dpCalculator = new DpCalculator(density);
+        ObjectGraph graph = ObjectGraph.create(
+                new RootModule(this,  dpCalculator));
+        rootScope = MortarScope.buildRootScope()
+                .withService(ObjectGraphService.SERVICE_NAME, graph)
+                .build("Root");
+        graph.get(Stickers.class);//todo better solution
+        rxGlide = graph.get(RxGlide.class);
     }
+
+
 
     private void maximizeCurrentThreadPriority() {
         try {
@@ -76,18 +103,29 @@ public class MyApp extends Application {
 
     @Override
     public Object getSystemService(String name) {
-        if (rootScope == null) {
-            ObjectGraph graph = ObjectGraph.create(new RootModule(this));
-            rootScope = MortarScope.buildRootScope()
-                    .withService(ObjectGraphService.SERVICE_NAME, graph)
-                    .build("Root");
-            graph.get(Stickers.class);//todo better solution
-        }
-
         if (rootScope.hasService(name)) {
             return rootScope.getService(name);
         }
 
         return super.getSystemService(name);
+    }
+
+    private void refreshDisplay() {
+        this.displayWidth  = getResources().getDisplayMetrics().widthPixels;
+    }
+
+//    public MyDsiplay getDisplay() {
+//        return display;
+//    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        refreshDisplay();
+        super.onConfigurationChanged(newConfig);
+
+    }
+
+    public static MyApp from(Context ctx) {
+        return (MyApp) ctx.getApplicationContext();
     }
 }

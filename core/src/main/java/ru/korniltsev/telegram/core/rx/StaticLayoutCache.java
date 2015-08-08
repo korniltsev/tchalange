@@ -7,14 +7,12 @@ import android.util.LruCache;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton
+
 public class StaticLayoutCache {
-    final Context ctx;
     private final LruCache<Key, StaticLayout> cache;
 
-    @Inject
-    public StaticLayoutCache(Context ctx) {
-        this.ctx = ctx;
+
+    public StaticLayoutCache() {
         cache = new LruCache<>(100);
     }
 
