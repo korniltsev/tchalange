@@ -223,6 +223,12 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
 //        view.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
 //        tricky.getOverlay().add(view);
         voiceOverlay = ((VoiceRecordingOverlay) findViewById(R.id.voice_recording_overlay));
+        messagePanel.getInput().addTextChangedListener(new TextWatcherAdapter(){
+            @Override
+            public void afterTextChanged(Editable s) {
+                voiceOverlay.setStateEnabled(s.length() == 0);
+            }
+        });
     }
 
     boolean scrollDownButtonIsVisible = false;
@@ -542,12 +548,13 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         messagePanel.getInput().addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
+
                 final int result = botsCommandAdapter.filter(s.toString());
                 if (result == 0) {
                     hideCommandList();
-                    voiceOverlay.setStateEnabled(true);
+
                 } else {
-                    voiceOverlay.setStateEnabled(false);
+
                     int newHeight;
                     final int commandHeight = calc.dp(36);
                     if (result > 3) {

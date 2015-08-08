@@ -115,6 +115,9 @@ public class VoiceRecordingOverlay extends FrameLayout {
 
     @Override
     public boolean onTouchEvent(@NonNull MotionEvent event) {
+        if(!stateEnabled){
+            return false;
+        }
 //        Log.d("VoiceRecordingOverlay", event.toString());
         final int actionMasked = event.getActionMasked();
         if (actionMasked == ACTION_DOWN) {
