@@ -8,7 +8,7 @@ dependencies {
     compile project.support_v4
     compile project.appcompat_v7
     compile project.recycler_v7
-    compile project.picasso
+    compile project(":picasso");
     compile project.flow
     compile project.flow_path
     compile project.mortar
