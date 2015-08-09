@@ -64,6 +64,7 @@ public class FakeToolbar extends FrameLayout {
         headerHeight = getLayoutParams().height;
         realHeaderHeight = getResources().getDimensionPixelSize(R.dimen.profile_header_height);
         //        fakeToolbarHeight = getResources().getDP
+
     }
 
     private void positionAvatar(float res) {

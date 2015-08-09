@@ -31,6 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AppUtils {
+    public static final int REQUEST_CHOOS_FROM_GALLERY = 1;
+    public static final int REQUEST_TAKE_PHOTO = 2;
+    public static final int REQUEST_CHOOS_FROM_GALLERY_MY_AVATAR = 3;
     private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
 
     public static String uiName(TdApi.User user, Context ctx) {//todo

@@ -237,7 +237,7 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
         activityResult.onNext(new ActivityResult(requestCode, resultCode, data));
     }
 
-    private PublishSubject<ActivityResult> activityResult = PublishSubject.create();
+    private final PublishSubject<ActivityResult> activityResult = PublishSubject.create();
 
     @Override
     public Activity expose() {

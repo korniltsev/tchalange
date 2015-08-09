@@ -55,8 +55,6 @@ public class Presenter extends ViewPresenter<ChatView>
 
 {
 
-    public static final int REQUEST_CHOOS_FROM_GALLERY = 1;
-    public static final int REQUEST_TAKE_PHOTO = 2;
     private final Chat path;
     private final RXClient client;
     private final RxChat rxChat;
@@ -553,7 +551,7 @@ public class Presenter extends ViewPresenter<ChatView>
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         owner.expose()
-                .startActivityForResult(Intent.createChooser(intent, title), REQUEST_CHOOS_FROM_GALLERY);
+                .startActivityForResult(Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY);
     }
 
     @Override
@@ -563,7 +561,7 @@ public class Presenter extends ViewPresenter<ChatView>
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
         owner.expose()
-                .startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+                .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO);
     }
 
     @NonNull
@@ -575,14 +573,14 @@ public class Presenter extends ViewPresenter<ChatView>
         if (result != Activity.RESULT_OK) {
             return;
         }
-        if (request == REQUEST_TAKE_PHOTO) {
+        if (request == AppUtils.REQUEST_TAKE_PHOTO) {
             File f = getTmpFileForCamera();
             if (f.exists()) {
                 rxChat.sendImage(f.getAbsolutePath());
                 getView()
                         .hideAttachPannel();
             }
-        } else if (request == REQUEST_CHOOS_FROM_GALLERY) {
+        } else if (request == AppUtils.REQUEST_CHOOS_FROM_GALLERY) {
             String picturePath = Utils.getGalleryPickedFilePath(getView().getContext(), data);
             if (picturePath != null) {
                 rxChat.sendImage(picturePath);
