@@ -172,8 +172,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new GeoPointVH(cell(), this);
             }
             case VIEW_TYPE_VIDEO: {
-                View view = inflate(R.layout.chat_item_video, p);
-                return new VideoVH(view, this);
+
+                return new VideoVH(cell(), this);
             }
             case VIEW_TYPE_TEXT: {
                 return new TextMessageVH(cell(), this);
