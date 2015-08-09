@@ -1,71 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                style="@style/Item.Root"
-        >
-
-    <include layout="@layout/chat_item_avatar"/>
-
-    <include layout="@layout/chat_item_nick_and_time"/>
-
-
-    <ru.korniltsev.telegram.chat.adapter.view.DocumentView
-            android:id="@+id/document_view"
-            android:layout_width="match_parent"
+<ru.korniltsev.telegram.chat.adapter.view.DocumentView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/document_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        style="@style/item_content_with_margins"
+        android:layout_marginTop="3dp">
+    <FrameLayout
+            android:id="@+id/thumb_and_btn_root"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            style="@style/item_content_with_margins"
-            android:layout_marginTop="3dp"
             >
-        <FrameLayout
-                android:id="@+id/thumb_and_btn_root"
+        <ImageView
+                android:id="@+id/image_document_thumb"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="centerCrop"
+                />
+        <ru.korniltsev.telegram.core.views.DownloadView
+                android:id="@+id/download_view"
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                >
-            <ImageView
-                    android:id="@+id/image_document_thumb"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:scaleType="centerCrop"
-                    />
-            <ru.korniltsev.telegram.core.views.DownloadView
-                    android:id="@+id/download_view"
-                    android:layout_gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
 
-
-                    />
-        </FrameLayout>
-        <LinearLayout
+                />
+    </FrameLayout>
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:orientation="vertical"
+            >
+        <TextView
+                android:id="@+id/document_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:orientation="vertical"
-                >
-            <TextView
-                    android:id="@+id/document_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#262626"
-                    android:textSize="16sp"
-                    android:paddingRight="8dp"
-                    />
+                android:textColor="#262626"
+                android:textSize="16sp"
+                android:paddingRight="8dp"
+                />
 
-            <TextView
-                    android:id="@+id/document_progress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#a4a4a4"
-                    android:textSize="14sp"
-                    />
-        </LinearLayout>
+        <TextView
+                android:id="@+id/document_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#a4a4a4"
+                android:textSize="14sp"
+                />
+    </LinearLayout>
 
-    </ru.korniltsev.telegram.chat.adapter.view.DocumentView>
-    <!--<ru.korniltsev.telegram.chat.adapter.view.EmojiTextView-->
-            <!--android:id="@+id/message"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-
-            <!--/>-->
-</RelativeLayout>
+</ru.korniltsev.telegram.chat.adapter.view.DocumentView>

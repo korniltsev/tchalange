@@ -191,12 +191,10 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new ChatPhotoChangedVH(view, this);
             }
             case VIEW_TYPE_DOCUMENT: {
-                View view = inflate(R.layout.chat_item_document, p);
-                return new DocumentVH(view, this);
+                return new DocumentVH(cell(), this);
             }
             case VIEW_TYPE_GIF: {
-                View view = inflate(R.layout.chat_item_video, p);
-                return new GifDocumentVH(view, this);
+                return new GifDocumentVH(cell(), this);
             }
             case VIEW_TYPE_CONTACT: {
                 View view = inflate(R.layout.chat_item_message_forward, p);
