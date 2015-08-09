@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.core.rx;
 
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
+import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
@@ -449,7 +450,18 @@ public class RxChat  {
 
             final List<TdApi.Message> messageList = new ArrayList<>();
             if (initMessage != null) {
-                messageList.add(initMessage);
+                boolean foundDuplicate = false;
+                for (TdApi.Message msg : portion.messages) {
+                    if (msg.id == initMessage.id){
+                        foundDuplicate = true;
+                        break;
+                    }
+                }
+                if (!foundDuplicate){
+                    messageList.add(initMessage);
+                } else {
+                    CrashlyticsCore.getInstance().logException(new IllegalStateException("duplicate in messages"));
+                }
             }
             addAll(messageList, portion.messages);
 
