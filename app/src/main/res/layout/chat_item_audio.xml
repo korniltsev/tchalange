@@ -5,7 +5,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/item_content_with_margins"
-        android:layout_marginTop="8dp"
+
+        android:paddingTop="5dp"
         >
     <ru.korniltsev.telegram.core.views.DownloadView
             android:id="@+id/download_view"

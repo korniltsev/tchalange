@@ -22,9 +22,9 @@ public class AudioVH extends RealBaseVH {
 
     //    private final AudioMessageView audioView;
 
-    public AudioVH(View itemView, Adapter adapter) {
+    public AudioVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
-        root = ((CustomCeilLayout) itemView);
+        root = ( itemView);
         audioView = (AudioMessageView) LayoutInflater.from(itemView.getContext())
                 .inflate(R.layout.chat_item_audio, root, false);
         root.addContentView(audioView);

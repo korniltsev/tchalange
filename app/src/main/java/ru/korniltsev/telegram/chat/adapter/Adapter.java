@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat.adapter;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -155,16 +156,16 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public RealBaseVH onCreateViewHolder(ViewGroup p, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_PHOTO: {
-                View view = inflate(R.layout.chat_item_photo, p);
-                return new PhotoMessageVH(view, this);
+
+
+                return new PhotoMessageVH(cell(), this);
             }
             case VIEW_TYPE_STICKER: {
                 View view = inflate(R.layout.chat_item_sticker, p);
                 return new StickerVH(view, this);
             }
             case VIEW_TYPE_AUDIO: {
-                View view = inflate(R.layout.chat_item_message, p);
-                return new AudioVH(view, this);
+                return new AudioVH(cell(), this);
             }
             case VIEW_TYPE_GEO: {
                 View view = inflate(R.layout.chat_item_geo, p);
@@ -175,7 +176,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new VideoVH(view, this);
             }
             case VIEW_TYPE_TEXT: {
-                return new TextMessageVH(new CustomCeilLayout(getCtx()), this);
+                return new TextMessageVH(cell(), this);
             }
             case VIEW_TYPE_TEXT_FORWARD: {
                 View view = inflate(R.layout.chat_item_message_forward, p);
@@ -224,9 +225,12 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
         }
     }
 
-    private View inflateRootCeil() {
+    @NonNull
+    private CustomCeilLayout cell() {
         return new CustomCeilLayout(getCtx());
     }
+
+
 
     @Override
     public void onBindViewHolder(RealBaseVH holder, int position) {

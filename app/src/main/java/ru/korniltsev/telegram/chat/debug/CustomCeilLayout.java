@@ -172,7 +172,7 @@ public class CustomCeilLayout extends ViewGroup {
 
         final int contentLeft = nickLeft;
         final int contentTop = avaTop + nickHeight;
-        final int contentRight = r;
+        final int contentRight = contentLeft + contentView.getMeasuredWidth();
         final int contentBottom = contentTop + contentView.getMeasuredHeight();
         contentView.layout(contentLeft, contentTop, contentRight, contentBottom);
 

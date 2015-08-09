@@ -1,21 +1,30 @@
 package ru.korniltsev.telegram.chat.adapter;
 
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
+import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.photoview.PhotoView;
 
-class PhotoMessageVH extends BaseAvatarVH {
+import static ru.korniltsev.telegram.chat.adapter.TextMessageVH.newBind;
+
+class PhotoMessageVH extends RealBaseVH {
     private final PhotoMessageView image;
+    private final CustomCeilLayout itemView;
 
-
-    public PhotoMessageVH(View itemView, final Adapter adapter) {
+    public PhotoMessageVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
-        image = (PhotoMessageView) itemView.findViewById(R.id.image);
+        this.itemView = itemView;
+
+
+
+        image = (PhotoMessageView) adapter.getViewFactory().inflate(R.layout.chat_item_photo, itemView, false);
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -25,11 +34,21 @@ class PhotoMessageVH extends BaseAvatarVH {
                         .set(new PhotoView(photo.photo, item.msg.id, item.msg.chatId));
             }
         });
+
+        itemView.addContentView(image);
+
+        final Resources resources = itemView.getContext().getResources();
+        Drawable[] ds = new Drawable[3];
+        ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
+        ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
+        ds[STATE_IC_NULL] = null;
+        itemView.iconRight2.init(ds);
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        super.bind(item, lastReadOutbox);
+        newBind(itemView, adapter, item, lastReadOutbox);
+
         TdApi.Message msg = ((MessageItem) item).msg;
         final TdApi.Photo photo = ((TdApi.MessagePhoto) msg.message).photo;
         image.load(photo, msg);
