@@ -2,6 +2,8 @@ package ru.korniltsev.telegram.chat.adapter.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -10,6 +12,8 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 
 import javax.inject.Inject;
 import java.util.Locale;
+
+import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public class GeoPointView extends ImageView {
     @Inject DpCalculator calc;
@@ -28,6 +32,14 @@ public class GeoPointView extends ImageView {
         picasso.getPicasso()
                 .load(url)
                 .into(this);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final ViewGroup.LayoutParams lp = getLayoutParams();
+        final int w = makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
+        final int h = makeMeasureSpec(lp.height, MeasureSpec.EXACTLY);
+        super.onMeasure(w, h);
     }
 
     private String urlFor(double latitude, double longitude) {

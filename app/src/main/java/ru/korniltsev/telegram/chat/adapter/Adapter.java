@@ -168,8 +168,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new AudioVH(cell(), this);
             }
             case VIEW_TYPE_GEO: {
-                View view = inflate(R.layout.chat_item_geo, p);
-                return new GeoPointVH(view, this);
+
+                return new GeoPointVH(cell(), this);
             }
             case VIEW_TYPE_VIDEO: {
                 View view = inflate(R.layout.chat_item_video, p);
