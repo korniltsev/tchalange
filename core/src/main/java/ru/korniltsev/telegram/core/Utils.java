@@ -143,4 +143,8 @@ public class Utils {
 //        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
 //        imm.showS(InputMethodManager.SHOW_FORCED, 0);
     }
+
+    public static void logDuration(long start, long end, String msg) {
+        Log.d("Duration", msg + (end - start));
+    }
 }

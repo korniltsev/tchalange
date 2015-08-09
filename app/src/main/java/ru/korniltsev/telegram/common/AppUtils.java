@@ -232,8 +232,4 @@ public class AppUtils {
     public static String kb(int size) {
         return humanReadableByteCount(size);
     }
-
-    public static void logDuration(long start, long end, String msg) {
-        Log.d("Duration", msg + (end - start));
-    }
 }

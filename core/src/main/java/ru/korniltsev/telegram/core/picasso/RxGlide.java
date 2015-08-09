@@ -244,7 +244,15 @@ public class RxGlide {
 
     public RequestCreator loadPhoto(TdApi.File f, boolean webp) {
         assertTrue(f.id != 0);
-        return picasso.load(TDFileRequestHandler.load(f, webp))
+//        long start = System.nanoTime();
+        final TDFileRequestHandler.TDFileUri load = TDFileRequestHandler.load(f, webp);
+//        long end = System.nanoTime();
+//        if ((end - start) != 0){
+//            System.out.println();
+//        }
+//        Utils.logDuration(start, end, "uri creation");
+
+        return picasso.load(load)
                 .stableKey(stableKeyForTdApiFile(f, webp));
     }
 
