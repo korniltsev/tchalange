@@ -37,12 +37,7 @@ class PhotoMessageVH extends RealBaseVH {
 
         itemView.addContentView(image);
 
-        final Resources resources = itemView.getContext().getResources();
-        Drawable[] ds = new Drawable[3];
-        ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
-        ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
-        ds[STATE_IC_NULL] = null;
-        itemView.iconRight2.init(ds);
+
     }
 
     @Override

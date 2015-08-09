@@ -17,6 +17,8 @@ import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
 
+import static ru.korniltsev.telegram.chat.debug.CustomCeilLayout.SquareDumbResourceView.*;
+
 public class TextMessageVH extends RealBaseVH {
 
     private final CustomCeilLayout root;
@@ -35,19 +37,12 @@ public class TextMessageVH extends RealBaseVH {
         applyTextStyle(message);
         root.addContentView(message);
 
-        final Resources resources = itemView.getContext().getResources();
-        Drawable[] ds = new Drawable[3];
-        ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
-        ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
-        ds[STATE_IC_NULL] = null;
-        root.iconRight2.init(ds);
 
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
         newBind(root, adapter, item, lastReadOutbox);
-        //        super.bind(item, lastReadOutbox);
         TdApi.Message rawMsg = ((MessageItem) item).msg;
         //
         TdApi.MessageContent msg = rawMsg.message;
@@ -62,36 +57,22 @@ public class TextMessageVH extends RealBaseVH {
         root.setTime(print);
 
         if (user != null) {
-            //            avatar.loadAvatarFor(user);
             root.avatarView.loadAvatarFor(user);
             String name = AppUtils.uiName(user, root.getContext());
-//            root.nick.setText(name);
             root.setNick(name);
         } else {
             root.setNick("");
         }
-        //else {
-//
-//        }
-
-
-//        root.time.setText(print);
 
         switch (adapter.chat.getMessageState(msg, lastReadOutbox, adapter.myId)) {
             case RxChat.MESSAGE_STATE_READ:
-                root.iconRight2.setSate(STATE_IC_NULL);
-
-                //root.iconRight.setVisibility(View.INVISIBLE);
+                root.iconRight3.setSate(STATE_IC_NULL);
                 break;
             case RxChat.MESSAGE_STATE_SENT:
-                root.iconRight2.setSate(STATE_IC_UNREAD);
-//                root.iconRight.setImageResource(R.drawable.ic_unread);
-//                root.iconRight.setVisibility(View.VISIBLE);
+                root.iconRight3.setSate(STATE_IC_UNREAD);
                 break;
             case RxChat.MESSAGE_STATE_NOT_SENT:
-                root.iconRight2.setSate(STATE_IC_CLOCK);
-//                root.iconRight.setImageResource(R.drawable.ic_clock);
-//                root.iconRight.setVisibility(View.VISIBLE);
+                root.iconRight3.setSate(STATE_IC_CLOCK);
                 break;
         }
     }

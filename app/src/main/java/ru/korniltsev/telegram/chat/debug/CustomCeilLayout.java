@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat.debug;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -35,8 +36,8 @@ import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public class CustomCeilLayout extends ViewGroup {
     //staff
-    public/* @Inject */DpCalculator calc;
-    public/* @Inject */StaticLayoutCache layoutCache;
+    public/* @Inject */ DpCalculator calc;
+    public/* @Inject */ StaticLayoutCache layoutCache;
     private final int screenWidth;
     private final int paddingTopBottom;
     private final int unspecifiedMeasureSpec;
@@ -51,19 +52,13 @@ public class CustomCeilLayout extends ViewGroup {
     //iconright
     private final int iconRightMarginRight;
     private final int iconRightSize;
-    public final SquareDumbResourceView iconRight2;
-
+    public final SquareDumbResourceView iconRight3;
 
     private String time;
     private TextPaint timePaint;
     private StaticLayout timeLayout;
     private int timeWidth;
     private final int timePadding;
-
-
-
-
-
 
     //nick
     private String nick;
@@ -83,7 +78,7 @@ public class CustomCeilLayout extends ViewGroup {
     public CustomCeilLayout(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         //todo all dp lazy
-//        ObjectGraphService.inject(ctx, this);
+        //        ObjectGraphService.inject(ctx, this);
 
         final MyApp app = MyApp.from(ctx);
         screenWidth = app.displayWidth;
@@ -96,17 +91,16 @@ public class CustomCeilLayout extends ViewGroup {
         //avatar
         avatarSize = calc.dp(41);
         avatarMeasureSpec = makeMeasureSpec(avatarSize, EXACTLY);
-        avatarView = new AvatarView(ctx,  avatarSize, app);
+        avatarView = new AvatarView(ctx, avatarSize, app);
         avatarView.setId(R.id.avatar);
         avatarMarginLeft = calc.dp(9);
         avatarMarginRight = calc.dp(11);
         addView(avatarView);
 
-
         //iconRight
         iconRightSize = calc.dp(12);
         iconRightMarginRight = calc.dp(15);
-        iconRight2 = new SquareDumbResourceView(iconRightSize);
+        iconRight3 = new SquareDumbResourceView(iconRightSize);
 
         //time
         timePadding = calc.dp(8);
@@ -120,11 +114,6 @@ public class CustomCeilLayout extends ViewGroup {
         nickPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         nickPaint.setColor(Colors.USER_NAME_COLOR);
 
-
-
-
-
-
         setWillNotDraw(false);
     }
 
@@ -135,7 +124,7 @@ public class CustomCeilLayout extends ViewGroup {
 
     @Override
     protected void onMeasure(final int widthMeasureSpec, int heightMeasureSpec) {
-//        long start = System.nanoTime();
+        //        long start = System.nanoTime();
         int availableWidth = MeasureSpec.getSize(widthMeasureSpec);
 
         avatarView.measure(avatarMeasureSpec, avatarMeasureSpec);
@@ -148,13 +137,13 @@ public class CustomCeilLayout extends ViewGroup {
         int real = paddingTopBottom * 2 + nickHeight + contentView.getMeasuredHeight();
         setMeasuredDimension(availableWidth, Math.max(min, real));
 
-        long end = System.nanoTime();
-//        DebugRelativeLayout.log(start, end, "total measure");
+//        long end = System.nanoTime();
+        //        DebugRelativeLayout.log(start, end, "total measure");
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-//        long start = System.nanoTime();
+        //        long start = System.nanoTime();
         final int avaLeft = l + avatarMarginLeft;
         final int avaTop = paddingTopBottom;
         final int avaRight = avaLeft + avatarSize;
@@ -167,8 +156,7 @@ public class CustomCeilLayout extends ViewGroup {
         final int iconRightRight = r - iconRightMarginRight;
         final int iconRightTop = avaTop;
         final int iconRightLeft = iconRightRight - iconRightSize;
-        iconRight2.layout(iconRightTop, iconRightLeft);
-
+        iconRight3.layout(iconRightTop, iconRightLeft);
 
         final int contentLeft = nickLeft;
         final int contentTop = avaTop + nickHeight;
@@ -176,11 +164,9 @@ public class CustomCeilLayout extends ViewGroup {
         final int contentBottom = contentTop + contentView.getMeasuredHeight();
         contentView.layout(contentLeft, contentTop, contentRight, contentBottom);
 
-//        long end = System.nanoTime();
-//        DebugRelativeLayout.log(start, end, "total дфнщге");
+        //        long end = System.nanoTime();
+        //        DebugRelativeLayout.log(start, end, "total дфнщге");
     }
-
-
 
     public void setTime(@NonNull String time) {
         if (!time.equals(this.time)) {
@@ -195,7 +181,7 @@ public class CustomCeilLayout extends ViewGroup {
         final int width = 700;
         final StaticLayoutCache.Key key = new StaticLayoutCache.Key(time, width);
         final StaticLayout check = layoutCache.check(key);
-        if (check != null){
+        if (check != null) {
             return check;
         }
         final StaticLayout res = new StaticLayout(time, timePaint, width, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
@@ -203,8 +189,8 @@ public class CustomCeilLayout extends ViewGroup {
         return res;
     }
 
-    public void setNick(@NonNull String nick){
-        if (!nick.equals(this.nick)){
+    public void setNick(@NonNull String nick) {
+        if (!nick.equals(this.nick)) {
             this.nick = nick;
             final int spaceLeftForNick = screenWidth - avatarSize - avatarMarginLeft - avatarMarginRight
                     - timeWidth - iconRightSize - iconRightMarginRight;
@@ -242,40 +228,45 @@ public class CustomCeilLayout extends ViewGroup {
         nickLayout.draw(canvas);
         canvas.restore();
 
-
-        iconRight2.draw(canvas);
-
+        iconRight3.draw(canvas);
     }
 
     public class SquareDumbResourceView {
-        final int sizePx;
-        private Drawable[] ds;
+        public static final int STATE_IC_UNREAD = 0;
+        public static final int STATE_IC_CLOCK = 1;
+        public static final int STATE_IC_NULL = 2;
+
+        private final Drawable[] ds;
         private Drawable current;
 
         int tx;
         int ty;
 
         public SquareDumbResourceView(int sizePx) {
-            this.sizePx = sizePx;
-        }
+            final Resources resources = getContext().getResources();
+            ds = new Drawable[3];
+            ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
 
-        public void init(Drawable[]ds){
-            this.ds = ds;
+            ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
+
+            ds[STATE_IC_NULL] = null;
             for (Drawable d : ds) {
-                if (d != null){
+                if (d != null) {
                     d.setBounds(0, 0, sizePx, sizePx);
                 }
             }
+
         }
+
         public void setSate(int state) {
-            if (current != ds[state]){
+            if (current != ds[state]) {
                 current = ds[state];
                 invalidate();
             }
         }
 
-        public void draw(Canvas c){
-            if (current != null){
+        public void draw(Canvas c) {
+            if (current != null) {
                 c.save();
                 c.translate(tx, ty);
                 current.draw(c);

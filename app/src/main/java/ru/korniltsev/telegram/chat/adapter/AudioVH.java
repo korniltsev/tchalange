@@ -29,12 +29,7 @@ public class AudioVH extends RealBaseVH {
                 .inflate(R.layout.chat_item_audio, root, false);
         root.addContentView(audioView);
 
-        final Resources resources = itemView.getContext().getResources();
-        Drawable[] ds = new Drawable[3];
-        ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
-        ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
-        ds[STATE_IC_NULL] = null;
-        root.iconRight2.init(ds);
+
     }
 
     @Override

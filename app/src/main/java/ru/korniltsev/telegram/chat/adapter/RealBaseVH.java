@@ -10,9 +10,7 @@ import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import static junit.framework.Assert.assertTrue;
 
 public abstract class RealBaseVH extends RecyclerView.ViewHolder {
-    public static final int STATE_IC_UNREAD = 0;
-    public static final int STATE_IC_CLOCK = 1;
-    public static final int STATE_IC_NULL = 2;
+
     public final Adapter adapter;
     public RealBaseVH(View itemView, Adapter adapter) {
         super(itemView);

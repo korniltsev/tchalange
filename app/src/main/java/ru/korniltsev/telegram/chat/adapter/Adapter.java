@@ -161,8 +161,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new PhotoMessageVH(cell(), this);
             }
             case VIEW_TYPE_STICKER: {
-                View view = inflate(R.layout.chat_item_sticker, p);
-                return new StickerVH(view, this);
+//                View view = inflate(R.layout.chat_item_sticker, p);
+                return new StickerVH(cell(), this);
             }
             case VIEW_TYPE_AUDIO: {
                 return new AudioVH(cell(), this);
