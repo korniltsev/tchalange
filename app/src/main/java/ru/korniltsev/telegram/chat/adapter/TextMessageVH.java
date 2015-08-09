@@ -97,8 +97,8 @@ public class TextMessageVH extends RealBaseVH {
     }
 
     public static void applyTextStyle(TextView text) {
-        text.setAutoLinkMask(Linkify.WEB_URLS | Linkify.PHONE_NUMBERS);
-        //        text.setAutoLinkMask(0);
+        text.setAutoLinkMask(Linkify.WEB_URLS);
+
         text.setLinkTextColor(Colors.USER_NAME_COLOR);//todo specify in theme/style
     }
 }
