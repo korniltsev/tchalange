@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.crashlytics.android.core.CrashlyticsCore;
 import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -31,7 +33,7 @@ public class DocumentView extends LinearLayout{
     private TextView documentProgress;
 //    private View clicker;
 //    private Subscription subscription = Subscriptions.empty();
-    @Inject RxDownloadManager downloader;
+    public @Inject RxDownloadManager downloader;
     @Inject RxGlide picasso;
     private TdApi.Document document;
     private DownloadView downloadView;
@@ -127,7 +129,9 @@ public class DocumentView extends LinearLayout{
             getContext()
                     .startActivity(intent);
         } catch (ActivityNotFoundException e1) {
-            //todo err
+            Toast.makeText(getContext(), "There is no app to view the document. The file is stored in downloads foled", Toast.LENGTH_LONG)
+                    .show();
+            CrashlyticsCore.getInstance().logException(e1);
         }
     }
 
