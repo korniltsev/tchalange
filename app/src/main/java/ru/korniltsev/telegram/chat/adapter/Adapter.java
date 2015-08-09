@@ -161,7 +161,6 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new PhotoMessageVH(cell(), this);
             }
             case VIEW_TYPE_STICKER: {
-//                View view = inflate(R.layout.chat_item_sticker, p);
                 return new StickerVH(cell(), this);
             }
             case VIEW_TYPE_AUDIO: {
@@ -197,8 +196,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new GifDocumentVH(cell(), this);
             }
             case VIEW_TYPE_CONTACT: {
-                View view = inflate(R.layout.chat_item_message_forward, p);
-                return new ContactVH(view, this);
+                return new ContactVH(cell(), this);
             }
             case VIEW_TYPE_DAY_SEPARATOR: {
                 View view = inflate(R.layout.chat_item_day_separator, p);
