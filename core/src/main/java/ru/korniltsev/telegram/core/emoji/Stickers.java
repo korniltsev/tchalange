@@ -60,25 +60,34 @@ public class Stickers {
     }
 
     private void requestStickers() {
+        client.sendRx(new TdApi.GetStickers())
+                .observeOn(mainThread())
+                .subscribe(new ObserverAdapter<TdApi.TLObject>(){
+            @Override
+            public void onNext(TdApi.TLObject response) {
+                updateStickers((TdApi.Stickers) response);
+            }
+        });
         //   public static class GetStickerSet extends TLFunction {
         //   public static class GetStickerSets extends TLFunction {
         //   public static class GetStickers extends TLFunction {
         //   public static class SearchStickerSet extends TLFunction {
         //   public static class UpdateStickerSet extends TLFunction {
-//        client.sendRx(new TdApi.GetContacts())
-//                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
-//                    @Override
-//                    public Observable<TdApi.TLObject> call(TdApi.TLObject tlObject) {
-//                        return client.sendRx(new TdApi.GetStickers(null));
-//                    }
-//                })
-//                .observeOn(mainThread())
-//                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-//                    @Override
-//                    public void onNext(TdApi.TLObject response) {
-//                        updateStickers((TdApi.Stickers) response);
-//                    }
-//                });
+
+        //        client.sendRx(new TdApi.GetContacts())
+        //                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
+        //                    @Override
+        //                    public Observable<TdApi.TLObject> call(TdApi.TLObject tlObject) {
+        //                        return client.sendRx(new TdApi.GetStickers(null));
+        //                    }
+        //                })
+        //                .observeOn(mainThread())
+        //                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+        //                    @Override
+        //                    public void onNext(TdApi.TLObject response) {
+        //                        updateStickers((TdApi.Stickers) response);
+        //                    }
+        //                });
     }
 
     private void updateStickers(TdApi.Stickers newStickers) {
