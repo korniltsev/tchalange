@@ -209,8 +209,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new NewMessagesVH(view, this);
             }
             case VIEW_TYPE_WEB_PAGE: {
-                View view = inflate(R.layout.chat_item_webpage, p);
-                return new WebPagePreviewVH(view, this);
+
+                return new WebPagePreviewVH(cell(), this);
             }
             case VIEW_TYPE_BOT_INFO: {
                 View view = inflate(R.layout.chat_item_bot_info, p);

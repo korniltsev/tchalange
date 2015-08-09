@@ -8,26 +8,33 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
+import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
-class WebPagePreviewVH extends BaseAvatarVH {
+class WebPagePreviewVH extends RealBaseVH {
     private final PhotoMessageView image;
     private final TextView link;
+    private final CustomCeilLayout root;
 
-
-    public WebPagePreviewVH(View itemView, final Adapter adapter) {
+    public WebPagePreviewVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
-        image = (PhotoMessageView) itemView.findViewById(R.id.image);
+        root = itemView;
 
-        ((View) image.getParent()).setOnClickListener(new View.OnClickListener() {
+        View contentView = adapter.getViewFactory().inflate(R.layout.chat_item_webpage, root, false);
+        root.addContentView(contentView);
+        contentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openLink();
             }
         });
-        link = (TextView) itemView.findViewById(R.id.link);
+
+        image = (PhotoMessageView) contentView.findViewById(R.id.image);
+        link = (TextView) contentView.findViewById(R.id.link);
         TextMessageVH.applyTextStyle(link);
+
+
     }
 
     private void openLink() {
@@ -46,7 +53,8 @@ class WebPagePreviewVH extends BaseAvatarVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        super.bind(item, lastReadOutbox);
+        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+
         TdApi.Message msg = ((MessageItem) item).msg;
         final TdApi.MessageWebPage webPage = (TdApi.MessageWebPage) msg.message;
 
