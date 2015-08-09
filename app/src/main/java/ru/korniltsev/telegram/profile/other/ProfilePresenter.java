@@ -8,6 +8,7 @@ import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.Chat;
+import ru.korniltsev.telegram.chat_list.ChatList;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.contacts.ContactList;
@@ -23,6 +24,8 @@ import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
 public class ProfilePresenter extends ViewPresenter<ProfileView> implements ProfileAdapter.CallBack {
@@ -73,7 +76,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
                 });
         final Observable<Boolean> updates = client.updateUserBlocked(path.user.user.id);
         return Observable.concat(getUserFull, updates)
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(mainThread());
     }
 
     @Override
@@ -102,13 +105,12 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     public void share() {
         Flow.get(getView())
                 .set(new ContactList(path.user.user));
-
     }
 
     public void block() {
-        if (blocked){
+        if (blocked) {
             client.sendSilently(new TdApi.UnblockUser(path.user.user.id));
-        }   else {
+        } else {
             client.sendSilently(new TdApi.BlockUser(path.user.user.id));
         }
         blocked = !blocked;
@@ -120,7 +122,22 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void delete() {
-        AppUtils.toastUnsupported(getView().getContext());
+        final int id = path.user.user.id;
+        final int[] ids = new int[]{id};
+        subscriptions.add(
+                client.sendRx(new TdApi.DeleteContacts(ids))
+                        .observeOn(mainThread())
+                        .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+                            @Override
+                            public void onNext(TdApi.TLObject response) {
+                                AppUtils.flowPushAndRemove(getView(), null, new FlowHistoryStripper() {
+                                    @Override
+                                    public boolean shouldRemovePath(Object path) {
+                                        return !(path instanceof ChatList);
+                                    }
+                                }, Flow.Direction.BACKWARD);
+                            }
+                        }));
     }
 
     public void muteFor(final int duration) {
@@ -138,8 +155,6 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
                     }
                 }, Flow.Direction.FORWARD
         );
-
-
     }
 
     public void addBotToGroup() {
