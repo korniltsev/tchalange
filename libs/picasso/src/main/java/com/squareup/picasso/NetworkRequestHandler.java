@@ -31,11 +31,9 @@ class NetworkRequestHandler extends RequestHandler {
   private static final String SCHEME_HTTPS = "https";
 
   private final Downloader downloader;
-  private final Stats stats;
 
-  public NetworkRequestHandler(Downloader downloader, Stats stats) {
+  public NetworkRequestHandler(Downloader downloader) {
     this.downloader = downloader;
-    this.stats = stats;
   }
 
   @Override public boolean canHandleRequest(Request data) {
@@ -66,9 +64,9 @@ class NetworkRequestHandler extends RequestHandler {
       Utils.closeQuietly(is);
       throw new ContentLengthException("Received response with 0 content-length header.");
     }
-    if (loadedFrom == NETWORK && response.getContentLength() > 0) {
-      stats.dispatchDownloadFinished(response.getContentLength());
-    }
+//    if (loadedFrom == NETWORK && response.getContentLength() > 0) {
+//      stats.dispatchDownloadFinished(response.getContentLength());
+//    }
     return new Result(is, loadedFrom);
   }
 

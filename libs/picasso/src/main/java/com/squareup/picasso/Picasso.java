@@ -150,7 +150,6 @@ public class Picasso {
   final Context context;
   final Dispatcher dispatcher;
   final Cache cache;
-  final Stats stats;
   final Map<Object, Action> targetToAction;
   final Map<ImageView, DeferredRequestCreator> targetToDeferredRequestCreator;
   final ReferenceQueue<Object> referenceQueue;
@@ -162,7 +161,7 @@ public class Picasso {
   boolean shutdown;
 
   Picasso(Context context, Dispatcher dispatcher, Cache cache, Listener listener,
-      RequestTransformer requestTransformer, List<RequestHandler> extraRequestHandlers, Stats stats,
+      RequestTransformer requestTransformer, List<RequestHandler> extraRequestHandlers,
       Bitmap.Config defaultBitmapConfig, boolean indicatorsEnabled, boolean loggingEnabled) {
     this.context = context;
     this.dispatcher = dispatcher;
@@ -188,10 +187,9 @@ public class Picasso {
     allRequestHandlers.add(new ContentStreamRequestHandler(context));
     allRequestHandlers.add(new AssetRequestHandler(context));
     allRequestHandlers.add(new FileRequestHandler(context));
-    allRequestHandlers.add(new NetworkRequestHandler(dispatcher.downloader, stats));
+    allRequestHandlers.add(new NetworkRequestHandler(dispatcher.downloader));
     requestHandlers = Collections.unmodifiableList(allRequestHandlers);
 
-    this.stats = stats;
     this.targetToAction = new WeakHashMap<Object, Action>();
     this.targetToDeferredRequestCreator = new WeakHashMap<ImageView, DeferredRequestCreator>();
     this.indicatorsEnabled = indicatorsEnabled;
@@ -442,9 +440,9 @@ public class Picasso {
    * <b>NOTE:</b> The snapshot may not always be completely up-to-date if requests are still in
    * progress.
    */
-  @SuppressWarnings("UnusedDeclaration") public StatsSnapshot getSnapshot() {
-    return stats.createSnapshot();
-  }
+//  @SuppressWarnings("UnusedDeclaration") public StatsSnapshot getSnapshot() {
+//    return stats.createSnapshot();
+//  }
 
   /** Stops this instance from accepting further requests. */
   public void shutdown() {
@@ -456,7 +454,7 @@ public class Picasso {
     }
     cache.clear();
     cleanupThread.shutdown();
-    stats.shutdown();
+//    stats.shutdown();
     dispatcher.shutdown();
     for (DeferredRequestCreator deferredRequestCreator : targetToDeferredRequestCreator.values()) {
       deferredRequestCreator.cancel();
@@ -504,11 +502,11 @@ public class Picasso {
 
   Bitmap quickMemoryCacheCheck(String key) {
     Bitmap cached = cache.get(key);
-    if (cached != null) {
-      stats.dispatchCacheHit();
-    } else {
-      stats.dispatchCacheMiss();
-    }
+//    if (cached != null) {
+//      stats.dispatchCacheHit();
+//    } else {
+//      stats.dispatchCacheMiss();
+//    }
     return cached;
   }
 
@@ -866,11 +864,11 @@ public class Picasso {
         transformer = RequestTransformer.IDENTITY;
       }
 
-      Stats stats = new Stats(cache);
+//      Stats stats = new Stats(cache);
 
-      Dispatcher dispatcher = new Dispatcher(context, service, HANDLER, downloader, cache, stats);
+      Dispatcher dispatcher = new Dispatcher(context, service, HANDLER, downloader, cache);
 
-      return new Picasso(context, dispatcher, cache, listener, transformer, requestHandlers, stats,
+      return new Picasso(context, dispatcher, cache, listener, transformer, requestHandlers,
           defaultBitmapConfig, indicatorsEnabled, loggingEnabled);
     }
   }
