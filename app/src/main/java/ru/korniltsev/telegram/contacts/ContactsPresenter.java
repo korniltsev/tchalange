@@ -13,10 +13,8 @@ import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.flow.utils.Utils;
 import ru.korniltsev.telegram.core.rx.ChatDB;
-import ru.korniltsev.telegram.core.rx.ContactsHelper;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
-import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -42,16 +40,14 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
     private Observable<MeAndChat> requestOpen;
     private final Context appCtx;
     final ContactList path;
-    final ContactsHelper helper;
 
     @Inject
-    public ContactsPresenter(RXClient client, final Context appCtx, ChatDB chat, final ContactList path, ContactsHelper helper) {
+    public ContactsPresenter(RXClient client, final Context appCtx, final ContactList path) {
         this.client = client;
         this.appCtx = appCtx;
         this.path = path;
-        this.helper = helper;
 
-        request = helper.getCachedContacts()
+        request = client.sendCachedRXUI(new TdApi.GetContacts())
                 .map(new Func1<TdApi.TLObject, List<Contact>>() {
                     @Override
                     public List<Contact> call(TdApi.TLObject response) {

@@ -8,15 +8,18 @@ import com.tonicartos.superslim.LayoutManager;
 import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.recycler.sections.Section;
+import ru.korniltsev.telegram.core.flow.pathview.TraversalAware;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 
 import javax.inject.Inject;
 import java.util.List;
 
-public class ContactListView extends LinearLayout {
+public class ContactListView extends LinearLayout implements TraversalAware{
     @Inject ContactsPresenter presenter;
     private RecyclerView list;
     private ContactsAdapter adapter;
+    private boolean traversalCompleted;
+    private Runnable afterTraversal;
 
     public ContactListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -48,7 +51,17 @@ public class ContactListView extends LinearLayout {
         presenter.dropView(this);
     }
 
-    public void showContacts(List<Contact> response) {
+    public void showContacts(final List<Contact> response) {
+        executeAftertraversal(new Runnable() {
+            @Override
+            public void run() {
+                showContactsImpl(response);
+            }
+        });
+
+    }
+
+    private void showContactsImpl(List<Contact> response) {
         adapter.addAll(
                 Section.prepareListOf(
                         response, new Section.SectionFactory<Contact>() {
@@ -62,6 +75,22 @@ public class ContactListView extends LinearLayout {
                                 return user.user.id;
                             }
                         }));
+    }
 
+    public void executeAftertraversal(Runnable run){
+        if (traversalCompleted){
+            run.run();
+        } else {
+            afterTraversal = run;
+        }
+    }
+
+    @Override
+    public void onTraversalCompleted() {
+        traversalCompleted = true;
+        if (afterTraversal != null) {
+            afterTraversal.run();
+            afterTraversal = null;
+        }
     }
 }
