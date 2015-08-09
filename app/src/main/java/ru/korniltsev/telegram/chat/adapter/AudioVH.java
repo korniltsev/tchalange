@@ -1,44 +1,40 @@
 package ru.korniltsev.telegram.chat.adapter;
 
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.text.method.LinkMovementMethod;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.chat.adapter.Adapter;
+import ru.korniltsev.telegram.chat.adapter.RealBaseVH;
+import ru.korniltsev.telegram.chat.adapter.TextMessageVH;
 import ru.korniltsev.telegram.chat.adapter.view.AudioMessageView;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
-import ru.korniltsev.telegram.core.emoji.EmojiTextView;
+import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
+import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
-
-import static ru.korniltsev.telegram.chat.adapter.TextMessageVH.newBind;
 
 public class AudioVH extends RealBaseVH {
     private final CustomCeilLayout root;
-    private final AudioMessageView audioView;
+    private final AudioMessageView contentView;
 
-    //    private final AudioMessageView audioView;
-
-    public AudioVH(CustomCeilLayout itemView, Adapter adapter) {
+    public AudioVH(View itemView, Adapter adapter) {
         super(itemView, adapter);
-        root = ( itemView);
-        audioView = (AudioMessageView) LayoutInflater.from(itemView.getContext())
-                .inflate(R.layout.chat_item_audio, root, false);
-        root.addContentView(audioView);
-
-
+        root = ((CustomCeilLayout) itemView);
+        root.setBottomMarginEnabled(false);
+        contentView = (AudioMessageView) adapter.getViewFactory().inflate(R.layout.chat_item_real_audio, root, false);
+        final DpCalculator dpCalculator = MyApp.from(itemView).dpCalculator;
+        final int dp6 = dpCalculator.dp(6);
+        contentView.setPadding(0, 0, 0, dp6);
+        root.addContentView(contentView);
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-//        super.bind(item, lastReadOutbox);
-        newBind(root, adapter, item, lastReadOutbox);
+        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+        final TdApi.MessageAudio a = (TdApi.MessageAudio) ((MessageItem) item).msg.message;
+        contentView.bind(a);
 
-        TdApi.Message rawMsg = ((MessageItem) item).msg;
-        TdApi.MessageVoice msg = (TdApi.MessageVoice) rawMsg.message;
-        audioView.setAudio(msg.voice);
     }
 }

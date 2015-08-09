@@ -3,7 +3,7 @@ package ru.korniltsev.telegram.chat;
 import android.support.annotation.Nullable;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.chat.adapter.view.AudioMessageView;
+import ru.korniltsev.telegram.chat.adapter.view.VoiceMessageView;
 import ru.korniltsev.telegram.chat.adapter.view.DocumentView;
 import ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView;
 import ru.korniltsev.telegram.chat.adapter.view.GeoPointView;
@@ -44,7 +44,7 @@ public class Chat extends BasePath implements Serializable {
             injects = {
                     ChatView.class,
                     PhotoMessageView.class,
-                    AudioMessageView.class ,
+                    VoiceMessageView.class ,
                     GeoPointView.class ,
                     VideoView.class ,
                     DocumentView.class ,

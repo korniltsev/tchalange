@@ -166,9 +166,9 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 final MessageItem item1 = (MessageItem) item;
                 if (item1.msg.message instanceof TdApi.MessageAudio) {
                     if (currentItem.msg.fromId == item1.msg.fromId) {
-                        return VIEW_TYPE_AUDIO;
-                    } else {
                         return VIEW_TYPE_AUDIO2;
+                    } else {
+                        return VIEW_TYPE_AUDIO;
                     }
                 } else {
                     return VIEW_TYPE_AUDIO;
@@ -195,7 +195,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new StickerVH(cell(), this);
             }
             case VIEW_TYPE_VOICE: {
-                return new AudioVH(cell(), this);
+                return new VoicdVH(cell(), this);
             }
             case VIEW_TYPE_GEO: {
                 return new GeoPointVH(cell(), this);
@@ -241,6 +241,13 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
             case VIEW_TYPE_BOT_INFO: {
                 View view = inflate(R.layout.chat_item_bot_info, p);
                 return new BotInfoVH(view, this);
+            }
+            case VIEW_TYPE_AUDIO: {
+                return new AudioVH(cell(), this);
+            }
+            case VIEW_TYPE_AUDIO2: {
+                View view = inflate(R.layout.chat_item_real_audio2, p);
+                return new AudioVH2(view, this);
             }
             default: {
                 View view = inflate(R.layout.chat_item_single_text_view, p);

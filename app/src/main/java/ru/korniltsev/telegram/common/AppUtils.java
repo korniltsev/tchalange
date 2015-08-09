@@ -216,4 +216,16 @@ public class AppUtils {
             }
         });
     }
+
+    public static String humanReadableByteCount(long bytes) {
+        int unit = 1024;
+        if (bytes < unit) return bytes + " b";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        String pre = ( "KMGTPE").charAt(exp-1) + "";
+        return String.format("%.1f %sb", bytes / Math.pow(unit, exp), pre);
+    }
+
+    public static String kb(int size) {
+        return humanReadableByteCount(size);
+    }
 }

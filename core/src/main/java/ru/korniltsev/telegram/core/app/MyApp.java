@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 import com.crashlytics.android.answers.Answers;
 import com.crashlytics.android.core.CrashlyticsCore;
 import dagger.ObjectGraph;
@@ -127,5 +128,9 @@ public class MyApp extends Application {
 
     public static MyApp from(Context ctx) {
         return (MyApp) ctx.getApplicationContext();
+    }
+
+    public static MyApp from(View v) {
+        return from(v.getContext());
     }
 }

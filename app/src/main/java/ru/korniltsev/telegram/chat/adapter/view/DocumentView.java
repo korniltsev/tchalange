@@ -16,6 +16,7 @@ import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.views.DownloadView;
@@ -89,12 +90,12 @@ public class DocumentView extends LinearLayout{
         downloadView.bind(d.document, cfg, new DownloadView.CallBack() {
             @Override
             public void onProgress(TdApi.UpdateFileProgress p) {
-                documentProgress.setText(getResources().getString(R.string.downloading_kb, kb(p.ready ), kb(p.size)));
+                documentProgress.setText(getResources().getString(R.string.downloading_kb, AppUtils.kb(p.ready), AppUtils.kb(p.size)));
             }
 
             @Override
             public void onFinished(TdApi.File e, boolean b) {
-                documentProgress.setText(getResources().getString(R.string.downloaded_kb, kb(e.size)));
+                documentProgress.setText(getResources().getString(R.string.downloaded_kb, AppUtils.kb(e.size)));
             }
 
             @Override
@@ -134,18 +135,4 @@ public class DocumentView extends LinearLayout{
             CrashlyticsCore.getInstance().logException(e1);
         }
     }
-
-    public static String humanReadableByteCount(long bytes) {
-        int unit = 1024;
-        if (bytes < unit) return bytes + " b";
-        int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = ( "KMGTPE").charAt(exp-1) + "";
-        return String.format("%.1f %sb", bytes / Math.pow(unit, exp), pre);
-    }
-
-    private String kb(int size) {
-        return humanReadableByteCount(size);
-    }
-
-
 }
