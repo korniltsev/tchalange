@@ -156,8 +156,6 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public RealBaseVH onCreateViewHolder(ViewGroup p, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_PHOTO: {
-
-
                 return new PhotoMessageVH(cell(), this);
             }
             case VIEW_TYPE_STICKER: {
@@ -167,7 +165,6 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new AudioVH(cell(), this);
             }
             case VIEW_TYPE_GEO: {
-
                 return new GeoPointVH(cell(), this);
             }
             case VIEW_TYPE_VIDEO: {
@@ -178,7 +175,6 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new TextMessageVH(cell(), this);
             }
             case VIEW_TYPE_TEXT_FORWARD: {
-
                 return new ForwardedTextMessageVH(cell(), this);
             }
             case VIEW_TYPE_TEXT_FORWARD2: {
@@ -207,7 +203,6 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new NewMessagesVH(view, this);
             }
             case VIEW_TYPE_WEB_PAGE: {
-
                 return new WebPagePreviewVH(cell(), this);
             }
             case VIEW_TYPE_BOT_INFO: {

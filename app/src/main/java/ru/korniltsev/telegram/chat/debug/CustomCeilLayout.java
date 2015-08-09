@@ -70,6 +70,7 @@ public class CustomCeilLayout extends ViewGroup {
     private int nickLeft;
     //content
     private View contentView;
+    private int marginBetweenNickAndContentView;
 
     public CustomCeilLayout(Context ctx) {
         this(ctx, null);
@@ -114,6 +115,7 @@ public class CustomCeilLayout extends ViewGroup {
         nickPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
         nickPaint.setColor(Colors.USER_NAME_COLOR);
 
+        marginBetweenNickAndContentView = calc.dp(4);
         setWillNotDraw(false);
     }
 
@@ -134,11 +136,10 @@ public class CustomCeilLayout extends ViewGroup {
         contentView.measure(contentWidthSpec, unspecifiedMeasureSpec);
 
         final int min = avatarSize + paddingTopBottom * 2;
-        int real = paddingTopBottom * 2 + nickHeight + contentView.getMeasuredHeight();
+        int real = paddingTopBottom * 2 + nickHeight + contentView.getMeasuredHeight() + marginBetweenNickAndContentView;
         setMeasuredDimension(availableWidth, Math.max(min, real));
 
-//        long end = System.nanoTime();
-        //        DebugRelativeLayout.log(start, end, "total measure");
+
     }
 
     @Override
@@ -159,7 +160,7 @@ public class CustomCeilLayout extends ViewGroup {
         iconRight3.layout(iconRightTop, iconRightLeft);
 
         final int contentLeft = nickLeft;
-        final int contentTop = avaTop + nickHeight;
+        final int contentTop = avaTop + nickHeight + marginBetweenNickAndContentView;
         final int contentRight = contentLeft + contentView.getMeasuredWidth();
         final int contentBottom = contentTop + contentView.getMeasuredHeight();
         contentView.layout(contentLeft, contentTop, contentRight, contentBottom);
