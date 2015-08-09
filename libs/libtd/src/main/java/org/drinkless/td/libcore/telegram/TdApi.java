@@ -674,6 +674,39 @@ public class TdApi {
         }
     }
 
+    public static class InputContact extends TLObject {
+        public String phoneNumber;
+        public String firstName;
+        public String lastName;
+
+        public InputContact() {
+        }
+
+        public InputContact(String phoneNumber, String firstName, String lastName) {
+            this.phoneNumber = phoneNumber;
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+
+        public static final int CONSTRUCTOR = 1707235253;
+
+        @Override
+        public int getConstructor() {
+            return 1707235253;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputContact").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public abstract static class InputFile extends TLObject {
     }
 
@@ -783,36 +816,6 @@ public class TdApi {
             s.append("InputMessageText").append(" {\n");
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("text").append(" = ").append(text).append('\n');
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
-    public static class InputMessageVoice extends InputMessageContent {
-        public InputFile voice;
-        public int duration;
-
-        public InputMessageVoice() {
-        }
-
-        public InputMessageVoice(InputFile voice, int duration) {
-            this.voice = voice;
-            this.duration = duration;
-        }
-
-        public static final int CONSTRUCTOR = -2013998476;
-
-        @Override
-        public int getConstructor() {
-            return -2013998476;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("InputMessageVoice").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -965,6 +968,36 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("video").append(" = "); video.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class InputMessageVoice extends InputMessageContent {
+        public InputFile voice;
+        public int duration;
+
+        public InputMessageVoice() {
+        }
+
+        public InputMessageVoice(InputFile voice, int duration) {
+            this.voice = voice;
+            this.duration = duration;
+        }
+
+        public static final int CONSTRUCTOR = -2013998476;
+
+        @Override
+        public int getConstructor() {
+            return -2013998476;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("InputMessageVoice").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
@@ -1284,33 +1317,6 @@ public class TdApi {
         }
     }
 
-    public static class MessageVoice extends MessageContent {
-        public Voice voice;
-
-        public MessageVoice() {
-        }
-
-        public MessageVoice(Voice voice) {
-            this.voice = voice;
-        }
-
-        public static final int CONSTRUCTOR = -1412619698;
-
-        @Override
-        public int getConstructor() {
-            return -1412619698;
-        }
-
-        @Override
-        protected void toStringBuilder(int shift, StringBuilder s) {
-            s.append("MessageVoice").append(" {\n");
-            shift += 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
-            shift -= 2;
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
-        }
-    }
-
     public static class MessageAudio extends MessageContent {
         public Audio audio;
 
@@ -1447,6 +1453,33 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("video").append(" = "); video.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("caption").append(" = ").append(caption).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class MessageVoice extends MessageContent {
+        public Voice voice;
+
+        public MessageVoice() {
+        }
+
+        public MessageVoice(Voice voice) {
+            this.voice = voice;
+        }
+
+        public static final int CONSTRUCTOR = -1412619698;
+
+        @Override
+        public int getConstructor() {
+            return -1412619698;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("MessageVoice").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("voice").append(" = "); voice.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -2194,6 +2227,39 @@ public class TdApi {
         }
     }
 
+    public static class ProfilePhotoCrop extends TLObject {
+        public double left;
+        public double top;
+        public double width;
+
+        public ProfilePhotoCrop() {
+        }
+
+        public ProfilePhotoCrop(double left, double top, double width) {
+            this.left = left;
+            this.top = top;
+            this.width = width;
+        }
+
+        public static final int CONSTRUCTOR = 800473724;
+
+        @Override
+        public int getConstructor() {
+            return 800473724;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ProfilePhotoCrop").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("left").append(" = ").append(left).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("top").append(" = ").append(top).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public abstract static class ReplyMarkup extends TLObject {
     }
 
@@ -2636,7 +2702,7 @@ public class TdApi {
         public long id;
         public String title;
         public String name;
-        public boolean isinstalled;
+        public boolean isInstalled;
         public boolean isEnabled;
         public boolean isOfficial;
         public int size;
@@ -2644,21 +2710,21 @@ public class TdApi {
         public StickerSetInfo() {
         }
 
-        public StickerSetInfo(long id, String title, String name, boolean isinstalled, boolean isEnabled, boolean isOfficial, int size) {
+        public StickerSetInfo(long id, String title, String name, boolean isInstalled, boolean isEnabled, boolean isOfficial, int size) {
             this.id = id;
             this.title = title;
             this.name = name;
-            this.isinstalled = isinstalled;
+            this.isInstalled = isInstalled;
             this.isEnabled = isEnabled;
             this.isOfficial = isOfficial;
             this.size = size;
         }
 
-        public static final int CONSTRUCTOR = 1063710380;
+        public static final int CONSTRUCTOR = -799900440;
 
         @Override
         public int getConstructor() {
-            return 1063710380;
+            return -799900440;
         }
 
         @Override
@@ -2668,7 +2734,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
-            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isinstalled").append(" = ").append(isinstalled).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInstalled").append(" = ").append(isInstalled).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isEnabled").append(" = ").append(isEnabled).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isOfficial").append(" = ").append(isOfficial).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("size").append(" = ").append(size).append('\n');
@@ -3194,6 +3260,36 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class UpdateChatPhoto extends Update {
+        public long chatId;
+        public ProfilePhoto photo;
+
+        public UpdateChatPhoto() {
+        }
+
+        public UpdateChatPhoto(long chatId, ProfilePhoto photo) {
+            this.chatId = chatId;
+            this.photo = photo;
+        }
+
+        public static final int CONSTRUCTOR = 977270305;
+
+        @Override
+        public int getConstructor() {
+            return 977270305;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("UpdateChatPhoto").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -4159,6 +4255,39 @@ public class TdApi {
         }
     }
 
+    public static class ChangeChatPhoto extends TLFunction {
+        public long chatId;
+        public InputFile photo;
+        public ProfilePhotoCrop crop;
+
+        public ChangeChatPhoto() {
+        }
+
+        public ChangeChatPhoto(long chatId, InputFile photo, ProfilePhotoCrop crop) {
+            this.chatId = chatId;
+            this.photo = photo;
+            this.crop = crop;
+        }
+
+        public static final int CONSTRUCTOR = 1188180943;
+
+        @Override
+        public int getConstructor() {
+            return 1188180943;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeChatPhoto").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photo").append(" = "); photo.toStringBuilder(shift, s);
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("crop").append(" = "); crop.toStringBuilder(shift, s);
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public static class ChangeChatTitle extends TLFunction {
         public long chatId;
         public String title;
@@ -4184,6 +4313,36 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class ChangeName extends TLFunction {
+        public String firstName;
+        public String lastName;
+
+        public ChangeName() {
+        }
+
+        public ChangeName(String firstName, String lastName) {
+            this.firstName = firstName;
+            this.lastName = lastName;
+        }
+
+        public static final int CONSTRUCTOR = 1341435471;
+
+        @Override
+        public int getConstructor() {
+            return 1341435471;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeName").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -4360,6 +4519,33 @@ public class TdApi {
         }
     }
 
+    public static class DeleteContacts extends TLFunction {
+        public int[] userIds;
+
+        public DeleteContacts() {
+        }
+
+        public DeleteContacts(int[] userIds) {
+            this.userIds = userIds;
+        }
+
+        public static final int CONSTRUCTOR = 641913511;
+
+        @Override
+        public int getConstructor() {
+            return 641913511;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteContacts").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(userIds)).append("}\n");
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public static class DeleteMessages extends TLFunction {
         public long chatId;
         public int[] messageIds;
@@ -4385,6 +4571,33 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messageIds").append(" = ").append("int[]").append(" {").append(Arrays.toString(messageIds)).append("}\n");
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class DeleteProfilePhoto extends TLFunction {
+        public long profilePhotoId;
+
+        public DeleteProfilePhoto() {
+        }
+
+        public DeleteProfilePhoto(long profilePhotoId) {
+            this.profilePhotoId = profilePhotoId;
+        }
+
+        public static final int CONSTRUCTOR = -564878026;
+
+        @Override
+        public int getConstructor() {
+            return -564878026;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("DeleteProfilePhoto").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("profilePhotoId").append(" = ").append(profilePhotoId).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -4939,6 +5152,33 @@ public class TdApi {
         }
     }
 
+    public static class ImportContacts extends TLFunction {
+        public InputContact[] inputContacts;
+
+        public ImportContacts() {
+        }
+
+        public ImportContacts(InputContact[] inputContacts) {
+            this.inputContacts = inputContacts;
+        }
+
+        public static final int CONSTRUCTOR = 577501086;
+
+        @Override
+        public int getConstructor() {
+            return 577501086;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ImportContacts").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("inputContacts").append(" = ").append("InputContact[]").append(" {").append(Arrays.toString(inputContacts)).append("}\n");
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public static class RecoverAuthPassword extends TLFunction {
         public String recoverCode;
 
@@ -5309,6 +5549,36 @@ public class TdApi {
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("value").append(" = "); value.toStringBuilder(shift, s);
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SetProfilePhoto extends TLFunction {
+        public String photoPath;
+        public ProfilePhotoCrop crop;
+
+        public SetProfilePhoto() {
+        }
+
+        public SetProfilePhoto(String photoPath, ProfilePhotoCrop crop) {
+            this.photoPath = photoPath;
+            this.crop = crop;
+        }
+
+        public static final int CONSTRUCTOR = 1367381507;
+
+        @Override
+        public int getConstructor() {
+            return 1367381507;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SetProfilePhoto").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("photoPath").append(" = ").append(photoPath).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("crop").append(" = "); crop.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
