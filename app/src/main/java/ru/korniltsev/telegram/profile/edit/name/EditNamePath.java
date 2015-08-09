@@ -12,10 +12,8 @@ import java.io.Serializable;
 
 @WithModule(EditNamePath.Module.class)
 public class EditNamePath extends BasePath implements Serializable{
-    public final TdApi.User user;
 
-    public EditNamePath(TdApi.User user) {
-        this.user = user;
+    public EditNamePath() {
     }
 
     @Override

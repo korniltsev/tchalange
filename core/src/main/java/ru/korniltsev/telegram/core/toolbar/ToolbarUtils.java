@@ -15,6 +15,7 @@ import android.view.View;
 import flow.Flow;
 import flow.path.PathContext;
 import mortar.dagger1support.ObjectGraphService;
+import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.utils.R;
 
@@ -49,6 +50,7 @@ public class ToolbarUtils {
             public void onClick(View view) {
                 Flow.get(view.getContext())
                         .goBack();
+                Utils.hideKeyboard(view);
             }
         };
         return pop(listener);

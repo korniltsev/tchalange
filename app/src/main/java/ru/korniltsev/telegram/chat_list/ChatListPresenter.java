@@ -206,11 +206,8 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     }
 
     public void openSettings() {
-        final TdApi.User user = me.user;
-        if (user != null){
-            Flow.get(getView())
-                    .set(new MyProfilePath(user));
-        }
+        Flow.get(getView())
+                .set(new MyProfilePath());
     }
 
     public void lockUnlock() {

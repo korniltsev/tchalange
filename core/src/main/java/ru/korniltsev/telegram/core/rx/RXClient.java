@@ -487,7 +487,7 @@ public class RXClient {
                 .compose(new FilterAndCastToClass<>(TdApi.UpdateChatReplyMarkup.class));
     }
 
-    static class RxClientException extends Exception {
+    public static class RxClientException extends Exception {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;
 

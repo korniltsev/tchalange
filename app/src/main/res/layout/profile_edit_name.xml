@@ -40,6 +40,8 @@
                     android:hint="@string/hint_first_name"
                     android:paddingBottom="16dp"
                     android:layout_marginTop="4dp"
+                    android:textCursorDrawable="@null"
+
                     />
 
             <EditText
@@ -53,6 +55,8 @@
                     android:hint="@string/hint_last_name"
 
                     android:paddingBottom="16dp"
+                    android:textCursorDrawable="@null"
+
 
                     />
         </LinearLayout>

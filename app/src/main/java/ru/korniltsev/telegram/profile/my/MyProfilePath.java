@@ -12,10 +12,8 @@ import java.io.Serializable;
 
 @WithModule(MyProfilePath.Module.class)
 public class MyProfilePath extends BasePath implements Serializable{
-    public final TdApi.User user;
 
-    public MyProfilePath(TdApi.User user) {
-        this.user = user;
+    public MyProfilePath() {
     }
 
     @Override

@@ -2,8 +2,11 @@ package ru.korniltsev.telegram.profile.edit.name;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
@@ -40,11 +43,25 @@ public class EditNameView extends LinearLayout {
                         new Runnable() {
                             @Override
                             public void run() {
-                                presenter.editName(textFrom(name), textFrom(lastName));
+                                saveName();
                             }
                         }
-                );;
+                );
+        lastName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    saveName();
+                    return true;
+                }
+                return false;
+            }
+        });
 
+    }
+
+    private void saveName() {
+        presenter.editName(textFrom(name), textFrom(lastName));
     }
 
     @Override
