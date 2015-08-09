@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.profile.edit.name;
 
 import android.os.Bundle;
 import android.widget.Toast;
+import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -32,16 +33,12 @@ public class EditNamePresenter extends ViewPresenter<EditNameView> {
     @Override
     protected void onLoad(Bundle savedInstanceState) {
         cs = new CompositeSubscription();
-        cs.add(client.sendRx(new TdApi.GetMe())
-                .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-                    @Override
-                    public void onNext(TdApi.TLObject response) {
-                        final TdApi.User me = (TdApi.User) response;
-                        getView()
-                                .bindUser(me);
-                    }
-                }));
+        try {
+            getView().bindUser(
+                    client.getMeBlocking());
+        } catch (Exception e) {
+            CrashlyticsCore.getInstance().logException(e);
+        }
     }
 
     public void editName(String firstName, String lastName) {

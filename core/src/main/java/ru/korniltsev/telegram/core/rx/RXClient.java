@@ -487,6 +487,12 @@ public class RXClient {
                 .compose(new FilterAndCastToClass<>(TdApi.UpdateChatReplyMarkup.class));
     }
 
+    public User getMeBlocking() throws Exception {
+        return (User) sendRx(new GetMe())
+                .toBlocking()
+                .first();
+    }
+
     public static class RxClientException extends Exception {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;

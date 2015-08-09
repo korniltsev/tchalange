@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
@@ -227,5 +228,9 @@ public class AppUtils {
 
     public static String kb(int size) {
         return humanReadableByteCount(size);
+    }
+
+    public static void logDuration(long start, long end, String msg) {
+        Log.d("Duration", msg + (end - start));
     }
 }
