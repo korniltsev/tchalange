@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
@@ -21,9 +22,11 @@ class ForwardedTextMessageVH extends RealBaseVH {
     public ForwardedTextMessageVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
         this.root = itemView;
-        View contentView = adapter.getViewFactory()
+        root.setBottomMarginEnabled(false);
+        ForwardedMessageView contentView = (ForwardedMessageView) adapter.getViewFactory()
                 .inflate(R.layout.chat_item_message_forward, root, false);
         root.addContentView(contentView);
+        contentView.disableBlueMargin();
 
         text = ((TextView) contentView.findViewById(R.id.forward_text));
         TextMessageVH.applyTextStyle(text);

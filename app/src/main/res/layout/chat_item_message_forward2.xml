@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:paddingLeft="71dp"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
@@ -12,7 +12,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:size="@dimen/avatar_size"
-            android:layout_marginTop="11dp"
+            android:layout_marginTop="8dp"
             />
 
     <TextView
@@ -44,4 +44,4 @@
             android:paddingRight="8dp"
             />
 
-</RelativeLayout>
+</ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView>

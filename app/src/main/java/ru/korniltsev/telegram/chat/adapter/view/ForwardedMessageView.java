@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.utils.Colors;
 
@@ -23,12 +24,12 @@ public class ForwardedMessageView extends RelativeLayout {
     private View forwardAvatar;
     private View nick;
     private View forwardText;
-    @Inject DpCalculator calc;
+    /*@Inject*/ DpCalculator calc;
     @Nullable private View avatar;
 
     public ForwardedMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        calc = MyApp.from(context).dpCalculator;
 
         setWillNotDraw(false);
         lineWidth = calc.dp(BLUE_LINE_WIDTH_DP);
@@ -54,9 +55,20 @@ public class ForwardedMessageView extends RelativeLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         int top = avatar == null ? 0 : forwardAvatar.getTop();
-        int left = leftAnchor;
+        int left;
+        if (marginEnabled) {
+            left = leftAnchor;
+        } else {
+            left = 0;
+        }
         int bottom = Math.max(forwardText.getBottom(), forwardAvatar.getBottom());
 
         canvas.drawRect(left, top, left + lineWidth, bottom, p);
+    }
+
+    boolean marginEnabled = true;
+
+    public void disableBlueMargin() {
+        marginEnabled = false;
     }
 }

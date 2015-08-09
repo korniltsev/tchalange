@@ -72,6 +72,9 @@ public class CustomCeilLayout extends ViewGroup {
     private View contentView;
     private int marginBetweenNickAndContentView;
 
+
+    boolean bottomMarginEnabled = true;
+
     public CustomCeilLayout(Context ctx) {
         this(ctx, null);
     }
@@ -135,8 +138,11 @@ public class CustomCeilLayout extends ViewGroup {
         int contentWidthSpec = makeMeasureSpec(spaceLeftForContent, EXACTLY);
         contentView.measure(contentWidthSpec, unspecifiedMeasureSpec);
 
-        final int min = avatarSize + paddingTopBottom * 2;
-        int real = paddingTopBottom * 2 + nickHeight + contentView.getMeasuredHeight() + marginBetweenNickAndContentView;
+        final int min = avatarSize + (bottomMarginEnabled ? paddingTopBottom * 2 : paddingTopBottom);
+        int real = (bottomMarginEnabled ? paddingTopBottom * 2 : paddingTopBottom)
+                + nickHeight
+                + contentView.getMeasuredHeight()
+                + marginBetweenNickAndContentView;
         setMeasuredDimension(availableWidth, Math.max(min, real));
 
 
@@ -279,5 +285,9 @@ public class CustomCeilLayout extends ViewGroup {
             tx = iconRightLeft;
             ty = iconRightTop;
         }
+    }
+
+    public void setBottomMarginEnabled(boolean bottomMarginEnabled) {
+        this.bottomMarginEnabled = bottomMarginEnabled;
     }
 }
