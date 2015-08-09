@@ -16,6 +16,7 @@ import io.fabric.sdk.android.services.concurrency.PriorityThreadPoolExecutor;
 import mortar.MortarScope;
 import mortar.dagger1support.ObjectGraphService;
 import net.danlew.android.joda.JodaTimeAndroid;
+import ru.korniltsev.telegram.core.audio.AudioPLayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
@@ -38,6 +39,7 @@ public class MyApp extends Application {
     public StaticLayoutCache staticLayoutCache;
     public DpCalculator dpCalculator;
     public RxGlide rxGlide;
+    public AudioPLayer audioPLayer;
 
     @Override
     public void onCreate() {
@@ -56,10 +58,12 @@ public class MyApp extends Application {
 
         refreshDisplay();
 
-
         float density = getResources().getDisplayMetrics().density;
-        staticLayoutCache = new StaticLayoutCache();
         dpCalculator = new DpCalculator(density);
+        audioPLayer = new AudioPLayer(this);
+        staticLayoutCache = new StaticLayoutCache();
+
+
         ObjectGraph graph = ObjectGraph.create(
                 new RootModule(this,  dpCalculator));
         rootScope = MortarScope.buildRootScope()

@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import mortar.dagger1support.ObjectGraphService;
+import ru.korniltsev.telegram.core.app.MyApp;
 
 import javax.inject.Inject;
 import java.lang.reflect.Field;
@@ -35,7 +36,7 @@ public class ObservableLinearLayout extends FrameLayout {
     private int keyboardHeight;
     private ObservableLinearLayout.CallBack cb;
 
-    @Inject DpCalculator calc;
+    /*@Inject*/ DpCalculator calc;
 
     public interface CallBack {
         void onLayout(int keyboardHeight);
@@ -43,6 +44,7 @@ public class ObservableLinearLayout extends FrameLayout {
 
     public ObservableLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        calc = MyApp.from(context).dpCalculator;
         ObjectGraphService.inject(context, this);
         setWillNotDraw(false);
         prefs = context.getSharedPreferences("EmojiPopup", Context.MODE_PRIVATE);

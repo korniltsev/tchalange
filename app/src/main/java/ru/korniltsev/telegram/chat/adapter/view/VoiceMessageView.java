@@ -15,7 +15,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.audio.AudioPlayer;
+import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.views.DownloadView;
@@ -34,7 +34,7 @@ public class VoiceMessageView extends LinearLayout {
     private TextView duration;
     private SeekBar progress;
 
-    @Inject AudioPlayer player;
+    @Inject VoicePlayer player;
     @Inject RXClient client;
     @Inject RxDownloadManager downloader;
 
@@ -132,16 +132,16 @@ public class VoiceMessageView extends LinearLayout {
         }, download_view);
     }
 
-    private ObserverAdapter<AudioPlayer.TrackState> updateProgress() {
-        return new ObserverAdapter<AudioPlayer.TrackState>() {
+    private ObserverAdapter<VoicePlayer.TrackState> updateProgress() {
+        return new ObserverAdapter<VoicePlayer.TrackState>() {
             @Override
-            public void onNext(AudioPlayer.TrackState trackState) {
+            public void onNext(VoicePlayer.TrackState trackState) {
                 updateProgress(trackState);
             }
         };
     }
 
-    private void updateProgress(AudioPlayer.TrackState trackState) {
+    private void updateProgress(VoicePlayer.TrackState trackState) {
 
         progress.setMax(trackState.duration);
         if (!trackState.playing || trackState.duration == trackState.head){

@@ -7,17 +7,15 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import ru.korniltsev.OpusToolsWrapper;
-import ru.korniltsev.telegram.core.audio.AudioPlayer;
+import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -36,7 +34,7 @@ public class VoiceRecorder {
         this.ctx = ctx;
         tmpFilesDir = new File(ctx.getFilesDir(), "VoiceRecorder");
         tmpFilesDir.mkdir();
-        playerBufferSize = AudioTrack.getMinBufferSize(AudioPlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        playerBufferSize = AudioTrack.getMinBufferSize(VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
 
         if (playerBufferSize <= 0) {
             playerBufferSize = 3840;
@@ -48,7 +46,7 @@ public class VoiceRecorder {
         if (audioRecord != null){
             return;
         }
-        audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, AudioPlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
         audioRecord.startRecording();
         reader = new Reader(audioRecord, getTemporaryFile(), playerBufferSize);
         new Thread(reader)
@@ -128,7 +126,7 @@ public class VoiceRecorder {
                 fos.close();
 
                 int samples = readTotal/2;
-                float duration = (float)samples / AudioPlayer.SAMPLE_RATE_IN_HZ;
+                float duration = (float)samples / VoicePlayer.SAMPLE_RATE_IN_HZ;
 
                 final File ogg = new File(targetFile.getParent(), "encoded_" + targetFile.getName() + ".ogg");
                 ogg.delete();

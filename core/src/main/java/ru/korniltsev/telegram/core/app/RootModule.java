@@ -19,12 +19,11 @@ import android.content.Context;
 import dagger.Module;
 import dagger.Provides;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Emoji;
-import ru.korniltsev.telegram.core.audio.AudioPlayer;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
 import ru.korniltsev.telegram.core.emoji.EmojiTextView;
-import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.BootReceiver;
@@ -36,7 +35,6 @@ import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
-import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.views.DownloadView;
 
@@ -52,7 +50,7 @@ import java.util.concurrent.Executors;
                 RxGlide.class,
                 Emoji.class,
                 RxDownloadManager.class,
-                AudioPlayer.class,
+                VoicePlayer.class,
                 DpCalculator.class,
                 ChatDB.class,
                 EmojiParser.class,
@@ -67,9 +65,9 @@ import java.util.concurrent.Executors;
                 EmojiTextView.class,
                 BootReceiver.class  ,
                 PasscodeManager.class,
-                ObservableLinearLayout.class,
+//                ObservableLinearLayout.class,
                 UserHolder.class ,
-                StaticLayoutCache.class
+
         },
         library = true)
 public class RootModule {

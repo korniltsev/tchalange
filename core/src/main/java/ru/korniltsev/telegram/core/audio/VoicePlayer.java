@@ -34,19 +34,17 @@ import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
 
 @Singleton
-public class AudioPlayer {
+public class VoicePlayer {
     public static final int SAMPLE_RATE_IN_HZ = 48000;
-    private final int[] mOutArgs = new int[3];
-//    private final MediaPlayer mPlayer;
     private final Context ctx;
     private final File decodeCacheDir;
     private int playerBufferSize;
-    //guarde by ui thread
+    //guarded by ui thread
     @Nullable private Track currentTrack;
     private final ExecutorService service = Executors.newCachedThreadPool();
 
     @Inject
-    public AudioPlayer(Context ctx, RXAuthState auth) {
+    public VoicePlayer(Context ctx, RXAuthState auth) {
         this.ctx = ctx;
         decodeCacheDir = createAudioCacheDir(ctx);
 
@@ -90,7 +88,6 @@ public class AudioPlayer {
 
     public Observable<TrackState> play(TdApi.File file){
 
-//        if (OpusSupport.nativeIsOpusFile(file.path)){
         try {
             return playOpus(file.path);
         } catch (Exception e) {
@@ -98,12 +95,6 @@ public class AudioPlayer {
                                 .logException(e);
             return Observable.empty();
         }
-        //        } else {
-//            CrashlyticsCore.getInstance()
-//                    .logException(new IllegalStateException("unsupported"));
-//            return Observable.empty();
-//
-//        }
 
     }
 
@@ -117,12 +108,9 @@ public class AudioPlayer {
         assertNotNull(currentTrack);
         assertTrue(path.equals(currentTrack.filePath));
         currentTrack.track.play();
-//        currentTrack.write(currentTrack.pcm16File, currentTrack.track.getPlaybackHeadPosition() * 2);
     }
 
-    public void decode(TdApi.UpdateFile updateFile) {
-        DecodeOpusFile(updateFile.file.path);
-    }
+
 
     class Track {
         final AudioTrack track;
@@ -161,8 +149,6 @@ public class AudioPlayer {
 
                 @Override
                 public void onPeriodicNotification(AudioTrack track) {
-
-//                    log("period " + track.getPlaybackHeadPosition() + " " +  frameCount);
                     state.onNext(new TrackState(true, track.getPlaybackHeadPosition(), frameCount));
                 }
             });
@@ -193,6 +179,7 @@ public class AudioPlayer {
                                     break;
                                 }
                                 if (writeInIteration != read) {
+                                    //todo wtf??!?!?!?!?
                                     SystemClock.sleep(64);//todo use semaphore
                                 }
                             } while (writeInIteration != read);
@@ -215,7 +202,7 @@ public class AudioPlayer {
                     }
 
                     log("finish " + arr);
-//                    log("wrote " + bytesWrote);
+
                 }
             });
 
@@ -232,8 +219,8 @@ public class AudioPlayer {
         }
     }
 
-    public static int log(String msg) {
-        return Log.d("AudioPlayer", msg);
+    public static void log(String msg) {
+//        return Log.d("AudioPlayer", msg);
     }
 
     private void trackPlayed() {
