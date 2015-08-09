@@ -17,7 +17,6 @@ import android.util.Property;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -30,7 +29,6 @@ import ru.korniltsev.telegram.utils.R;
 import com.crashlytics.android.core.CrashlyticsCore;
 import rx.Observable;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
@@ -180,6 +178,7 @@ public class DownloadView extends FrameLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
         int radius = size / 2;
         canvas.drawCircle(radius, radius, radius, bgPaint);
         if (drawProgress) {
@@ -198,30 +197,48 @@ public class DownloadView extends FrameLayout {
                 .subscribe(new ObserverAdapter<RxDownloadManager.FileState>() {
                     @Override
                     public void onNext(RxDownloadManager.FileState fileState) {
+
                         if (fileState instanceof RxDownloadManager.FileDownloaded) {
                             final RxDownloadManager.FileDownloaded d = (RxDownloadManager.FileDownloaded) fileState;
                             cb.onFinished(d.f, true);
-                            animateProgress(1f);
-                            progressAnimator.addListener(new AnimatorListenerAdapter() {
+                            final boolean animStarted = animateProgress(1f);
+
+                            final AnimatorListenerAdapter l = new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
+
                                     if (cfg.playIconIcon == Config.FINAL_ICON_EMPTY) {
                                         animate()
                                                 .alpha(0f);
                                     } else {
                                         bind(d.f, cfg, cb, clickTarget, true);
+
                                         fadeProgress();
-                                        if (cfg.darkenBlue){
+                                        if (cfg.darkenBlue) {
                                             animateDarkenBlue();
                                         }
                                     }
                                 }
-                            });
+                            };
+                            if (animStarted){
+                                progressAnimator.addListener(l);
+                            } else {
+                                progressAnimator.addListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        progressAnimator = null;
+                                        animateProgress(1f);
+                                        progressAnimator.addListener(l);
+                                    }
+                                });
+                            }
                         } else {
                             RxDownloadManager.FileProgress p = (RxDownloadManager.FileProgress) fileState;
                             float progress = (float) p.p.ready / p.p.size;
-                            cb.onProgress(p.p);
-                            animateProgress(progress);
+                            if (progress != 1f){
+                                cb.onProgress(p.p);
+                                animateProgress(progress);
+                            }
                         }
                     }
                 });
@@ -252,39 +269,42 @@ public class DownloadView extends FrameLayout {
         progressAlphaAnimator.start();
     }
 
-    ProgressProperty property = new ProgressProperty();
+    final ProgressProperty property = new ProgressProperty();
     ProgressAlphaProperty progressAlphaProperty = new ProgressAlphaProperty();
     BgColorProperty bgColorProperty = new BgColorProperty();
 
     float animationProgress = 0f;
-    private void animateProgress(final float progress) {
+    private boolean animateProgress(final float progress) {
+//        log("called animateProgress " + progress + " from " + from);
         animationProgress = progress;
         if (progressAnimator != null && progressAnimator.isRunning()) {
-            return;
-            //            progressAnimator.cancel();
+            return false;
         }
         float diff = progress - getProgress();
         long duration = 512;//(long) (diff * 600);
-//        long duration = (long) (diff * 600);
-//        duration = Math.max(duration, 16 * 8);
+        //        long duration = (long) (diff * 600);
+        //        duration = Math.max(duration, 16 * 8);
         progressAnimator = ObjectAnimator.ofFloat(this, property, progress);
         progressAnimator.setInterpolator(INTERPOLATOR);
         progressAnimator.setDuration(duration);
         progressAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                progressAlphaAnimator = null;
                 if (DownloadView.this.progress != animationProgress) {
                     animateProgress(animationProgress);
                 }
             }
         });
         progressAnimator.start();
+        return true;
 
         //        setProgress(progress);
     }
     public void bind(TdApi.File f,Config cfg,  CallBack cb, View clickTarget) {
         bind(f, cfg, cb, clickTarget, false);
     }
+
     private void bind(TdApi.File f,Config cfg,  CallBack cb, View clickTarget, boolean animateIcons) {
         p.setAlpha(255);
         this.clickTarget = clickTarget;
