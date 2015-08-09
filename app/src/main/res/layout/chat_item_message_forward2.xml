@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView xmlns:android="http://schemas.android.com/apk/res/android"
-                                                               android:paddingLeft="71dp"
-                                                               android:layout_height="wrap_content"
-                                                               android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:paddingLeft="71dp"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
         >
 
     <ru.korniltsev.telegram.core.views.AvatarView
@@ -43,10 +43,5 @@
             android:layout_below="@id/forward_nick"
             android:paddingRight="8dp"
             />
-    <!--<TextView-->
-    <!--android:id="@+id/message"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--style="@style/item_content"-->
-    <!--/>-->
-</ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView>
+
+</RelativeLayout>

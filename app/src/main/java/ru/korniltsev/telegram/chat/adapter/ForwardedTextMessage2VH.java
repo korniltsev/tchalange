@@ -11,7 +11,6 @@ import ru.korniltsev.telegram.common.AppUtils;
 
 class ForwardedTextMessage2VH extends RealBaseVH {
 
-//    private final TextView message;
     private final TextView text;
     private final TextView message_time;
     private final TextView nick;
@@ -19,7 +18,6 @@ class ForwardedTextMessage2VH extends RealBaseVH {
 
     public ForwardedTextMessage2VH(View itemView, Adapter adapter) {
         super(itemView, adapter);
-//        message = ((TextView) itemView.findViewById(R.id.message));
         text = ((TextView) itemView.findViewById(R.id.forward_text));
         TextMessageVH.applyTextStyle(text);
         message_time = ((TextView) itemView.findViewById(R.id.forward_time));
@@ -30,7 +28,6 @@ class ForwardedTextMessage2VH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-//        super.bind(item);
         TdApi.Message rawMsg = ((MessageItem) item).msg;
         TdApi.MessageContent msg = rawMsg.message;
         TdApi.MessageText text = (TdApi.MessageText) msg;
@@ -42,8 +39,6 @@ class ForwardedTextMessage2VH extends RealBaseVH {
         avatar.loadAvatarFor(user);
         nick.setText(
                 AppUtils.uiName(user, itemView.getContext()));
-//        long forwardDateInMillis = Utils.dateToMillis(rawMsg.forwardDate);
-//        long localTime = DateTimeZone.UTC.convertUTCToLocal(forwardDateInMillis);
         message_time.setText(BaseAvatarVH.format(rawMsg));
 
 

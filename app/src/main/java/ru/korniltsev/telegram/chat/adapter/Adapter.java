@@ -179,8 +179,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new TextMessageVH(cell(), this);
             }
             case VIEW_TYPE_TEXT_FORWARD: {
-                View view = inflate(R.layout.chat_item_message_forward, p);
-                return new ForwardedTextMessageVH(view, this);
+
+                return new ForwardedTextMessageVH(cell(), this);
             }
             case VIEW_TYPE_TEXT_FORWARD2: {
                 View view = inflate(R.layout.chat_item_message_forward2, p);
