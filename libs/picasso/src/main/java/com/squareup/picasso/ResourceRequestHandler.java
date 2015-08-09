@@ -35,7 +35,9 @@ class ResourceRequestHandler extends RequestHandler {
     if (data.resourceId != 0) {
       return true;
     }
-
+    if (data.uri == null) {
+      return false;
+    }
     return SCHEME_ANDROID_RESOURCE.equals(data.uri.getScheme());
   }
 

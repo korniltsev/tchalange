@@ -66,19 +66,19 @@ public class RequestCreator {
   private Drawable errorDrawable;
   private Object tag;
 
-  RequestCreator(Picasso picasso, Uri uri, int resourceId) {
+  RequestCreator(Picasso picasso, Uri uri, int resourceId, Object customUri) {
     if (picasso.shutdown) {
       throw new IllegalStateException(
           "Picasso instance already shut down. Cannot submit new requests.");
     }
     this.picasso = picasso;
-    this.data = new Request.Builder(uri, resourceId, picasso.defaultBitmapConfig);
+    this.data = new Request.Builder(uri, resourceId, customUri, picasso.defaultBitmapConfig);
   }
 
-  @TestOnly RequestCreator() {
-    this.picasso = null;
-    this.data = new Request.Builder(null, 0, null);
-  }
+//  @TestOnly RequestCreator() {
+//    this.picasso = null;
+//    this.data = new Request.Builder(null, 0, null);
+//  }
 
   /**
    * Explicitly opt-out to having a placeholder set when calling {@code into}.

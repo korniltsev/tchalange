@@ -28,6 +28,7 @@ import static java.util.Collections.unmodifiableList;
 public final class Request {
   private static final long TOO_LONG_LOG = TimeUnit.SECONDS.toNanos(5);
 
+
   /** A unique ID for the request. */
   int id;
   /** The time that the request was first submitted (in nanos). */
@@ -47,6 +48,11 @@ public final class Request {
    * This is mutually exclusive with {@link #uri}.
    */
   public final int resourceId;
+  /**
+   * dirty hack to extend picasso and allow load not only uris
+   * This is mutually exclusive with {@link #uri} and resourceId.
+   */
+  public final Object customUri;
   /**
    * Optional stable key for this request to be used instead of the URI or resource ID when
    * caching. Two requests with the same value are considered to be for the same resource.
@@ -86,12 +92,13 @@ public final class Request {
   /** The priority of this request. */
   public final Priority priority;
 
-  private Request(Uri uri, int resourceId, String stableKey, List<Transformation> transformations,
+  private Request(Uri uri, int resourceId, Object customUri,  String stableKey, List<Transformation> transformations,
       int targetWidth, int targetHeight, boolean centerCrop, boolean centerInside,
       boolean onlyScaleDown, float rotationDegrees, float rotationPivotX, float rotationPivotY,
       boolean hasRotationPivot, boolean purgeable, Bitmap.Config config, Priority priority) {
     this.uri = uri;
     this.resourceId = resourceId;
+    this.customUri = customUri;
     this.stableKey = stableKey;
     if (transformations == null) {
       this.transformations = null;
@@ -197,6 +204,7 @@ public final class Request {
   public static final class Builder {
     private Uri uri;
     private int resourceId;
+    private Object customUri;
     private String stableKey;
     private int targetWidth;
     private int targetHeight;
@@ -213,19 +221,20 @@ public final class Request {
     private Priority priority;
 
     /** Start building a request using the specified {@link Uri}. */
-    public Builder(Uri uri) {
-      setUri(uri);
-    }
+//    public Builder(Uri uri) {
+//      setUri(uri);
+//    }
 
     /** Start building a request using the specified resource ID. */
-    public Builder(int resourceId) {
-      setResourceId(resourceId);
-    }
+//    public Builder(int resourceId) {
+//      setResourceId(resourceId);
+//    }
 
-    Builder(Uri uri, int resourceId, Bitmap.Config bitmapConfig) {
+    Builder(Uri uri, int resourceId, Object customUri, Bitmap.Config bitmapConfig) {
       this.uri = uri;
       this.resourceId = resourceId;
       this.config = bitmapConfig;
+      this.customUri = customUri;
     }
 
     private Builder(Request request) {
@@ -250,7 +259,7 @@ public final class Request {
     }
 
     boolean hasImage() {
-      return uri != null || resourceId != 0;
+      return uri != null || resourceId != 0 || customUri != null;
     }
 
     boolean hasSize() {
@@ -478,7 +487,7 @@ public final class Request {
       if (priority == null) {
         priority = Priority.NORMAL;
       }
-      return new Request(uri, resourceId, stableKey, transformations, targetWidth, targetHeight,
+      return new Request(uri, resourceId, customUri, stableKey, transformations, targetWidth, targetHeight,
           centerCrop, centerInside, onlyScaleDown, rotationDegrees, rotationPivotX, rotationPivotY,
           hasRotationPivot, purgeable, config, priority);
     }

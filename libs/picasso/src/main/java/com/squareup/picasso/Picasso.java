@@ -284,7 +284,7 @@ public class Picasso {
    * @see #load(int)
    */
   public RequestCreator load(Uri uri) {
-    return new RequestCreator(this, uri, 0);
+    return new RequestCreator(this, uri, 0, null);
   }
 
   /**
@@ -305,7 +305,7 @@ public class Picasso {
    */
   public RequestCreator load(String path) {
     if (path == null) {
-      return new RequestCreator(this, null, 0);
+      return new RequestCreator(this, null, 0, null);
     }
     if (path.trim().length() == 0) {
       throw new IllegalArgumentException("Path must not be empty.");
@@ -328,7 +328,7 @@ public class Picasso {
    */
   public RequestCreator load(File file) {
     if (file == null) {
-      return new RequestCreator(this, null, 0);
+      return new RequestCreator(this, null, 0, null);
     }
     return load(Uri.fromFile(file));
   }
@@ -344,7 +344,11 @@ public class Picasso {
     if (resourceId == 0) {
       throw new IllegalArgumentException("Resource ID must not be zero.");
     }
-    return new RequestCreator(this, null, resourceId);
+    return new RequestCreator(this, null, resourceId, null);
+  }
+
+  public RequestCreator load(Object customUri) {
+    return new RequestCreator(this, null, 0, customUri);
   }
 
   /**

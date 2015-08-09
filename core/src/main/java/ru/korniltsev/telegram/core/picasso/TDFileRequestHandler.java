@@ -27,23 +27,24 @@ public class TDFileRequestHandler extends RequestHandler {
     public static final String ID = "id";
     private static final long TIMEOUT = 25000;
 
-    public static Uri load(TdApi.File f, boolean webp) {
-        if (f.isLocal()) {
-            return new Uri.Builder()
-                    .scheme(TD_FILE)
-                    .appendQueryParameter(FILE_PATH, f.path)
-                    .appendQueryParameter(WEBP, String.valueOf(webp))
-                    .build();
-        } else {
-
-//            Log.e("SomeCrazyTag", "create uri for id " + e.id, new Throwable());
-            assertTrue(f.id != 0);
-            return new Uri.Builder()
-                    .scheme(TD_FILE)
-                    .appendQueryParameter(ID, String.valueOf(f.id))
-                    .appendQueryParameter(WEBP, String.valueOf(webp))
-                    .build();
-        }
+    public static TDFileUri load(TdApi.File f, boolean webp) {
+        return new TDFileUri(f, webp);
+//        if (f.isLocal()) {
+//            return new Uri.Builder()
+//                    .scheme(TD_FILE)
+//                    .appendQueryParameter(FILE_PATH, f.path)
+//                    .appendQueryParameter(WEBP, String.valueOf(webp))
+//                    .build();
+//        } else {
+//
+////            Log.e("SomeCrazyTag", "create uri for id " + e.id, new Throwable());
+//            assertTrue(f.id != 0);
+//            return new Uri.Builder()
+//                    .scheme(TD_FILE)
+//                    .appendQueryParameter(ID, String.valueOf(f.id))
+//                    .appendQueryParameter(WEBP, String.valueOf(webp))
+//                    .build();
+//        }
     }
 
     final RxDownloadManager downloader;
@@ -54,26 +55,23 @@ public class TDFileRequestHandler extends RequestHandler {
 
     @Override
     public boolean canHandleRequest(Request data) {
-
-        String scheme = data.uri.getScheme();
-        if (scheme == null) {
-            return false;
-        }
-        return scheme.equals(TD_FILE);
+        return data.customUri != null;
+//        String scheme = data.uri.getScheme();
+//        if (scheme == null) {
+//            return false;
+//        }
+//        return scheme.equals(TD_FILE);
     }
 
     @Override
     public Result load(Request request, int networkPolicy) throws IOException {
-//        Log.e("FileDownloader", "download " + request.uri);
-        Uri uri = request.uri;
-        boolean webp = Boolean.parseBoolean(uri.getQueryParameter(WEBP));
-        String strId = uri.getQueryParameter(ID);
+        TDFileUri uri = (TDFileUri) request.customUri;
+        boolean webp = uri.webp;
         String path;
-        if (strId == null) {
-            path = uri.getQueryParameter(FILE_PATH);
+        if (uri.file.isLocal()) {
+            path = uri.file.path;
         } else {
-            int id = Integer.parseInt(strId);
-            path = downloadAndGetPath(id);//uri.getQueryParameter(FILE_PATH);
+            path = downloadAndGetPath(uri.file.id);
         }
 
         //        https://code.google.com/p/webp/issues/detail?id=147
@@ -117,6 +115,16 @@ public class TDFileRequestHandler extends RequestHandler {
         }catch (Throwable e) {
             Log.e("EmptyFileDataFetcher", "err", e);
             throw new IOException(e);
+        }
+    }
+
+    public static class TDFileUri {
+        final TdApi.File file;
+        final boolean webp;
+
+        public TDFileUri(TdApi.File file, boolean webp) {
+            this.file = file;
+            this.webp = webp;
         }
     }
 }
