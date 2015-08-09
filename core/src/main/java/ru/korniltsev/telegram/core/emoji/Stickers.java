@@ -5,6 +5,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -26,8 +27,6 @@ public class Stickers {
     //maps
     private Map<String, TdApi.Sticker> filePathToStickerInfo = new HashMap<>();
 
-
-
     @Inject
     public Stickers(final RXClient client, final RXAuthState auth) {
         this.client = client;
@@ -37,7 +36,7 @@ public class Stickers {
                 .subscribe(new ObserverAdapter<RXAuthState.AuthState>() {
                     @Override
                     public void onNext(RXAuthState.AuthState authState) {
-                        if (authState instanceof RXAuthState.StateAuthorized){
+                        if (authState instanceof RXAuthState.StateAuthorized) {
                             //                            client.sendSilently(new TdApi.GetContacts());
                         } else {
                             ss.clear();
@@ -54,14 +53,25 @@ public class Stickers {
                 });
     }
 
-    private void handleState( RXAuthState.AuthState auth) {
-        if (auth instanceof RXAuthState.StateAuthorized){
+    private void handleState(RXAuthState.AuthState auth) {
+        if (auth instanceof RXAuthState.StateAuthorized) {
             requestStickers();
         }
     }
 
     private void requestStickers() {
-//        client.sendRx(new TdApi.GetStickers(""))
+        //   public static class GetStickerSet extends TLFunction {
+        //   public static class GetStickerSets extends TLFunction {
+        //   public static class GetStickers extends TLFunction {
+        //   public static class SearchStickerSet extends TLFunction {
+        //   public static class UpdateStickerSet extends TLFunction {
+//        client.sendRx(new TdApi.GetContacts())
+//                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
+//                    @Override
+//                    public Observable<TdApi.TLObject> call(TdApi.TLObject tlObject) {
+//                        return client.sendRx(new TdApi.GetStickers(null));
+//                    }
+//                })
 //                .observeOn(mainThread())
 //                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
 //                    @Override
