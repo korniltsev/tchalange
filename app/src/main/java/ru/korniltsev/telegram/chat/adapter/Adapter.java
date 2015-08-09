@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
@@ -23,7 +24,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public static final int VIEW_TYPE_PHOTO = 0;
     public static final int VIEW_TYPE_TEXT = 1;
     public static final int VIEW_TYPE_STICKER = 2;
-    public static final int VIEW_TYPE_AUDIO = 3;
+    public static final int VIEW_TYPE_VOICE = 3;
     public static final int VIEW_TYPE_GEO = 4;
     public static final int VIEW_TYPE_VIDEO = 5;
     public static final int VIEW_TYPE_SINGLE_TEXT_VIEW = 6;
@@ -37,6 +38,8 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public static final int VIEW_TYPE_NEW_MESSAGES = 14;
     public static final int VIEW_TYPE_WEB_PAGE = 15;
     public static final int VIEW_TYPE_BOT_INFO = 16;
+    public static final int VIEW_TYPE_AUDIO = 17;
+    public static final int VIEW_TYPE_AUDIO2 = 18;
 
     final RxGlide picasso;
     private final Chat chatPath;
@@ -97,7 +100,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
             } else if (message instanceof TdApi.MessageSticker) {
                 return VIEW_TYPE_STICKER;
             } else if (message instanceof TdApi.MessageVoice) {
-                return VIEW_TYPE_AUDIO;
+                return VIEW_TYPE_VOICE;
             } else if (message instanceof TdApi.MessageLocation) {
                 return VIEW_TYPE_GEO;
             } else if (message instanceof TdApi.MessageVideo) {
@@ -136,6 +139,13 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return VIEW_TYPE_CONTACT;
             } else if (message instanceof TdApi.MessageWebPage) {
                 return VIEW_TYPE_WEB_PAGE;
+            } else if (message instanceof TdApi.MessageAudio) {
+                try {
+                    return getAudioViewType( position);
+                } catch (Exception e) {
+                    CrashlyticsCore.getInstance().logException(e);
+                    return VIEW_TYPE_AUDIO;
+                }
             } else {
                 return VIEW_TYPE_SINGLE_TEXT_VIEW;
             }
@@ -145,6 +155,29 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
             return VIEW_TYPE_BOT_INFO;
         } else {
             return VIEW_TYPE_DAY_SEPARATOR;
+        }
+    }
+
+    int getAudioViewType( int position) {
+        final MessageItem currentItem= (MessageItem) getItem(position);
+        if (position + 1 < getItemCount() - 1) {
+            final ChatListItem item = getItem(position + 1);
+            if (item instanceof MessageItem) {
+                final MessageItem item1 = (MessageItem) item;
+                if (item1.msg.message instanceof TdApi.MessageAudio) {
+                    if (currentItem.msg.fromId == item1.msg.fromId) {
+                        return VIEW_TYPE_AUDIO;
+                    } else {
+                        return VIEW_TYPE_AUDIO2;
+                    }
+                } else {
+                    return VIEW_TYPE_AUDIO;
+                }
+            } else {
+                return VIEW_TYPE_AUDIO;
+            }
+        } else {
+            return VIEW_TYPE_AUDIO;
         }
     }
 
@@ -161,7 +194,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
             case VIEW_TYPE_STICKER: {
                 return new StickerVH(cell(), this);
             }
-            case VIEW_TYPE_AUDIO: {
+            case VIEW_TYPE_VOICE: {
                 return new AudioVH(cell(), this);
             }
             case VIEW_TYPE_GEO: {
@@ -221,14 +254,11 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
         return new CustomCeilLayout(getCtx());
     }
 
-
-
     @Override
     public void onBindViewHolder(RealBaseVH holder, int position) {
         ChatListItem item1 = getItem(position);
         holder.bind(item1, lastReadOutbox);
     }
-
 
     public void setChat(RxChat chat) {
         this.chat = chat;
