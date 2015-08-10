@@ -71,11 +71,17 @@ public class DocumentView extends LinearLayout{
 
     public void set(TdApi.Document d) {
         this.document = d;
-        boolean image = document.mimeType.startsWith("image");
+        final boolean image = document.mimeType.startsWith("image");
         if (image) {
             documentThumb.setVisibility(View.VISIBLE);
-            picasso.loadPhoto(document.thumb.photo, false)
-                    .into(documentThumb);
+            //check if downloaded
+            if (!downloader.isDownloaded(document.document)){
+                picasso.loadPhoto(document.thumb.photo, false)
+                        .transform(new BlurTransformation(getContext().getApplicationContext()))
+                        .into(documentThumb);
+            } else {
+                //we load original image in onFinished
+            }
         } else {
             documentThumb.setVisibility(View.GONE);
         }
@@ -96,6 +102,11 @@ public class DocumentView extends LinearLayout{
             @Override
             public void onFinished(TdApi.File e, boolean b) {
                 documentProgress.setText(getResources().getString(R.string.downloaded_kb, AppUtils.kb(e.size)));
+                if (image) {
+                    picasso.loadPhoto(e, false)
+                            .noPlaceholder()
+                            .into(documentThumb);
+                }
             }
 
             @Override

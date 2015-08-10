@@ -9,7 +9,9 @@ dependencies {
     compile project(':core')
     compile project(':libgif')
     compile project(':libsuperslim')
+
     compile project(':picasso')
+    compile project(':blurry')
 
 
     testCompile 'junit:junit:4.12'
