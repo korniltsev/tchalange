@@ -7,7 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
+import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
@@ -19,6 +21,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
+import ru.korniltsev.telegram.photoview.PhotoView;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.DividerItemDecorator;
 import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
@@ -97,6 +100,18 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 presenter.startChat();
             }
         });
+        fakeToolbar.image.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final TdApi.TLObject boundObject = fakeToolbar.image.boundObject;
+                if (boundObject instanceof TdApi.User) {
+                    final TdApi.User u = (TdApi.User) boundObject;
+                    Flow.get(getContext())
+                            .set(new PhotoView(u.profilePhoto));
+                }
+            }
+        });
+        activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));
     }
 
     private void mute() {
