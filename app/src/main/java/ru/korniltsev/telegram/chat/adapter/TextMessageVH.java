@@ -19,16 +19,13 @@ import ru.korniltsev.telegram.core.utils.Colors;
 
 import static ru.korniltsev.telegram.chat.debug.CustomCeilLayout.SquareDumbResourceView.*;
 
-public class TextMessageVH extends RealBaseVH {
+public class TextMessageVH extends BaseAvatarVH {
 
-    private final CustomCeilLayout root;
     private final EmojiTextView message;
 
-    //    private final TextView message;
 
-    public TextMessageVH(View itemView, Adapter adapter) {
+    public TextMessageVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
-        root = ((CustomCeilLayout) itemView);
 
         message = new EmojiTextView(itemView.getContext());
         message.setTextColor(Color.BLACK);
@@ -42,7 +39,7 @@ public class TextMessageVH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        newBind(root, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
         TdApi.Message rawMsg = ((MessageItem) item).msg;
         //
         TdApi.MessageContent msg = rawMsg.message;

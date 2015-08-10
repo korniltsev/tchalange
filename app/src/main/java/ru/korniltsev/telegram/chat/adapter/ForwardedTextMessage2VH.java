@@ -11,6 +11,7 @@ import ru.korniltsev.telegram.common.AppUtils;
 
 class ForwardedTextMessage2VH extends RealBaseVH {
 
+
     private final TextView text;
     private final TextView message_time;
     private final TextView nick;

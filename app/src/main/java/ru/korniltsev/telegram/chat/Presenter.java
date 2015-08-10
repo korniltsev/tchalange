@@ -29,6 +29,7 @@ import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
+import ru.korniltsev.telegram.profile.chat.LeaveOnlyChatList;
 import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
 import rx.functions.Func1;
@@ -645,5 +646,21 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void sendVoice(Observable<VoiceRecorder.Record> stop) {
         rxChat.sendVoice(stop);
+    }
+
+    public void openChatWithAuthorOf(TdApi.Message msg) {
+        final TdApi.User user = uerHolder.getUser(msg.fromId);
+        if (user == null) {
+            return;
+        }
+        subscription.add(
+                client.sendRx(new TdApi.CreatePrivateChat(msg.fromId))
+                        .observeOn(mainThread())
+                        .subscribe(new ObserverAdapter<TdApi.TLObject>(){
+                            @Override
+                            public void onNext(TdApi.TLObject response) {
+                                AppUtils.flowPushAndRemove(getView(), new Chat((TdApi.Chat) response, user), new LeaveOnlyChatList(), Flow.Direction.FORWARD);
+                            }
+                        }));
     }
 }

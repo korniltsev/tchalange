@@ -2,16 +2,11 @@ package ru.korniltsev.telegram.core.mortar.mortarflow;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.util.Log;
 import android.view.LayoutInflater;
-import com.crashlytics.android.core.CrashlyticsCore;
 import flow.path.Path;
 import flow.path.PathContextFactory;
 import mortar.MortarScope;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.ScreenScoper;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 public final class MortarContextFactory implements PathContextFactory {
   private final ScreenScoper screenScoper = new ScreenScoper();
@@ -20,8 +15,12 @@ public final class MortarContextFactory implements PathContextFactory {
   }
 
   @Override public Context setUpContext(Path path, Context parentContext) {
+    String simpleName = path.getClass().getSimpleName();
+    if (path instanceof NamedPath) {
+      simpleName += ((NamedPath) path).name();
+    }
     MortarScope screenScope =
-        screenScoper.getScreenScope(parentContext, path.getClass().getSimpleName(), path);
+        screenScoper.getScreenScope(parentContext, simpleName, path);
 //    CrashlyticsCore.getInstance()
 //            .log(Log.DEBUG, "MortarContextFactory", "setUpContext " + screenScope);
     return new TearDownContext(parentContext, screenScope);

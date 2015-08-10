@@ -202,7 +202,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         messagePanel.setOnAnyKeyboardShownListener(new Runnable() {
             @Override
             public void run() {
-                if (messagePanel.doNotHideCommandsOnce){
+                if (messagePanel.doNotHideCommandsOnce) {
                     messagePanel.doNotHideCommandsOnce = false;//todo quick hack. delete when have time
                 } else {
                     hideCommandList();
@@ -228,6 +228,12 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
             }
         });
         splitter = presenter.getRxChat().daySplitter;
+        adapter.setClickListner(new Adapter.Callback() {
+            @Override
+            public void avatarOfMessageClicked(TdApi.Message msg) {
+                presenter.openChatWithAuthorOf(msg);
+            }
+        });
     }
 
     boolean scrollDownButtonIsVisible = false;

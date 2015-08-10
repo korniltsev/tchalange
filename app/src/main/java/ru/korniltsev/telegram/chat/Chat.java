@@ -15,12 +15,13 @@ import ru.korniltsev.telegram.chat.adapter.view.VideoView;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
+import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
 @WithModule(Chat.Module.class)
-public class Chat extends BasePath implements Serializable {
+public class Chat extends BasePath implements Serializable, NamedPath {
 
     public static final int LIMIT = 15;
 
@@ -40,6 +41,10 @@ public class Chat extends BasePath implements Serializable {
         return R.layout.chat_view;
     }
 
+    @Override
+    public String name() {
+        return String.valueOf(chat.id);
+    }
 
     @dagger.Module(
             injects = {

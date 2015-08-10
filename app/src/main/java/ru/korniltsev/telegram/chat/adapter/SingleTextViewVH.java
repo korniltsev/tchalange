@@ -28,6 +28,7 @@ import ru.korniltsev.telegram.common.AppUtils;
 
 
 
+
 public class SingleTextViewVH extends RealBaseVH {
     private final TextView text;
     private Resources resources;

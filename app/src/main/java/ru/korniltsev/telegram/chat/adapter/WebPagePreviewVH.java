@@ -12,14 +12,12 @@ import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
-class WebPagePreviewVH extends RealBaseVH {
+class WebPagePreviewVH extends BaseAvatarVH {
     private final PhotoMessageView image;
     private final TextView link;
-    private final CustomCeilLayout root;
 
     public WebPagePreviewVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
-        root = itemView;
 
         View contentView = adapter.getViewFactory().inflate(R.layout.chat_item_webpage, root, false);
         root.addContentView(contentView);
@@ -53,7 +51,7 @@ class WebPagePreviewVH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
 
         TdApi.Message msg = ((MessageItem) item).msg;
         final TdApi.MessageWebPage webPage = (TdApi.MessageWebPage) msg.message;

@@ -10,22 +10,18 @@ import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
 import static ru.korniltsev.telegram.chat.adapter.TextMessageVH.newBind;
 
-class StickerVH extends RealBaseVH {
+class StickerVH extends BaseAvatarVH {
     final StickerView image;
-    private final CustomCeilLayout root;
 
     public StickerVH( CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
-        this.root = itemView;
         image = (StickerView) adapter.getViewFactory().inflate(R.layout.chat_item_sticker, itemView, false);
         root.addContentView(image);
-
-//        image = (StickerView) itemView.findViewById(R.id.image);
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        newBind(root, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
 
         TdApi.Message msg = ((MessageItem) item).msg;
         TdApi.MessageSticker sticker = (TdApi.MessageSticker) msg.message;

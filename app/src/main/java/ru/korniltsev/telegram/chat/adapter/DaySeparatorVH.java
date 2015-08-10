@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class DaySeparatorVH extends RealBaseVH {
+
     public static DateTimeFormatter FORMATTER;
 
     static {

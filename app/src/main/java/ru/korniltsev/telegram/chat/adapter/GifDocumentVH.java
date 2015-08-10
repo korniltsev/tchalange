@@ -9,14 +9,12 @@ import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
-public class GifDocumentVH extends RealBaseVH {
+public class GifDocumentVH extends BaseAvatarVH {
     private final GifView video;
-    private final CustomCeilLayout root;
 
-    public GifDocumentVH(View itemView, final Adapter adapter) {
+    public GifDocumentVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
 
-        root = (CustomCeilLayout) itemView;
         video = (GifView) adapter.getViewFactory().inflate(R.layout.chat_item_gif, root, false);
         root.addContentView(video);
 
@@ -24,8 +22,8 @@ public class GifDocumentVH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
+        super.bind(item, lastReadOutbox);
 
-        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
 
         TdApi.Message rawMsg = ((MessageItem) item).msg;
 

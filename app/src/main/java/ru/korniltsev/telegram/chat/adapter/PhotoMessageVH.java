@@ -14,17 +14,15 @@ import ru.korniltsev.telegram.photoview.PhotoView;
 
 import static ru.korniltsev.telegram.chat.adapter.TextMessageVH.newBind;
 
-class PhotoMessageVH extends RealBaseVH {
+class PhotoMessageVH extends BaseAvatarVH {
     private final PhotoMessageView image;
-    private final CustomCeilLayout itemView;
 
     public PhotoMessageVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
-        this.itemView = itemView;
 
 
 
-        image = (PhotoMessageView) adapter.getViewFactory().inflate(R.layout.chat_item_photo, itemView, false);
+        image = (PhotoMessageView) adapter.getViewFactory().inflate(R.layout.chat_item_photo, root, false);
         image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -35,14 +33,14 @@ class PhotoMessageVH extends RealBaseVH {
             }
         });
 
-        itemView.addContentView(image);
+        root.addContentView(image);
 
 
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        newBind(itemView, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
 
         TdApi.Message msg = ((MessageItem) item).msg;
         final TdApi.Photo photo = ((TdApi.MessagePhoto) msg.message).photo;

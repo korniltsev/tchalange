@@ -21,6 +21,7 @@ import static ru.korniltsev.telegram.chat.adapter.SingleTextViewVH.userColor;
 
 public class ChatPhotoChangedVH extends RealBaseVH {
 
+
     private final TextView text;
     private final AvatarView image;
     private final Resources res;

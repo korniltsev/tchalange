@@ -8,6 +8,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
@@ -22,23 +23,24 @@ import java.util.Locale;
 abstract class BaseAvatarVH extends RealBaseVH {
     private static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm aa")
             .withLocale(Locale.US);
-    private final AvatarView avatar;
-    private final TextView nick;
-    private final TextView time;
-    private final ImageView iconRight;
-                  private final int myId = adapter.myId;
-    public BaseAvatarVH(View itemView, Adapter adapter) {
-        super(itemView, adapter);
-        avatar = (AvatarView) itemView.findViewById(R.id.avatar);
-        nick = ((TextView) itemView.findViewById(R.id.nick));
-        time = (TextView) itemView.findViewById(R.id.time);
-        iconRight = (ImageView) itemView.findViewById(R.id.icon_right);
 
-        colorizeNick(nick);
-        nick.setLines(1);
-        nick.setSingleLine();
-        //todo blue dot
-        //todo message set status
+    private final int myId = adapter.myId;
+    protected final CustomCeilLayout root;
+
+    public BaseAvatarVH(CustomCeilLayout itemView, final Adapter adapter) {
+        super(itemView, adapter);
+        root = itemView;
+        itemView.avatarView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final ChatListItem item = adapter.getItem(getAdapterPosition());
+                if (item instanceof MessageItem){
+                    final TdApi.Message msg = ((MessageItem) item).msg;
+                    adapter.cb.avatarOfMessageClicked(msg);
+                }
+            }
+        });
+
     }
 
     public static void colorizeNick(TextView v) {
@@ -46,45 +48,9 @@ abstract class BaseAvatarVH extends RealBaseVH {
     }
 
     public void bind(ChatListItem item, long lastReadOutbox){
-        TdApi.Message msg = ((MessageItem) item).msg;
-        TdApi.User user = adapter.getUserHolder().getUser(msg.fromId);
-        if (user != null){
-            avatar.loadAvatarFor(user);
-            String name = AppUtils.uiName(user, itemView.getContext());
-            nick.setText(name);
-        }
-        String print = format(msg);
-        time.setText(print);
-        switch (adapter.chat.getMessageState(msg, lastReadOutbox, myId)){
-            case RxChat.MESSAGE_STATE_READ:
-                iconRight.setVisibility(View.GONE);
-                break;
-            case RxChat.MESSAGE_STATE_SENT:
-                iconRight.setImageResource(R.drawable.ic_unread);
-                iconRight.setVisibility(View.VISIBLE);
-                break;
-            case RxChat.MESSAGE_STATE_NOT_SENT:
-                iconRight.setImageResource(R.drawable.ic_clock);
-                iconRight.setVisibility(View.VISIBLE);
-                break;
-        }
-//        TdApi.UpdateMessageId upd = adapter.chat.getUpdForOldId(msg.id);
-//        if (msg.id >= MSG_WITHOUT_VALID_ID && upd == null){
-//            iconRight.setImageResource(R.drawable.ic_clock);
-//            iconRight.setVisibility(View.VISIBLE);
-//        } else {
-//            //message sent
-//            int id = msg.id;
-//            if (id >= MSG_WITHOUT_VALID_ID) {
-//                id = upd.newId;
-//            }
-//            if (lastReadOutbox < id){
-//                iconRight.setImageResource(R.drawable.ic_unread);
-//                iconRight.setVisibility(View.VISIBLE);
-//            } else {
-//                iconRight.setVisibility(View.GONE);
-//            }
-//        }
+        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+
+
 
     }
 

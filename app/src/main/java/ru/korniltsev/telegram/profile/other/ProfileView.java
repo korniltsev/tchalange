@@ -111,7 +111,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 }
             }
         });
-        fakeToolbar.hideFAB();
+//        fakeToolbar.hideFAB();
         activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));
     }
 

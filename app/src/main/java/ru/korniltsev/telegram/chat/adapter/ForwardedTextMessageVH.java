@@ -11,17 +11,15 @@ import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
 
-class ForwardedTextMessageVH extends RealBaseVH {
+class ForwardedTextMessageVH extends BaseAvatarVH {
 
     private final TextView text;
     private final TextView message_time;
     private final TextView nick;
     private final AvatarView avatar;
-    private final CustomCeilLayout root;
 
     public ForwardedTextMessageVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
-        this.root = itemView;
         root.setBottomMarginEnabled(false);
         ForwardedMessageView contentView = (ForwardedMessageView) adapter.getViewFactory()
                 .inflate(R.layout.chat_item_message_forward, root, false);
@@ -39,7 +37,8 @@ class ForwardedTextMessageVH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
+
 
         TdApi.Message rawMsg = ((MessageItem) item).msg;
         TdApi.MessageContent msg = rawMsg.message;

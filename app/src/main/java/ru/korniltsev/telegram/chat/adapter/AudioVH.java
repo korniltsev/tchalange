@@ -15,13 +15,11 @@ import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
-public class AudioVH extends RealBaseVH {
-    private final CustomCeilLayout root;
+public class AudioVH extends BaseAvatarVH {
     private final AudioMessageView contentView;
 
-    public AudioVH(View itemView, Adapter adapter) {
+    public AudioVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
-        root = ((CustomCeilLayout) itemView);
         root.setBottomMarginEnabled(false);
         contentView = (AudioMessageView) adapter.getViewFactory().inflate(R.layout.chat_item_real_audio, root, false);
         final DpCalculator dpCalculator = MyApp.from(itemView).dpCalculator;
@@ -32,9 +30,8 @@ public class AudioVH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
         final TdApi.MessageAudio a = (TdApi.MessageAudio) ((MessageItem) item).msg.message;
         contentView.bind(a);
-
     }
 }

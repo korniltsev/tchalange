@@ -11,6 +11,7 @@ import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 
 public class BotInfoVH extends RealBaseVH {
 
+
     private final TextView botInfo;
     private final View botInfoRoot;
 

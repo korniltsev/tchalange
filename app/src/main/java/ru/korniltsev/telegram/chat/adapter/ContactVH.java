@@ -11,17 +11,16 @@ import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.common.AppUtils;
 
-class ContactVH extends RealBaseVH {
+class ContactVH extends BaseAvatarVH {
 
     private final TextView text;
     private final TextView message_time;
     private final TextView nick;
     private final AvatarView avatar;
-    private final CustomCeilLayout root;
 
     public ContactVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
-        this.root = itemView;
+
 
         ForwardedMessageView contentView = (ForwardedMessageView) adapter.getViewFactory().inflate(R.layout.chat_item_message_forward, root, false);
         contentView.disableBlueMargin();
@@ -40,7 +39,8 @@ class ContactVH extends RealBaseVH {
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
-        TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
+        super.bind(item, lastReadOutbox);
+
 
         TdApi.Message rawMsg = ((MessageItem) item).msg;
         TdApi.MessageContact msg = (TdApi.MessageContact) rawMsg.message;

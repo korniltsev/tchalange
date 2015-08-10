@@ -9,6 +9,7 @@ import ru.korniltsev.telegram.core.rx.items.NewMessagesItem;
 
 public class NewMessagesVH extends RealBaseVH {
 
+
     private final TextView text;
     private final Resources res;
 

@@ -278,4 +278,14 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
     public Chat getChatPath() {
         return chatPath;
     }
+
+    Callback cb;
+
+    public void setClickListner(Callback cb) {
+        this.cb = cb;
+    }
+
+    public interface Callback {
+        void avatarOfMessageClicked(TdApi.Message msg);
+    }
 }
