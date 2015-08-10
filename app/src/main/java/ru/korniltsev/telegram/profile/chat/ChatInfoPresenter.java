@@ -67,7 +67,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         subscriptions = new CompositeSubscription();
         getView().bindUser(path, chat);
         //todo
-        final boolean muted = notifications.isMuted(chat.notificationSettings);
+        final boolean muted = chat.notificationSettings.muteFor > 0;//notifications.isMuted(chat.notificationSettings);
         getView().bindMuteMenu(muted);
 
         subscriptions.add(
@@ -208,7 +208,8 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
 
     public void muteFor(int durationSeconds) {
         notifications.muteChat(chat, durationSeconds);
-        getView().bindMuteMenu(notifications.isMuted(chat));
+        final boolean muted = durationSeconds > 0;
+        getView().bindMuteMenu(muted);
     }
 
     public void changePhoto() {
