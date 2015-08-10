@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import com.crashlytics.android.core.CrashlyticsCore;
 import dagger.Provides;
 import flow.Flow;
 import mortar.MortarScope;
@@ -201,6 +202,11 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
                         flow.set(new EnterCode(sentPhonenumber));
                     } else if (response instanceof TdApi.AuthStateWaitName){
                         flow.set(new EnterName(sentPhonenumber));
+                    } else {
+                        CrashlyticsCore.getInstance().logException(
+                                new IllegalStateException("unhandled state" + response)
+                        );
+
                     }
                     sendPhoneRequest = null;
                     pd.dismiss();

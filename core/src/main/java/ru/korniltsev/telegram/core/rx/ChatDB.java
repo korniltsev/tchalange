@@ -240,7 +240,7 @@ public class ChatDB {
                         return updateMessageId;
                     }
                 });
-        messageIdsUpdates.subscribe();
+        messageIdsUpdates.subscribe(new ObserverAdapter<TdApi.UpdateMessageId>());
     }
 
     private void prepareForUpdateDeleteMessages() {

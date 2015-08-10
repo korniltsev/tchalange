@@ -168,8 +168,9 @@ public class FakeToolbar extends FrameLayout {
     }
 
     public void bindChat(ChatInfo chat) {
+        final TdApi.Chat chat1 = chat.chat;
+        bindChatAvatar(chat1);
         title.setText(chat.chatFull.groupChat.title);
-        image.loadAvatarFor(chat.chat);
 
         int online = 0;
         for (TdApi.ChatParticipant p : chat.chatFull.participants) {
@@ -185,6 +186,10 @@ public class FakeToolbar extends FrameLayout {
         //        subTitle.setText();
     }
 
+    public void bindChatAvatar(TdApi.Chat chat1) {
+        image.loadAvatarFor(chat1);
+    }
+
     public void bindFAB(int icon, final Runnable runnable) {
         fabIcon.setImageResource(icon);
         fabIcon.setOnClickListener(new OnClickListener() {
@@ -195,6 +200,10 @@ public class FakeToolbar extends FrameLayout {
                 }
             }
         });
+    }
+
+    public void hideFAB() {
+        fab.setVisibility(View.GONE);
     }
 
     private class MyOnScrollListener extends RecyclerView.OnScrollListener {

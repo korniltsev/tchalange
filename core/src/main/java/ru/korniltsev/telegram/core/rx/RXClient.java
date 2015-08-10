@@ -493,6 +493,18 @@ public class RXClient {
                 .first();
     }
 
+    public void setProfilePhoto(String filePath) {
+        sendRx(new TdApi.SetProfilePhoto(filePath, null))
+                .observeOn(mainThread())
+                .subscribe(new ObserverAdapter<TdApi.TLObject>());
+    }
+
+    public void setChatAvatar(long chatId, String first) {
+        sendRx(new TdApi.ChangeChatPhoto(chatId,new InputFileLocal(first), null))
+                .observeOn(mainThread())
+                .subscribe(new ObserverAdapter<TdApi.TLObject>());
+    }
+
     public static class RxClientException extends Exception {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;

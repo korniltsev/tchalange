@@ -118,25 +118,7 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> implements 
     }
 
     private void setAvatarImage(final String filePath) {
-        Observable.defer(new Func0<Observable<String>>() {
-            @Override
-            public Observable<String> call() {
-                return Observable.just(filePath);
-            }
-        }).subscribeOn(Schedulers.io())
-                .flatMap(new Func1<String, Observable<TdApi.TLObject>>() {
-                    @Override
-                    public Observable<TdApi.TLObject> call(String s) {
-                        return client.sendRx(new TdApi.SetProfilePhoto(s, null));
-                    }
-                })
-                .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-                    @Override
-                    public void onNext(TdApi.TLObject response) {
-                        System.out.println();
-                    }
-                });
+        client.setProfilePhoto(filePath);
     }
 
     @Override

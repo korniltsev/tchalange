@@ -19,6 +19,8 @@ import rx.subscriptions.CompositeSubscription;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import java.io.File;
+
 import static junit.framework.Assert.assertTrue;
 
 @Singleton
@@ -96,6 +98,6 @@ public class PhotoViewPresenter extends ViewPresenter<PhotoViewView> {
 
     public void saveToGallery() {
         galleryService.saveToGallery(path.photo)
-                .subscribe();
+                .subscribe(new ObserverAdapter<File>());
     }
 }

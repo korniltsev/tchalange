@@ -1,15 +1,23 @@
 package ru.korniltsev.telegram.profile.chat;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.chat.Chat;
+import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.contacts.ContactList;
+import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
+import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import rx.Observable;
@@ -18,13 +26,15 @@ import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.korniltsev.telegram.common.AppUtils.getTmpFileForCamera;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
-public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements ChatInfoAdapter.CallBack {
+public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements ChatInfoAdapter.CallBack, AttachPanelPopup.Callback {
     final ChatInfo path;
     final ActivityOwner owner;
     final NotificationManager notifications;
@@ -46,6 +56,56 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         getView().bindUser(path);
         final boolean muted = notifications.isMuted(path.chat.notificationSettings);
         getView().bindMuteMenu(muted);
+
+        subscriptions.add(
+                owner.activityResult().subscribe(new ObserverAdapter<ActivityResult>() {
+                    @Override
+                    public void onNext(ActivityResult response) {
+                        onActivityResult(response);
+                    }
+                }));
+        subscriptions.add(client
+                .getGlobalObservableWithBackPressure()
+                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateChatPhoto.class))
+                .filter(new Func1<TdApi.UpdateChatPhoto, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateChatPhoto updateChatPhoto) {
+                        return updateChatPhoto.chatId == path.chat.id;
+                    }
+                })
+                .observeOn(mainThread())
+                .subscribe(new ObserverAdapter<TdApi.UpdateChatPhoto>() {
+                    @Override
+                    public void onNext(TdApi.UpdateChatPhoto response) {
+                        final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) path.chat.type;
+                        type.groupChat.photo = response.photo;
+                        getView()
+                                .bindChatAvatar(path.chat);
+                    }
+                }));
+    }
+
+    private void onActivityResult(ActivityResult response) {
+        int result = response.result;
+        int request = response.request;
+        if (result != Activity.RESULT_OK) {
+            return;
+        }
+        if (request == AppUtils.REQUEST_TAKE_PHOTO_CHAT_AVATAR) {
+            File f = AppUtils.getTmpFileForCamera();
+            if (f.exists()) {
+                setAvatarImage(f.getAbsolutePath());
+                getView()
+                        .hideAttachPannel();
+            }
+        } else if (request == AppUtils.REQUEST_CHOOS_FROM_GALLERY_CHAT_AVATAR) {
+            String picturePath = Utils.getGalleryPickedFilePath(getView().getContext(), response.data);
+            if (picturePath != null) {
+                setAvatarImage(picturePath);
+                getView()
+                        .hideAttachPannel();
+            }
+        }
     }
 
     @Override
@@ -89,12 +149,12 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                             }
                         })
                         .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-                    @Override
-                    public void onNext(TdApi.TLObject response) {
-                        goBackTwice();
-                    }
-                }));
+                        .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+                            @Override
+                            public void onNext(TdApi.TLObject response) {
+                                goBackTwice();
+                            }
+                        }));
     }
 
     private void goBackTwice() {
@@ -119,5 +179,38 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
 
     public void changePhoto() {
         AppUtils.toastUnsupported(getView().getContext());
+    }
+
+    @Override
+    public void sendImages(List<String> selectedImages) {
+        if (selectedImages.size() == 1) {
+            final String first = selectedImages.get(0);
+            setAvatarImage(first);
+            getView().hideAttachPannel();
+        }
+    }
+
+    private void setAvatarImage(String first) {
+        client.setChatAvatar(path.chat.id, first);
+    }
+
+    @Override
+    public void chooseFromGallery() {
+        String title = getView().getResources().getString(R.string.select_picture);
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        owner.expose()
+                .startActivityForResult(Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY_CHAT_AVATAR);
+    }
+
+    @Override
+    public void takePhoto() {
+        File f = getTmpFileForCamera();
+        f.delete();
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+        owner.expose()
+                .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO_CHAT_AVATAR);
     }
 }

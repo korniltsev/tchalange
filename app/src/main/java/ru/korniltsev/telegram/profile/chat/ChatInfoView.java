@@ -14,7 +14,9 @@ import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
+import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
@@ -46,6 +48,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
     private ChatInfoAdapter adapter;
     private ToolbarUtils toolbar;
     @Nullable private ListChoicePopup mutePopup;
+    private AttachPanelPopup selectImage;
 
     public ChatInfoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -92,6 +95,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
             @Override
             public void run() {
                 presenter.changePhoto();
+                selectImage = RecentImagesBottomSheet.create(owner.expose(), presenter, false);
             }
         });
 
@@ -172,7 +176,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
 
 
 
-            list.addItemDecoration(new BottomShadow(ctx, calc, adapter.getItemCount() -1 ));
+            list.addItemDecoration(new BottomShadow(ctx, calc, adapter.getItemCount() - 1));
         }
 
     }
@@ -191,6 +195,24 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
             return true;
         }
         mutePopup = null;
+        if (selectImage != null && selectImage.isShowing()) {
+            selectImage.dismiss();
+            selectImage = null;
+            return true;
+        }
+        selectImage = null;
         return false;
+    }
+
+    public void hideAttachPannel() {
+        if (selectImage != null && selectImage.isShowing()){
+            selectImage.dismiss();
+            selectImage = null;
+        }
+    }
+
+    public void bindChatAvatar(TdApi.Chat chat) {
+        fakeToolbar.bindChatAvatar(chat);
+
     }
 }
