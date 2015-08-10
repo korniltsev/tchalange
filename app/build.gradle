@@ -11,7 +11,7 @@ dependencies {
     compile project(':libsuperslim')
 
     compile project(':picasso')
-    compile project(':blurry')
+    compile project(':blur')
 
 
     testCompile 'junit:junit:4.12'
