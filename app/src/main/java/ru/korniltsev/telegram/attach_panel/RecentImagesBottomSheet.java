@@ -23,21 +23,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecentImagesBottomSheet extends AttachPanelPopup {
+    private final Context ctx;
     private final Callback callback;
+    private final boolean allowMultiChoice;
     private TextView btnTakePhoto;
     private TextView btnChooseFromGallery;
     private RecyclerView recentGalleryImages;
     private RecentImagesAdapter adapter;
 
-    RecentImagesBottomSheet(Context ctx, Callback callback) {
+    RecentImagesBottomSheet(Context ctx, Callback callback, boolean allowMultiChoice) {
         super(ctx);
+        this.ctx = ctx;
         this.callback = callback;
+        this.allowMultiChoice = allowMultiChoice;
+
         initView();
 
     }
 
-    public static AttachPanelPopup create(Activity ctx, Callback callback) {
-        AttachPanelPopup res = new RecentImagesBottomSheet(ctx, callback);
+    public static AttachPanelPopup create(Activity ctx, Callback callback, boolean allowMultiChoice) {
+        AttachPanelPopup res = new RecentImagesBottomSheet(ctx, callback, allowMultiChoice);
         res.show(ctx);
         return res;
     }

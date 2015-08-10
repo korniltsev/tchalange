@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -556,7 +555,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     @Override
     public void takePhoto() {
-        File f = getTmpFileForCamera();
+        File f = AppUtils.getTmpFileForCamera();
         f.delete();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
@@ -564,17 +563,12 @@ public class Presenter extends ViewPresenter<ChatView>
                 .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO);
     }
 
-    @NonNull
-    private File getTmpFileForCamera() {
-        return new File(Environment.getExternalStorageDirectory(), "temp.jpg");
-    }
-
     public void onActivityResult(int request, int result, Intent data) {
         if (result != Activity.RESULT_OK) {
             return;
         }
         if (request == AppUtils.REQUEST_TAKE_PHOTO) {
-            File f = getTmpFileForCamera();
+            File f = AppUtils.getTmpFileForCamera();
             if (f.exists()) {
                 rxChat.sendImage(f.getAbsolutePath());
                 getView()

@@ -1,6 +1,9 @@
 package ru.korniltsev.telegram.profile.my;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,10 +14,15 @@ import android.widget.FrameLayout;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
+import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.DividerItemDecorator;
@@ -23,16 +31,19 @@ import ru.korniltsev.telegram.profile.decorators.MyWhiteRectTopPaddingDecorator;
 import ru.korniltsev.telegram.profile.decorators.TopShadow;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.copy;
+import static ru.korniltsev.telegram.common.AppUtils.getTmpFileForCamera;
 import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
 
-public class MyProfileView extends FrameLayout {
+public class MyProfileView extends FrameLayout implements HandlesBack {
     @Inject MyProfilePresenter presenter;
+    @Inject ActivityOwner activity;
     @Inject DpCalculator calc;
     @Inject PhoneFormat phoneFormat;
 
@@ -41,6 +52,7 @@ public class MyProfileView extends FrameLayout {
     private FakeToolbar fakeToolbar;
     private MyProfileAdapter adapter;
     private ToolbarUtils toolbar;
+    private AttachPanelPopup selectImage;
 
     public MyProfileView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -83,11 +95,15 @@ public class MyProfileView extends FrameLayout {
         fakeToolbar.bindFAB(R.drawable.ic_camera, new Runnable() {
             @Override
             public void run() {
-                presenter.changePhoto();
+                selectImage = RecentImagesBottomSheet.create(activity.expose(), presenter, false);
             }
         });
 
     }
+
+
+
+
 
     @Override
     public void onAttachedToWindow() {
@@ -107,7 +123,7 @@ public class MyProfileView extends FrameLayout {
     }
 
     public void bindUser(@NonNull TdApi.User user, boolean passcodeEnabled) {
-        fakeToolbar.bindUser(user);
+        bindUserAvatar(user);
         List<MyProfileAdapter.Item> items = new ArrayList<>();
         final boolean hasUserName = !isEmpty(user.username);
         if (hasUserName) {
@@ -147,6 +163,10 @@ public class MyProfileView extends FrameLayout {
         list.addItemDecoration(new InsetDecorator(passCodePosition, calc.dp(6)));
     }
 
+    public void bindUserAvatar(@NonNull TdApi.User user) {
+        fakeToolbar.bindUser(user);
+    }
+
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {
         final ArrayList<ListChoicePopup.Item> data = new ArrayList<>();
         data.add(new ListChoicePopup.Item(getContext().getString(R.string.call_phone), new Runnable() {
@@ -162,5 +182,22 @@ public class MyProfileView extends FrameLayout {
             }
         }));
         return data;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (selectImage != null && selectImage.isShowing()) {
+            selectImage.dismiss();
+            return true;
+        }
+        selectImage = null;
+        return false;
+    }
+
+    public void hideAttachPannel() {
+        if (selectImage != null) {
+            selectImage.dismiss();
+            selectImage = null;
+        }
     }
 }

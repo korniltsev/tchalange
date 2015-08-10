@@ -168,7 +168,7 @@ public abstract class AttachPanelPopup extends PopupWindow {
                 .setDuration(DURATION)
                 .translationY(panel.getHeight());
     }
-    public void realDismiss() {
+    private void realDismiss() {
         super.dismiss();
     }
 }

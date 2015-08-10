@@ -243,7 +243,7 @@ public class MessagePanel extends FrameLayout {
     }
 
     private void showAttachPopup() {
-        attachPanelPopup = RecentImagesBottomSheet.create(activityOwner.expose(), presenter);
+        attachPanelPopup = RecentImagesBottomSheet.create(activityOwner.expose(), presenter, true);
     }
 
     OnSendListener listener;

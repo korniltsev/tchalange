@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +27,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.R;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +36,7 @@ public class AppUtils {
     public static final int REQUEST_CHOOS_FROM_GALLERY = 1;
     public static final int REQUEST_TAKE_PHOTO = 2;
     public static final int REQUEST_CHOOS_FROM_GALLERY_MY_AVATAR = 3;
+    public static final int REQUEST_TAKE_PHOTO_MY_AVATAR = 4;
     private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
 
     public static String uiName(TdApi.User user, Context ctx) {//todo
@@ -236,5 +239,10 @@ public class AppUtils {
     public static void showNoActivityError(Context ctx) {
         Toast.makeText(ctx, "There is no app to view the document. The file is stored in downloads foled", Toast.LENGTH_LONG)
                 .show();
+    }
+
+    @NonNull
+    public static File getTmpFileForCamera() {
+        return new File(Environment.getExternalStorageDirectory(), "temp.jpg");
     }
 }
