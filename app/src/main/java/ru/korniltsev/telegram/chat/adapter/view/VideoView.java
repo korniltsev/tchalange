@@ -99,41 +99,21 @@ public class VideoView extends FrameLayout {
         }
         height = (int) (width / ratio);
 
-        boolean clearPlaceholder = true;
         if (thumb.photo.id == 0) {
             picasso.getPicasso()
                     .cancelRequest(preview);
         } else {
-            if (!downloader.isDownloaded(file)) {
-                picasso.loadPhoto(thumb.photo, false)
-                        .transform(blur)
-                        .into(preview);
-                clearPlaceholder = false;
-            }
+            picasso.loadPhoto(thumb.photo, false)
+                    .transform(blur)
+                    .into(preview);
         }
         requestLayout();
 
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, FINAL_ICON_EMPTY, false, false, 48);
         downloadView.setVisibility(View.VISIBLE);
-        final boolean finalClearPlaceholder = clearPlaceholder;
         downloadView.bind(file, cfg, new DownloadView.CallBack() {
             @Override
             public void onFinished(TdApi.File e, boolean justDownloaded) {
-                final VideoThumbnailRequestHandler.VideoThumbUri uri = VideoThumbnailRequestHandler.create(e);
-                if (finalClearPlaceholder) {
-                    picasso.getPicasso()
-                            .load(uri)
-                            .resize(width, height)
-                            .stableKey(uri.filePath)
-                            .into(preview);
-                } else {
-                    picasso.getPicasso()
-                            .load(uri)
-                            .stableKey(uri.filePath)
-                            .resize(width, height)
-                            .noPlaceholder()
-                            .into(preview);
-                }
             }
 
             @Override
