@@ -182,8 +182,8 @@ public class DownloadView extends FrameLayout {
         int radius = size / 2;
         canvas.drawCircle(radius, radius, radius, bgPaint);
         if (drawProgress) {
-            //todo start from
-            canvas.drawArc(rect, 0f, 360f * progress, false, p);
+            float start = -90f;
+            canvas.drawArc(rect, start, 360f * progress, false, p);
         }
     }
 
