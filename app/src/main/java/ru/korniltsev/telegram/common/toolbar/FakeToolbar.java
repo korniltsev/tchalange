@@ -63,6 +63,8 @@ public class FakeToolbar extends FrameLayout {
 
         headerHeight = getLayoutParams().height;
         realHeaderHeight = getResources().getDimensionPixelSize(R.dimen.profile_header_height);
+
+        image.setNoPlaceholder(true);
         //        fakeToolbarHeight = getResources().getDP
 
 //        image.setOnClickListener(new OnClickListener() {

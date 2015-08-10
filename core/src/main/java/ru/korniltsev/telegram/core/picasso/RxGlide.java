@@ -122,10 +122,18 @@ public class RxGlide {
                 return;
             }
         }
-        loadPhoto(file, false)
-                .transform(ROUND)
-                .placeholder(getStubDrawable(u, size))
-                .into(avatarView);
+        if (avatarView.isNoPlaceholder()){
+            loadPhoto(file, false)
+                    .transform(ROUND)
+                    .noPlaceholder()
+                    .into(avatarView);
+        } else {
+            loadPhoto(file, false)
+                    .transform(ROUND)
+                    .placeholder(getStubDrawable(u, size))
+                    .into(avatarView);
+        }
+
     }
 
     /**
@@ -185,11 +193,18 @@ public class RxGlide {
                 return;
             }
         }
-        loadPhoto(file, false)
-//                .resize(size, size)
-                .transform(ROUND)
-                .placeholder(getStubDrawable(info, size))
-                .into(avatarView);
+        if (avatarView.isNoPlaceholder()){
+            loadPhoto(file, false)
+                    .transform(ROUND)
+                    .placeholder(avatarView.getDrawable())
+                    .into(avatarView);
+        } else {
+            loadPhoto(file, false)
+                    .transform(ROUND)
+                    .placeholder(getStubDrawable(info, size))
+                    .into(avatarView);
+        }
+
     }
 
     private final Map<StubKey, StubDrawable> stubs = new HashMap<>();

@@ -55,6 +55,16 @@ public class AvatarView extends ImageView {
 
     }
 
+    private boolean noPlaceholder = false;
+
+    public void setNoPlaceholder(boolean noPlaceholder) {
+        this.noPlaceholder = noPlaceholder;
+    }
+
+    public boolean isNoPlaceholder() {
+        return noPlaceholder;
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(size, size);
@@ -75,7 +85,9 @@ public class AvatarView extends ImageView {
             return;
         }
 //        assertNotNull(o);
-        setImageBitmap(null);
+        if (!noPlaceholder){
+            setImageBitmap(null);
+        }
         if (o instanceof TdApi.User) {
             picasso2.loadAvatarForUser((TdApi.User) o, size, this);
             //                    .transform(ROUND)
