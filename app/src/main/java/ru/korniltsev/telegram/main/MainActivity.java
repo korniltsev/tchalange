@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.*;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -234,6 +235,7 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("BTF", "onActivityResult");
         activityResult.onNext(new ActivityResult(requestCode, resultCode, data));
     }
 

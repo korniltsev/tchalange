@@ -505,6 +505,10 @@ public class RXClient {
                 .subscribe(new ObserverAdapter<TdApi.TLObject>());
     }
 
+    public TLObject sendRxBlocking(TLFunction function) throws Exception{
+        return sendRx(function).toBlocking().first();
+    }
+
     public static class RxClientException extends Exception {
         public final TdApi.Error error;
         public final TdApi.TLFunction f;

@@ -167,4 +167,5 @@
     <string name="slide_to_cancel">Смахните чтобы отменить</string>
     <string name="message_voice">Voice</string>
     <string name="name_not_modified">Name not modified</string>
+    <string name="chat_title">Chat title</string>
 </resources>

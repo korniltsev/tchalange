@@ -5,12 +5,15 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
+import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.chat_list.ChatList;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.contacts.ContactList;
@@ -20,6 +23,7 @@ import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.profile.edit.chat.title.EditChatTitlePath;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
@@ -41,6 +45,8 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     final RXClient client;
     private CompositeSubscription subscriptions;
 
+    TdApi.Chat chat;
+
     @Inject
     public ChatInfoPresenter(ChatInfo path, ActivityOwner owner, NotificationManager notifications, RXClient client) {
         this.path = path;
@@ -52,9 +58,16 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     @Override
     protected void onLoad(Bundle savedInstanceState) {
         super.onLoad(savedInstanceState);
+        try {
+            chat = (TdApi.Chat) client.sendRxBlocking(new TdApi.GetChat(path.chatId));
+        } catch (Exception e) {
+            CrashlyticsCore.getInstance().logException(e);
+            return;
+        }
         subscriptions = new CompositeSubscription();
-        getView().bindUser(path);
-        final boolean muted = notifications.isMuted(path.chat.notificationSettings);
+        getView().bindUser(path, chat);
+        //todo
+        final boolean muted = notifications.isMuted(chat.notificationSettings);
         getView().bindMuteMenu(muted);
 
         subscriptions.add(
@@ -70,17 +83,33 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                 .filter(new Func1<TdApi.UpdateChatPhoto, Boolean>() {
                     @Override
                     public Boolean call(TdApi.UpdateChatPhoto updateChatPhoto) {
-                        return updateChatPhoto.chatId == path.chat.id;
+                        return updateChatPhoto.chatId == chat.id;
                     }
                 })
                 .observeOn(mainThread())
                 .subscribe(new ObserverAdapter<TdApi.UpdateChatPhoto>() {
                     @Override
                     public void onNext(TdApi.UpdateChatPhoto response) {
-                        final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) path.chat.type;
+                        final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
                         type.groupChat.photo = response.photo;
                         getView()
-                                .bindChatAvatar(path.chat);
+                                .bindChatAvatar(chat);
+                    }
+                }));
+        subscriptions.add(client
+                .getGlobalObservableWithBackPressure()
+                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateChatTitle.class))
+                .filter(new Func1<TdApi.UpdateChatTitle, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateChatTitle updateChatPhoto) {
+                        return updateChatPhoto.chatId == chat.id;
+                    }
+                })
+                .observeOn(mainThread())
+                .subscribe(new ObserverAdapter<TdApi.UpdateChatTitle>() {
+                    @Override
+                    public void onNext(TdApi.UpdateChatTitle response) {
+                        getView().setChatTitle(response.title);
                     }
                 }));
     }
@@ -117,7 +146,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     @Override
     public void btnAddMemberClicked() {
         Flow.get(getView())
-                .set(new ContactList(createFilter(), path.chat));
+                .set(new ContactList(createFilter(), chat));
     }
 
     private List<TdApi.User> createFilter() {
@@ -135,7 +164,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
 
     public void deleteAndLeave() {
         subscriptions.add(
-                client.sendRx(new TdApi.DeleteChatHistory(path.chat.id))
+                client.sendRx(new TdApi.DeleteChatHistory(chat.id))
                         .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.User>>() {
                             @Override
                             public Observable<TdApi.User> call(TdApi.TLObject tlObject) {
@@ -145,7 +174,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                         .flatMap(new Func1<TdApi.User, Observable<TdApi.TLObject>>() {
                             @Override
                             public Observable<TdApi.TLObject> call(TdApi.User me) {
-                                return client.sendRx(new TdApi.DeleteChatParticipant(path.chat.id, me.id));
+                                return client.sendRx(new TdApi.DeleteChatParticipant(chat.id, me.id));
                             }
                         })
                         .observeOn(mainThread())
@@ -161,20 +190,25 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         AppUtils.flowPushAndRemove(getView(), null, new FlowHistoryStripper() {
             @Override
             public boolean shouldRemovePath(Object path) {
-                return path instanceof ChatInfo && ((ChatInfo) path).chat.id == ((ChatInfo) path).chat.id
-                        || path instanceof Chat && ((Chat) path).chat.id == ((Chat) path).chat.id;
+                return !(path instanceof ChatList);
             }
         }, Flow.Direction.BACKWARD);
 
     }
 
     public void editChatName() {
-        AppUtils.toastUnsupported(getView().getContext());
+        getView().post(new Runnable() {
+            @Override
+            public void run() {
+                Flow.get(getView()).set(new EditChatTitlePath(chat.id));
+            }
+        });
+
     }
 
     public void muteFor(int durationSeconds) {
-        notifications.muteChat(path.chat, durationSeconds);
-        getView().bindMuteMenu(notifications.isMuted(path.chat));
+        notifications.muteChat(chat, durationSeconds);
+        getView().bindMuteMenu(notifications.isMuted(chat));
     }
 
     public void changePhoto() {
@@ -191,7 +225,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     }
 
     private void setAvatarImage(String first) {
-        client.setChatAvatar(path.chat.id, first);
+        client.setChatAvatar(chat.id, first);
     }
 
     @Override

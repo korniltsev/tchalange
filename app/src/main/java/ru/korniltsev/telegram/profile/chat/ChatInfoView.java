@@ -151,8 +151,8 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
         }
     }
 
-    public void bindUser(@NonNull ChatInfo chat) {
-        fakeToolbar.bindChat(chat);
+    public void bindUser(@NonNull ChatInfo chat, TdApi.Chat chat1) {
+        fakeToolbar.bindChat(chat, chat1);
         List<ChatInfoAdapter.Item> data = new ArrayList<>();
         data.add(new ChatInfoAdapter.ButtonItem());
 
@@ -214,5 +214,9 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
     public void bindChatAvatar(TdApi.Chat chat) {
         fakeToolbar.bindChatAvatar(chat);
 
+    }
+
+    public void setChatTitle(String title) {
+        fakeToolbar.setTitle(title);
     }
 }

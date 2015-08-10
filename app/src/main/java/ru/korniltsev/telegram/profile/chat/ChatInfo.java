@@ -16,14 +16,16 @@ import java.util.List;
 @WithModule(ChatInfo.Module.class)
 public class ChatInfo extends BasePath implements Serializable{
     public final TdApi.GroupChatFull chatFull;
-    public final TdApi.Chat chat;
+    public final long chatId;
+    //    public final TdApi.Chat chat;
 
     public List<TdApi.User> addedUsers = new ArrayList<>();
 
 
     public ChatInfo(TdApi.GroupChatFull chatFull, TdApi.Chat chat) {
         this.chatFull = chatFull;
-        this.chat = chat;
+        this.chatId = chat.id;
+//        this.chat = chat;
     }
 
 

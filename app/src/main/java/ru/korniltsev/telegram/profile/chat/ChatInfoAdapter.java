@@ -68,8 +68,12 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
                 pVH.avatar.loadAvatarFor(p.user);
                 pVH.nick.setText(
                         uiName(p.user, getCtx()));
-                pVH.status.setText(
-                        uiUserStatus(getCtx(), p.user.status));
+                if (p.user.type instanceof TdApi.UserTypeBot){
+                    pVH.status.setText(R.string.user_status_bot);
+                } else {
+                    pVH.status.setText(
+                            uiUserStatus(getCtx(), p.user.status));
+                }
                 pVH.status.setTextColor(
                         uiStatusColor(p.user.status));
                 if (p.showIcon){

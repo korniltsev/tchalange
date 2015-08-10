@@ -169,10 +169,9 @@ public class FakeToolbar extends FrameLayout {
         }
     }
 
-    public void bindChat(ChatInfo chat) {
-        final TdApi.Chat chat1 = chat.chat;
+    public void bindChat(ChatInfo chat, TdApi.Chat chat1) {
         bindChatAvatar(chat1);
-        title.setText(chat.chatFull.groupChat.title);
+        setTitle(chat.chatFull.groupChat.title);
 
         int online = 0;
         for (TdApi.ChatParticipant p : chat.chatFull.participants) {
@@ -206,6 +205,10 @@ public class FakeToolbar extends FrameLayout {
 
     public void hideFAB() {
         fab.setVisibility(View.GONE);
+    }
+
+    public void setTitle(String title) {
+        this.title.setText(title);
     }
 
     private class MyOnScrollListener extends RecyclerView.OnScrollListener {
