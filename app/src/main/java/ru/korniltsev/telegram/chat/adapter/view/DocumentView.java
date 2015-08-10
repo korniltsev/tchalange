@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.crashlytics.android.core.CrashlyticsCore;
 import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
@@ -151,8 +150,7 @@ public class DocumentView extends LinearLayout{
             getContext()
                     .startActivity(intent);
         } catch (ActivityNotFoundException e1) {
-            Toast.makeText(getContext(), "There is no app to view the document. The file is stored in downloads foled", Toast.LENGTH_LONG)
-                    .show();
+            AppUtils.showNoActivityError(getContext());
             CrashlyticsCore.getInstance().logException(e1);
         }
     }

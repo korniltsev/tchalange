@@ -232,4 +232,9 @@ public class AppUtils {
     public static String kb(int size) {
         return humanReadableByteCount(size);
     }
+
+    public static void showNoActivityError(Context ctx) {
+        Toast.makeText(ctx, "There is no app to view the document. The file is stored in downloads foled", Toast.LENGTH_LONG)
+                .show();
+    }
 }

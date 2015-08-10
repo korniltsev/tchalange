@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.chat.adapter.view;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.AttributeSet;
@@ -11,22 +12,21 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.common.AppUtils;
-import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import pl.droidsonroids.gif.GifDrawable;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.picasso.VideoThumbnailRequestHandler;
-import ru.korniltsev.telegram.core.rx.RxDownloadManager;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.views.DownloadView;
 
 import javax.inject.Inject;
-
 import java.io.File;
+import java.io.IOException;
 
 import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.views.DownloadView.Config.FINAL_ICON_EMPTY;
 
-public class VideoView extends FrameLayout {
+public class GifView extends FrameLayout {
 
     private final int dp207;
     private final int dp154;
@@ -34,17 +34,17 @@ public class VideoView extends FrameLayout {
     @Inject DpCalculator calc;
     @Inject RxDownloadManager downloader;
 
-    //    private ImageView actionIcon;
+//    private ImageView actionIcon;
     private ImageView preview;
 
-    //    private TdApi.Video msg;
+//    private TdApi.Video msg;
     private DownloadView downloadView;
     private int width;
     private int height;
     private TdApi.PhotoSize thumb;
     private final BlurTransformation blur;
 
-    public VideoView(Context context, AttributeSet attrs) {
+    public GifView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         //207x165
@@ -64,6 +64,7 @@ public class VideoView extends FrameLayout {
         assertTrue(f.isLocal());
         File src = new File(f.path);
 
+
         File exposed = downloader.exposeFile(src, Environment.DIRECTORY_DOWNLOADS, null);
 
         Uri uri = Uri.fromFile(exposed);
@@ -72,9 +73,11 @@ public class VideoView extends FrameLayout {
         try {
             getContext().startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            AppUtils.showNoActivityError(getContext());
+            //todo error
         }
     }
+
+
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -83,13 +86,24 @@ public class VideoView extends FrameLayout {
                 MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
     }
 
-    public void set(TdApi.Video msg) {
-        TdApi.PhotoSize thumb = msg.thumb;
-        TdApi.File file = msg.video;
+
+
+//    public void set(TdApi.Video msg) {
+////        this.msg = msg;
+//        TdApi.PhotoSize thumb = msg.thumb;
+//        TdApi.File file = msg.video;
+//        bindGeneral(thumb, file, false);
+//    }
+
+    public void set(TdApi.Document doc) {
+        assertTrue("image/gif".equals(doc.mimeType));
+        TdApi.PhotoSize thumb = doc.thumb;
+        TdApi.File file = doc.document;
         bindGeneral(thumb, file);
     }
 
     private void bindGeneral(TdApi.PhotoSize thumb, TdApi.File file) {
+        final boolean gif = true;
         this.thumb = thumb;
         float ratio = (float) thumb.width / thumb.height;
         if (ratio > 1) {
@@ -98,47 +112,57 @@ public class VideoView extends FrameLayout {
             width = dp154;
         }
         height = (int) (width / ratio);
-
-        boolean clearPlaceholder = true;
-        if (thumb.photo.id == 0) {
-            picasso.getPicasso()
-                    .cancelRequest(preview);
-        } else {
-            if (!downloader.isDownloaded(file)) {
-                picasso.loadPhoto(thumb.photo, false)
-                        .transform(blur)
-                        .into(preview);
-                clearPlaceholder = false;
-            }
-        }
+        showLowQualityThumb(thumb);
         requestLayout();
 
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, FINAL_ICON_EMPTY, false, false, 48);
         downloadView.setVisibility(View.VISIBLE);
-        final boolean finalClearPlaceholder = clearPlaceholder;
         downloadView.bind(file, cfg, new DownloadView.CallBack() {
             @Override
             public void onFinished(TdApi.File e, boolean justDownloaded) {
-                final VideoThumbnailRequestHandler.VideoThumbUri uri = VideoThumbnailRequestHandler.create(e);
-                if (finalClearPlaceholder) {
-                    picasso.getPicasso()
-                            .load(uri)
-                            .stableKey(uri.filePath)
-                            .into(preview);
-                } else {
-                    picasso.getPicasso()
-
-                            .load(uri)
-                            .stableKey(uri.filePath)
-                            .noPlaceholder()
-                            .into(preview);
+                assertTrue(e.isLocal());
+                if (justDownloaded) {
+                    setAndPlayGif(e);
                 }
             }
 
             @Override
             public void play(TdApi.File e) {
-                playVideo(e);
+                assertTrue(e.isLocal());
+                Drawable drawable = preview.getDrawable();
+                if (drawable instanceof GifDrawable){
+                    ((GifDrawable) drawable).pause();
+                    preview.setImageDrawable(null);
+                    showLowQualityThumb(GifView.this.thumb);
+                    downloadView.setVisibility(View.VISIBLE);
+                } else {
+                    setAndPlayGif(e);
+                }
             }
         }, this);
+    }
+
+    private void setAndPlayGif(TdApi.File e) {
+        assertTrue(e.isLocal());
+        try {
+            preview.setImageDrawable(new GifDrawable(e.path));
+            downloadView.setVisibility(View.GONE);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+
+    private boolean showLowQualityThumb(TdApi.PhotoSize thumb) {
+        if (thumb.photo.id == 0) {
+            picasso.getPicasso()
+                    .cancelRequest(preview);
+            return false;
+        } else {
+            picasso.loadPhoto(thumb.photo, false)
+                    .transform(blur)
+                    .into(preview);
+            return true;
+        }
     }
 }

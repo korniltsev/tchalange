@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ru.korniltsev.telegram.chat.adapter.view.GifView
+        android:id="@+id/video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+        <ImageView
+                android:id="@+id/preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                />
+
+        <ru.korniltsev.telegram.core.views.DownloadView
+                android:id="@+id/download_view"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                />
+
+    </ru.korniltsev.telegram.chat.adapter.view.GifView>
+
