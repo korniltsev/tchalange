@@ -135,7 +135,9 @@ public class EnterCode extends BasePath implements Serializable {
         }
 
         public void checkCode(String code) {
-            assertNull(request);
+            if (request != null){
+                return;
+            }
             atLeastOneRequestSent = true;
             TdApi.SetAuthCode f = new TdApi.SetAuthCode(code);
             request = authorizeAndGetMe(f);
