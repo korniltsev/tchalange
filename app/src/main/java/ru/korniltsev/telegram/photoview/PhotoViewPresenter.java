@@ -48,9 +48,14 @@ public class PhotoViewPresenter extends ViewPresenter<PhotoViewView> {
         Display display = wm.getDefaultDisplay();
         int width = display.getWidth();
         int height = display.getHeight();
-        TdApi.File f = PhotoUtils.findSmallestBiggerThan(path.photo, width, height);
-        getView()
-                .show(f);
+        if (path.photo == null
+                && path.profilePhoto != null) {
+            getView().show(path.profilePhoto.big);
+        } else {
+            TdApi.File f = PhotoUtils.findSmallestBiggerThan(path.photo, width, height);
+            getView()
+                    .show(f);
+        }
         if (PhotoView.NO_MESSAGE == path.messageId) {
             getView()
                     .hideDeleteMessageMenuItem();

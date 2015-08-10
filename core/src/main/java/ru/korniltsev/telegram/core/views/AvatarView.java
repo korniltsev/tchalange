@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import com.crashlytics.android.core.CrashlyticsCore;
+import flow.Flow;
 import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -22,7 +23,7 @@ public class AvatarView extends ImageView {
     private int size;
 
     public final RxGlide picasso2;
-
+    public TdApi.TLObject boundObject;
 
     public AvatarView(Context context, int size, MyApp app) {
         super(context);
@@ -51,6 +52,7 @@ public class AvatarView extends ImageView {
 
 
         setScaleType(ScaleType.CENTER_CROP);
+
     }
 
     @Override
@@ -64,6 +66,7 @@ public class AvatarView extends ImageView {
      * @param o can be TdApi.User or TdApi.Chat
      */
     public void loadAvatarFor(@NonNull TdApi.TLObject o) {
+        this.boundObject = o;
         if (o == null) {
             CrashlyticsCore.getInstance()
                     .logException(new NullPointerException());

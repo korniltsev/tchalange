@@ -18,15 +18,26 @@ public class PhotoView extends BasePath implements Serializable {
     public final TdApi.Photo photo;
     public final int messageId;
     public final long chatId;
+    public final TdApi.ProfilePhoto profilePhoto;
 
     public PhotoView(TdApi.Photo photo) {
+        profilePhoto = null;
         this.photo = photo;
+        messageId = NO_MESSAGE;
+        chatId = NO_MESSAGE;
+    }
+
+    public PhotoView(TdApi.ProfilePhoto photo) {
+        this.profilePhoto = photo;
+        this.photo = null;
         messageId = NO_MESSAGE;
         chatId = NO_MESSAGE;
     }
 
     public PhotoView(TdApi.Photo photo, int msgId, long chatId) {
         this.photo = photo;
+        profilePhoto = null;
+
         this.messageId = msgId;
         this.chatId = chatId;
     }

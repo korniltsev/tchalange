@@ -36,7 +36,7 @@ import static ru.korniltsev.telegram.common.AppUtils.uiUserStatus;
 public class FakeToolbar extends FrameLayout {
     @Inject DpCalculator calc;
     @Inject ChatDB chats;
-    private AvatarView image;
+    public AvatarView image;
     private TextView title;
     private TextView subTitle;
     private ViewGroup titleParent;
@@ -65,6 +65,12 @@ public class FakeToolbar extends FrameLayout {
         realHeaderHeight = getResources().getDimensionPixelSize(R.dimen.profile_header_height);
         //        fakeToolbarHeight = getResources().getDP
 
+//        image.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
     }
 
     private void positionAvatar(float res) {
