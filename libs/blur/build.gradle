@@ -1,0 +1,13 @@
+apply plugin: 'com.android.library'
+
+android {
+    defaultConfig {
+        renderscriptTargetApi 22
+        renderscriptSupportModeEnabled true
+    }
+}
+dependencies {
+
+    compile files("libs/renderscript-v8.jar")//22.0.1
+    //todo wtf? should not the plugin add it
+}
