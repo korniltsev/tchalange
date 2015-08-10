@@ -56,7 +56,7 @@ public class SingleTextViewVH extends RealBaseVH {
             SpannableStringBuilder sb = new SpannableStringBuilder();
             sb.append(creator)
                     .append(" ")
-                    .append(res.getString(R.string.message_created_group))
+                    .append(res.getString(R.string.message_renamed_group))
                     .append(" ")
                     .append(title);
             return sb;
