@@ -17,6 +17,7 @@ import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 
 import javax.inject.Inject;
 
+import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 
 public class EditChatTitleView extends LinearLayout {
@@ -53,6 +54,7 @@ public class EditChatTitleView extends LinearLayout {
                             @Override
                             public void run() {
                                 saveTitle();
+                                hideKeyboard();
                             }
                         }
                 );
@@ -67,11 +69,19 @@ public class EditChatTitleView extends LinearLayout {
                 return false;
             }
         });
+        showKeyboard(title);
 
     }
 
     private void hideKeyboard() {
-        Utils.hideKeyboard(this);
+        title.requestFocus();
+        Utils.hideKeyboard(title);
+//        post(new Runnable() {
+//            @Override
+//            public void run() {
+//                Utils.hideKeyboard(title);
+//            }
+//        });
     }
 
     private void saveTitle() {
@@ -94,5 +104,9 @@ public class EditChatTitleView extends LinearLayout {
         title.setText(((TdApi.GroupChatInfo) user.type).groupChat.title);
         title.setSelection(title.getText().length());
         title.requestFocus();
+
+
+        Utils.toggleKeyboard(title);
+
     }
 }

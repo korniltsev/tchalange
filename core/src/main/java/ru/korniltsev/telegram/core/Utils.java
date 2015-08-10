@@ -144,6 +144,13 @@ public class Utils {
 //        imm.showS(InputMethodManager.SHOW_FORCED, 0);
     }
 
+    public static void toggleKeyboard(View anchor) {
+        InputMethodManager inputManager = (InputMethodManager)anchor.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+            inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+    }
+
     public static void logDuration(long start, long end, String msg) {
         Log.d("Duration", msg + (end - start));
     }

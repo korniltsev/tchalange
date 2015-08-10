@@ -12,9 +12,7 @@ import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.Utils;
-import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 
 import javax.inject.Inject;
@@ -97,7 +95,10 @@ public class EditNameView extends LinearLayout {
 
     public void bindUser(TdApi.User user) {
         name.setText(user.firstName);
+        name.setSelection(name.getText().length());
         lastName.setText(user.lastName);
+        lastName.setSelection(lastName.getText().length());
         name.requestFocus();
+        Utils.toggleKeyboard(name);
     }
 }
