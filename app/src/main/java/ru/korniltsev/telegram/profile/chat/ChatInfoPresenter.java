@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
@@ -158,8 +157,18 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     }
 
     @Override
-    public void participantClicked(ChatInfoAdapter.ParticipantItem item) {
-
+    public void participantClicked(final ChatInfoAdapter.ParticipantItem item) {
+        subscriptions.add(
+                client.sendRx(new TdApi.CreatePrivateChat(item.user.id))
+                        .observeOn(mainThread())
+                        .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+                            @Override
+                            public void onNext(TdApi.TLObject response) {
+                                TdApi.Chat chat = (TdApi.Chat) response;
+                                final Chat path = new Chat(chat, item.user);
+                                AppUtils.flowPushAndRemove(getView(), path, new LeaveOnlyChatList(), Flow.Direction.FORWARD);
+                            }
+                        }));
     }
 
     public void deleteAndLeave() {
@@ -193,7 +202,6 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                 return !(path instanceof ChatList);
             }
         }, Flow.Direction.BACKWARD);
-
     }
 
     public void editChatName() {
@@ -203,7 +211,6 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                 Flow.get(getView()).set(new EditChatTitlePath(chat.id));
             }
         });
-
     }
 
     public void muteFor(int durationSeconds) {

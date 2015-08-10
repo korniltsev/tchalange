@@ -14,7 +14,6 @@ import java.io.Serializable;
 public class ProfilePath extends BasePath implements Serializable{
     public final TdApi.UserFull user;
     public final TdApi.Chat chat;
-
     public final TdApi.User me;
     //    @Nullable public final TdApi.Chat groupChat;
 
