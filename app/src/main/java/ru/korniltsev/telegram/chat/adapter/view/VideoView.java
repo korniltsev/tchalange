@@ -123,13 +123,14 @@ public class VideoView extends FrameLayout {
                 if (finalClearPlaceholder) {
                     picasso.getPicasso()
                             .load(uri)
+                            .resize(width, height)
                             .stableKey(uri.filePath)
                             .into(preview);
                 } else {
                     picasso.getPicasso()
-
                             .load(uri)
                             .stableKey(uri.filePath)
+                            .resize(width, height)
                             .noPlaceholder()
                             .into(preview);
                 }
