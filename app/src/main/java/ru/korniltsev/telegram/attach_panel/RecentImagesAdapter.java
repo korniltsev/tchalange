@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import com.squareup.picasso.Picasso;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 
@@ -20,11 +19,13 @@ public class RecentImagesAdapter extends RecyclerView.Adapter<RecentImagesAdapte
     final RxGlide glide;
     final List<Item> recentImages = new ArrayList<>();
     final Callback cb;
+    private final boolean multiChoice;
 
-    public RecentImagesAdapter(Context ctx, RxGlide glide, Callback cb) {
+    public RecentImagesAdapter(Context ctx, RxGlide glide, Callback cb, boolean multiChoice) {
         this.ctx = ctx;
         this.glide = glide;
         this.cb = cb;
+        this.multiChoice = multiChoice;
         viewFactory = LayoutInflater.from(ctx);
     }
 
@@ -62,8 +63,12 @@ public class RecentImagesAdapter extends RecyclerView.Adapter<RecentImagesAdapte
                 @Override
                 public void onClick(View v) {
                     Item item = recentImages.get(getPosition());
-                    item.selected = !item.selected;
-                    animateChange(item);
+                    if (multiChoice){
+                        item.selected = !item.selected;
+                        animateChange(item);
+                    } else {
+                        cb.singleImageSelected(item.image);
+                    }
                 }
             });
             attachCheck = itemView.findViewById(R.id.attach_check);
@@ -133,5 +138,6 @@ public class RecentImagesAdapter extends RecyclerView.Adapter<RecentImagesAdapte
 
     interface Callback {
         void imagesSelected(int count);
+        void singleImageSelected(String filePath);
     }
 }

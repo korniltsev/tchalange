@@ -20,6 +20,7 @@ import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import rx.android.schedulers.AndroidSchedulers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RecentImagesBottomSheet extends AttachPanelPopup {
@@ -82,7 +83,13 @@ public class RecentImagesBottomSheet extends AttachPanelPopup {
             public void imagesSelected(int count) {
                 updateButtonText(count);
             }
-        });
+
+            @Override
+            public void singleImageSelected(String filePath) {
+                final List<String> singleElement = Collections.singletonList(filePath);
+                callback.sendImages(singleElement);
+            }
+        }, allowMultiChoice);
         btnTakePhoto = (TextView) view.findViewById(R.id.btn_take_photo);
         btnChooseFromGallery = (TextView) view.findViewById(R.id.btn_choose_from_gallery);
         recentGalleryImages = ((RecyclerView) view.findViewById(R.id.recent_images));
