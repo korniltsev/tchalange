@@ -556,6 +556,7 @@ public class TdApi {
     }
 
     public static class File extends TLObject {
+        public static final int NO_FILE_ID = 0;
         public int id;
         public String persistentId;
         public int size;

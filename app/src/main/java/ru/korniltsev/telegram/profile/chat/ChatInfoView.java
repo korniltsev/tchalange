@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
+import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
@@ -20,6 +22,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
+import ru.korniltsev.telegram.photoview.PhotoView;
 import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
 import ru.korniltsev.telegram.profile.decorators.MyWhiteRectTopPaddingDecorator;
@@ -28,6 +31,8 @@ import ru.korniltsev.telegram.profile.decorators.TopShadow;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.drinkless.td.libcore.telegram.TdApi.File.NO_FILE_ID;
 
 public class ChatInfoView extends FrameLayout implements HandlesBack {
     @Inject ChatInfoPresenter presenter;
@@ -89,6 +94,28 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
                 presenter.changePhoto();
             }
         });
+
+        fakeToolbar.image.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPhotoView();
+            }
+        });
+        owner.setStatusBarColor(getResources().getColor(R.color.primary_dark));
+    }
+
+    private void showPhotoView() {
+        final TdApi.TLObject boundObject = fakeToolbar.image.boundObject;
+        if (!(boundObject instanceof TdApi.Chat)) {
+            return;
+        }
+        final TdApi.Chat u = (TdApi.Chat) boundObject;
+        final TdApi.GroupChat groupChat = ((TdApi.GroupChatInfo) u.type).groupChat;
+        if (groupChat.photo.big.id == NO_FILE_ID){
+            return;
+        }
+        Flow.get(getContext())
+                .set(new PhotoView(groupChat.photo));
     }
 
     private void changeNotificationSettings() {

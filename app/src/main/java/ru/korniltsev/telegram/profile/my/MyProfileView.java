@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
+import static org.drinkless.td.libcore.telegram.TdApi.File.NO_FILE_ID;
 import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.copy;
 import static ru.korniltsev.telegram.common.AppUtils.getTmpFileForCamera;
@@ -105,21 +106,26 @@ public class MyProfileView extends FrameLayout implements HandlesBack {
         fakeToolbar.image.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final TdApi.TLObject boundObject = fakeToolbar.image.boundObject;
-                if (boundObject instanceof TdApi.User) {
-                    TdApi.User u = (TdApi.User) boundObject;
-                    Flow.get(getContext())
-                            .set(new PhotoView(u.profilePhoto));
-                }
+                showProfileBigPhoto();
             }
         });
         activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));
 
     }
 
+    private void showProfileBigPhoto() {
+        final TdApi.TLObject boundObject = fakeToolbar.image.boundObject;
+        if (!(boundObject instanceof TdApi.User)) {
+            return;
+        }
 
-
-
+        TdApi.User u = (TdApi.User) boundObject;
+        if (u.profilePhoto.big.id == NO_FILE_ID){
+            return;
+        }
+        Flow.get(getContext())
+                .set(new PhotoView(u.profilePhoto));
+    }
 
     @Override
     public void onAttachedToWindow() {
