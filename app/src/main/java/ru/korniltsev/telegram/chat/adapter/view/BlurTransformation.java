@@ -8,16 +8,19 @@ import ru.korniltsev.blur.rs.Blur;
 
 public class BlurTransformation implements Transformation {
     final Context appCtx;
+    private float radius;
 
-    public BlurTransformation(Context appCtx) {
+    public BlurTransformation(Context appCtx, float radius) {
         this.appCtx = appCtx;
+        this.radius = radius;
     }
 
     @Override
     public Bitmap transform(Bitmap source) {
         final Bitmap result;
         try {
-            result = Blur.blur(appCtx, source, 25f);
+
+            result = Blur.blur(appCtx, source, radius);
             source.recycle();
             return result;
         } catch (Throwable th) {

@@ -43,6 +43,7 @@ public class VideoView extends FrameLayout {
     private int width;
     private int height;
     private TdApi.PhotoSize thumb;
+    private final BlurTransformation blur;
 
     public VideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -50,6 +51,7 @@ public class VideoView extends FrameLayout {
         //207x165
         dp207 = calc.dp(207);
         dp154 = calc.dp(154);
+        blur = new BlurTransformation(getContext().getApplicationContext(), 12f);
     }
 
     @Override
@@ -161,7 +163,7 @@ public class VideoView extends FrameLayout {
                     .cancelRequest(preview);
         } else {
             picasso.loadPhoto(thumb.photo, false)
-                    .resize(width, height)
+                    .transform(blur)
                     .into(preview);
         }
     }

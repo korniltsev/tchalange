@@ -38,10 +38,12 @@ public class DocumentView extends LinearLayout{
     @Inject RxGlide picasso;
     private TdApi.Document document;
     private DownloadView downloadView;
+    private final BlurTransformation blur;
 
     public DocumentView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
+        blur = new BlurTransformation(getContext().getApplicationContext(), 12f);
     }
 
     @Override
@@ -71,14 +73,16 @@ public class DocumentView extends LinearLayout{
 
     public void set(TdApi.Document d) {
         this.document = d;
-        final boolean image = document.mimeType.startsWith("image");
+        final boolean image = document.mimeType.startsWith("image") && document.thumb.photo.id != 0;
+        boolean shouldClearPlaceHolder = true;
         if (image) {
             documentThumb.setVisibility(View.VISIBLE);
             //check if downloaded
             if (!downloader.isDownloaded(document.document)){
                 picasso.loadPhoto(document.thumb.photo, false)
-                        .transform(new BlurTransformation(getContext().getApplicationContext()))
+                        .transform(blur)
                         .into(documentThumb);
+                shouldClearPlaceHolder = false;
             } else {
                 //we load original image in onFinished
             }
@@ -93,6 +97,7 @@ public class DocumentView extends LinearLayout{
         } else {
             cfg = new DownloadView.Config(R.drawable.ic_file, FINAL_ICON_EMPTY, true, false, 38);
         }
+        final boolean finalShouldClearPlaceHolder = shouldClearPlaceHolder;
         downloadView.bind(d.document, cfg, new DownloadView.CallBack() {
             @Override
             public void onProgress(TdApi.UpdateFileProgress p) {
@@ -103,9 +108,14 @@ public class DocumentView extends LinearLayout{
             public void onFinished(TdApi.File e, boolean b) {
                 documentProgress.setText(getResources().getString(R.string.downloaded_kb, AppUtils.kb(e.size)));
                 if (image) {
-                    picasso.loadPhoto(e, false)
-                            .noPlaceholder()
-                            .into(documentThumb);
+                    if (finalShouldClearPlaceHolder){
+                        picasso.loadPhoto(e, false)
+                                .into(documentThumb);
+                    } else {
+                        picasso.loadPhoto(e, false)
+                                .noPlaceholder()
+                                .into(documentThumb);
+                    }
                 }
             }
 
