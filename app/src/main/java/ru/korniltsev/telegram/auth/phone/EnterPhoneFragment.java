@@ -148,7 +148,9 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
         }
 
         public void sendCode(final String phoneNumber) {
-            assertNull(sendPhoneRequest);
+            if (sendPhoneRequest != null){//multiple action_done
+                return;
+            }
             sendPhoneRequest = setPhoneObservable(phoneNumber)
             .onErrorResumeNext(new Func1<Throwable, Observable<? extends TdApi.TLObject>>() {
                 @Override
