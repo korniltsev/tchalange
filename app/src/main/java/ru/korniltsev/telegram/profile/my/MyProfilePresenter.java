@@ -76,21 +76,14 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> implements 
                         onActivityResult(response);
                     }
                 }));
-        subscription.add(client
-                .getGlobalObservableWithBackPressure()
-                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateUser.class))
-                .filter(new Func1<TdApi.UpdateUser, Boolean>() {
-                    @Override
-                    public Boolean call(TdApi.UpdateUser updateUser) {
-                        return updateUser.user.id == me.id;
-                    }
-                })
-                .observeOn(mainThread()).subscribe(new ObserverAdapter<TdApi.UpdateUser>() {
-                    @Override
-                    public void onNext(TdApi.UpdateUser response) {
-                        getView().bindUserAvatar(response.user);
-                    }
-                }));
+        subscription.add(
+                client.userUpdates(me.id)
+                        .subscribe(new ObserverAdapter<TdApi.UpdateUser>() {
+                            @Override
+                            public void onNext(TdApi.UpdateUser response) {
+                                getView().bindUserAvatar(response.user);
+                            }
+                        }));
     }
 
     private void onActivityResult(ActivityResult response) {

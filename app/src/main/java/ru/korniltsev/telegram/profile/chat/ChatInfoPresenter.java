@@ -76,41 +76,26 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                         onActivityResult(response);
                     }
                 }));
-        subscriptions.add(client
-                .getGlobalObservableWithBackPressure()
-                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateChatPhoto.class))
-                .filter(new Func1<TdApi.UpdateChatPhoto, Boolean>() {
-                    @Override
-                    public Boolean call(TdApi.UpdateChatPhoto updateChatPhoto) {
-                        return updateChatPhoto.chatId == chat.id;
-                    }
-                })
-                .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.UpdateChatPhoto>() {
-                    @Override
-                    public void onNext(TdApi.UpdateChatPhoto response) {
-                        final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
-                        type.groupChat.photo = response.photo;
-                        getView()
-                                .bindChatAvatar(chat);
-                    }
-                }));
-        subscriptions.add(client
-                .getGlobalObservableWithBackPressure()
-                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateChatTitle.class))
-                .filter(new Func1<TdApi.UpdateChatTitle, Boolean>() {
-                    @Override
-                    public Boolean call(TdApi.UpdateChatTitle updateChatPhoto) {
-                        return updateChatPhoto.chatId == chat.id;
-                    }
-                })
-                .observeOn(mainThread())
-                .subscribe(new ObserverAdapter<TdApi.UpdateChatTitle>() {
-                    @Override
-                    public void onNext(TdApi.UpdateChatTitle response) {
-                        getView().setChatTitle(response.title);
-                    }
-                }));
+        subscriptions.add(
+                client.updateChatPhoto(chat.id)
+                        .subscribe(new ObserverAdapter<TdApi.UpdateChatPhoto>() {
+                            @Override
+                            public void onNext(TdApi.UpdateChatPhoto response) {
+                                final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
+                                type.groupChat.photo = response.photo;
+                                getView()
+                                        .bindChatAvatar(chat);
+                            }
+                        }));
+        subscriptions.add(
+                client.updateChatTitle(chat.id)
+                        .subscribe(new ObserverAdapter<TdApi.UpdateChatTitle>() {
+                            @Override
+                            public void onNext(TdApi.UpdateChatTitle response) {
+                                getView()
+                                        .setChatTitle(response.title);
+                            }
+                        }));
     }
 
     private void onActivityResult(ActivityResult response) {

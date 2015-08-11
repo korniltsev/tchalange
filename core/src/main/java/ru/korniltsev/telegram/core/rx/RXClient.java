@@ -28,6 +28,7 @@ import java.util.List;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 import static org.drinkless.td.libcore.telegram.TdApi.*;
+
 /**
  * Created by korniltsev on 21/04/15.
  */
@@ -308,7 +309,7 @@ public class RXClient {
     }
 
     public Observable<TLObject> sendRx(final TdApi.TLFunction function) {
-//        final Throwable th = new Throwable();
+        //        final Throwable th = new Throwable();
         return Observable.create(new Observable.OnSubscribe<TLObject>() {
             @Override
             public void call(final Subscriber<? super TLObject> s) {
@@ -470,7 +471,6 @@ public class RXClient {
                         return updateUserBlocked.isBlocked;
                     }
                 });
-
     }
 
     public Observable<TdApi.UserFull> getUserFull(int id) {
@@ -500,13 +500,38 @@ public class RXClient {
     }
 
     public void setChatAvatar(long chatId, String first) {
-        sendRx(new TdApi.ChangeChatPhoto(chatId,new InputFileLocal(first), null))
+        sendRx(new TdApi.ChangeChatPhoto(chatId, new InputFileLocal(first), null))
                 .observeOn(mainThread())
                 .subscribe(new ObserverAdapter<TdApi.TLObject>());
     }
 
-    public TLObject sendRxBlocking(TLFunction function) throws Exception{
+    public TLObject sendRxBlocking(TLFunction function) throws Exception {
         return sendRx(function).toBlocking().first();
+    }
+
+    public Observable<UpdateChatTitle> updateChatTitle(final long chatId) {
+        return getGlobalObservableWithBackPressure()
+                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateChatTitle.class))
+                .filter(new Func1<TdApi.UpdateChatTitle, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateChatTitle updateChatPhoto) {
+                        return updateChatPhoto.chatId == chatId;
+                    }
+                })
+                .observeOn(mainThread());
+    }
+
+    public Observable<UpdateChatPhoto> updateChatPhoto(final long chatId) {
+
+        return getGlobalObservableWithBackPressure()
+                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateChatPhoto.class))
+                .filter(new Func1<TdApi.UpdateChatPhoto, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateChatPhoto updateChatPhoto) {
+                        return updateChatPhoto.chatId == chatId;
+                    }
+                })
+                .observeOn(mainThread());
     }
 
     public static class RxClientException extends Exception {
@@ -552,19 +577,19 @@ public class RXClient {
                 .map(CAST_TO_CHATS);
     }
 
-    public Observable<List<TdApi.Chat>> getChatsList(int offset, int limit) {
-        return getChats(offset, limit).map(new Func1<TdApi.Chats, List<TdApi.Chat>>() {
-            @Override
-            public List<TdApi.Chat> call(TdApi.Chats chats) {
-                final ArrayList<TdApi.Chat> res = new ArrayList<>();
-                Collections.addAll(res, chats.chats);
-                return res;
-            }
-        });
-
-        //        return sendRx(new TdApi.GetChats(offset, limit))
-        //                .map(CAST_TO_CHATS);
-    }
+    //    public Observable<List<TdApi.Chat>> getChatsList(int offset, int limit) {
+    //        return getChats(offset, limit).map(new Func1<TdApi.Chats, List<TdApi.Chat>>() {
+    //            @Override
+    //            public List<TdApi.Chat> call(TdApi.Chats chats) {
+    //                final ArrayList<TdApi.Chat> res = new ArrayList<>();
+    //                Collections.addAll(res, chats.chats);
+    //                return res;
+    //            }
+    //        });
+    //
+    //        //        return sendRx(new TdApi.GetChats(offset, limit))
+    //        //                .map(CAST_TO_CHATS);
+    //    }
 
     public Observable<TdApi.User> getMe() {
         return sendCachedRXUI(new TdApi.GetMe())
@@ -606,5 +631,17 @@ public class RXClient {
 
     public Observable<TLObject> getGlobalObservableWithBackPressure() {
         return globalObservableWithBackPressure;
+    }
+
+    public Observable<UpdateUser> userUpdates(final int userId) {
+        return getGlobalObservableWithBackPressure()
+                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateUser.class))
+                .filter(new Func1<TdApi.UpdateUser, Boolean>() {
+                    @Override
+                    public Boolean call(TdApi.UpdateUser updateUser) {
+                        return updateUser.user.id == userId;
+                    }
+                })
+                .observeOn(mainThread());
     }
 }

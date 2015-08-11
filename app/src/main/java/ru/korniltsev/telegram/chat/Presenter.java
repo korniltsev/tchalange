@@ -63,7 +63,9 @@ public class Presenter extends ViewPresenter<ChatView>
     private final Observable<TdApi.GroupChatFull> fullChatInfoRequest;
     private final Observable<TdApi.UserFull> userFullRequest;
     private final boolean isGroupChat;
+    @Nullable private final TdApi.User user;//null if groupChat
     private final TdApi.Chat chat;
+
     private CompositeSubscription subscription;
     @Nullable private volatile TdApi.GroupChatFull mGroupChatFull;
     private int botCount;
@@ -92,12 +94,14 @@ public class Presenter extends ViewPresenter<ChatView>
             fullChatInfoRequest = client.getGroupChatInfo(groupChat.id)
                     .cache()
                     .observeOn(mainThread());
+            this.user = null;
             isGroupChat = true;
             userFullRequest = Observable.empty();
         } else {
             fullChatInfoRequest = Observable.empty();
             isGroupChat = false;
             final TdApi.PrivateChatInfo info = (TdApi.PrivateChatInfo) chat.type;
+            this.user = info.user;
             userFullRequest = client.getUserFull(info.user.id)
                     .cache()
                     .observeOn(mainThread());
@@ -228,7 +232,7 @@ public class Presenter extends ViewPresenter<ChatView>
                                        public void onNext(List<TdApi.Message> ms) {
                                            getView()
                                                    .addNewMessages(ms);
-//                                           showBotKeyboard(ms);
+                                           //                                           showBotKeyboard(ms);
                                            rxChat.hackToReadTheMessage(ms);
                                        }
                                    }
@@ -326,16 +330,47 @@ public class Presenter extends ViewPresenter<ChatView>
                         showBotKeyboardForMessage(response);
                     }
                 }));
+
+        if (isGroupChat){
+            subscription.add(
+                    client.updateChatPhoto(chat.id)
+                            .subscribe(new ObserverAdapter<TdApi.UpdateChatPhoto>() {
+                                @Override
+                                public void onNext(TdApi.UpdateChatPhoto response) {
+                                    final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
+                                    type.groupChat.photo = response.photo;
+                                    getView()
+                                            .loadAvatarFor(chat);
+                                }
+                            }));
+            subscription.add(
+                    client.updateChatTitle(chat.id)
+                            .subscribe(new ObserverAdapter<TdApi.UpdateChatTitle>() {
+                                @Override
+                                public void onNext(TdApi.UpdateChatTitle response) {
+                                    final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
+                                    type.groupChat.title = response.title;
+                                    getView().setGroupChatTitle(type.groupChat, chat);
+                                }
+                            }));
+        } else {
+            assertNotNull(user);
+            subscription.add(
+                    client.userUpdates(user.id)
+                            .subscribe(new ObserverAdapter<TdApi.UpdateUser>() {
+                                @Override
+                                public void onNext(TdApi.UpdateUser response) {
+                                    getView()
+                                            .loadAvatarFor(response.user);
+                                    setViewTitle(response.user);
+                                }
+                            }));
+
+        }
+
     }
 
-//    private void showBotKeyboard(List<TdApi.Message> ms) {
-//        for (int i = ms.size() - 1; i >= 0; i--) {
-//            final TdApi.Message msg = ms.get(i);
-//            if (showKeyboardForMessage(msg)) {
-//                break;
-//            }
-//        }
-//    }
+
 
     private void showBotKeyboardForMessage(@NonNull ChatDB.UpdateReplyMarkupWithData markup) {
         if (markup.msg == null){

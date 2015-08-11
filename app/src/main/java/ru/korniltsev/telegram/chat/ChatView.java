@@ -292,6 +292,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     }
 
     public void loadToolBarImage(TdApi.Chat chat) {
+        loadAvatarFor(chat);
+    }
+
+    public void loadAvatarFor(TdApi.TLObject chat) {
         toolbarAvatar.loadAvatarFor(chat);
     }
 
