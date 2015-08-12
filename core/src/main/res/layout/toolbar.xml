@@ -7,6 +7,5 @@
         android:layout_height="56dp"
         app:theme="@style/ToolBarStyle"
         app:popupTheme="@style/Theme.AppCompat.Light"
-        android:elevation="4dp"
         android:background="?attr/colorPrimary"
         />

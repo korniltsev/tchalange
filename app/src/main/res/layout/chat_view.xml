@@ -6,7 +6,15 @@
                                       style="@style/PathRoot"
         >
 
-    <include layout="@layout/toolbar"/>
+    <android.support.v7.widget.Toolbar
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:theme="@style/ToolBarStyle"
+            app:popupTheme="@style/Theme.AppCompat.Light"
+            android:background="?attr/colorPrimary"
+            />
 
     <ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout
             android:id="@+id/list_and_message_panel"

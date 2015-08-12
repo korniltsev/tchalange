@@ -53,10 +53,12 @@ public class AudioPLayer {
         if (current != null) {
             current.stop();
             current.release();
-            currentState.onNext(new StateStopped(currentAudio));
+            final TdApi.Audio copy = this.currentAudio;
             currentFile = null;
+            currentAudio = null;
             current = null;
             paused = false;
+            currentState.onNext(new StateStopped(copy));
         }
 
     }
