@@ -559,8 +559,8 @@ public class Presenter extends ViewPresenter<ChatView>
         }, 16);
     }
 
-    public void sendSticker(final String stickerFilePath, final TdApi.Sticker sticker) {
-        stickers.map(stickerFilePath, sticker);
+    public void sendSticker(final TdApi.Sticker sticker) {
+//        stickers.map(stickerFilePath, sticker);
         getView().scrollToBottom();
         getView().postDelayed(new Runnable() {
             @Override

@@ -1,6 +1,8 @@
 package ru.korniltsev.telegram.core.emoji;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import com.crashlytics.android.core.CrashlyticsCore;
 import ru.korniltsev.telegram.core.Utils;
 
 import java.util.ArrayList;
@@ -17,39 +19,37 @@ public class RecentSmiles {
 
     final Set<Entry> recent = new HashSet<>();
     private final SharedPreferences prefs;
-
-    public RecentSmiles(SharedPreferences prefs) {
-        this.prefs = prefs;
+    final int max;
+    public RecentSmiles(Context ctx, String name, int max) {
+        this.max = max;
+        this.prefs = ctx.getSharedPreferences(name, Context.MODE_PRIVATE);
         String string = this.prefs.getString(PREF_RECENT_SMILES, "");
         String[] split = string.split(DIVIDER_ENTRY);
-        for (int i = 0; i < split.length; i++) {
-            String s = split[i];
-            if (s.length() == 0) continue;
-            String[] timeCode = s.split(DIVIDER_TIME_CODE);
-            long time = Long.parseLong(timeCode[0]);
-            long code = Long.parseLong(timeCode[1]);
-            recent.add(new Entry(time, code));
+        try {
+            for (int i = 0; i < split.length; i++) {
+                String s = split[i];
+                if (s.length() == 0) {
+                    continue;
+                }
+                String[] timeCode = s.split(DIVIDER_TIME_CODE);
+
+                long time = Long.parseLong(timeCode[0]);
+                String code = timeCode[1];
+                recent.add(new Entry(time, code));
+            }
+        } catch (Exception e) {
+            CrashlyticsCore.getInstance().logException(e);
         }
     }
 
-    public void emojiClicked(long emojiCode) {
+    public void count(String emojiCode) {
         Entry e = new Entry(System.currentTimeMillis(), emojiCode);
-        if (recent.contains(e)) {
-            recent.remove(e);
-        }
+        recent.remove(e);
         recent.add(e);
         saveToPrefs();
     }
 
-    public long[] get() {
-        List<Entry> entries = getSortedRecentEmoji();
-        long[] ids = new long[entries.size()];
-        for (int i = 0; i < entries.size(); i++) {
-            ids[i] = entries.get(i).code;
-        }
-        return ids;
-    }
-    public List<Entry> getSortedRecentEmoji() {
+    public List<Entry> getRecent() {
         ArrayList<Entry> res = new ArrayList<>(recent);
         Collections.sort(res, new Comparator<Entry>() {
             @Override
@@ -61,8 +61,9 @@ public class RecentSmiles {
         return res;
     }
 
+
     private void saveToPrefs() {
-        List<Entry> es = getSortedRecentEmoji();
+        List<Entry> es = getRecent();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < es.size(); i++) {
             Entry e = es.get(i);
@@ -80,9 +81,9 @@ public class RecentSmiles {
 
     class Entry {
         final long time;
-        final long code;
+        final String code;
 
-        public Entry(long time, long code) {
+        public Entry(long time, String code) {
             this.time = time;
             this.code = code;
         }
@@ -98,12 +99,12 @@ public class RecentSmiles {
 
             Entry entry = (Entry) o;
 
-            return code == entry.code;
+            return code.equals(entry.code);
         }
 
         @Override
         public int hashCode() {
-            return (int) (code ^ (code >>> 32));
+            return code.hashCode();
         }
     }
 }

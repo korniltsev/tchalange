@@ -19,7 +19,7 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
+import ru.korniltsev.telegram.core.emoji.StickerAdapter;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.utils.R;
 
@@ -193,12 +193,12 @@ public class EmojiPagerStripView extends ViewGroup {
         if (gridView == null) {
             return;
         }
-        final EmojiKeyboardView.StickerAdapter a = (EmojiKeyboardView.StickerAdapter) gridView.getAdapter();
-        final List<EmojiKeyboardView.StickerAdapter.Item> data = a.getData();
+        final StickerAdapter a = (StickerAdapter) gridView.getAdapter();
+        final List<StickerAdapter.Item> data = a.getData();
         for (int i = 0; i < data.size(); i++) {
-            EmojiKeyboardView.StickerAdapter.Item item = data.get(i);
-            if (item instanceof EmojiKeyboardView.StickerAdapter.Data) {
-                final EmojiKeyboardView.StickerAdapter.Data d = (EmojiKeyboardView.StickerAdapter.Data) item;
+            StickerAdapter.Item item = data.get(i);
+            if (item instanceof StickerAdapter.Data) {
+                final StickerAdapter.Data d = (StickerAdapter.Data) item;
                 if (!d.recents) {
                     if (d.sticker.setId == set.id) {
                         gridView.setSelection(i);
@@ -244,8 +244,8 @@ public class EmojiPagerStripView extends ViewGroup {
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 final GridView view1 = (GridView) view;
                 final Object itemAtPosition = view1.getItemAtPosition(firstVisibleItem);
-                if (itemAtPosition instanceof EmojiKeyboardView.StickerAdapter.Data) {
-                    final EmojiKeyboardView.StickerAdapter.Data d = (EmojiKeyboardView.StickerAdapter.Data) itemAtPosition;
+                if (itemAtPosition instanceof StickerAdapter.Data) {
+                    final StickerAdapter.Data d = (StickerAdapter.Data) itemAtPosition;
                     setSelectedStickerPack(d);
                 }
             }
@@ -254,7 +254,7 @@ public class EmojiPagerStripView extends ViewGroup {
     }
 
     int currentStickerSetPosition = 0;
-    private void setSelectedStickerPack(EmojiKeyboardView.StickerAdapter.Data setId) {
+    private void setSelectedStickerPack(StickerAdapter.Data setId) {
         int position = 1;
         if (setId.recents) {
             position = 1;
@@ -275,13 +275,13 @@ public class EmojiPagerStripView extends ViewGroup {
             final boolean selected = i == position;
             childAt.setSelected(selected);
             if (selected) {
-                checkVisible(childAt);
+                checkVisible(childAt, i);
             }
         }
     }
 
     final int[] tmpRect = new int[2];
-    private void checkVisible(View childAt) {
+    private void checkVisible(View childAt, int position) {
         final int right = childAt.getRight();
         final int width = stickers.getWidth();
 //        childAt.getLocationOnScreen(tmpRect);
@@ -294,8 +294,10 @@ public class EmojiPagerStripView extends ViewGroup {
             stickers.smoothScrollBy(diff, 0);
         } else {
             final int left = childAt.getLeft() - stickers.getScrollX();
-            if (left < 0 ) {
-                stickers.smoothScrollBy(-left - calc.dp(16), 0);
+            if (position == 2){
+                stickers.smoothScrollTo(0, 0);
+            } else if (left < 0 ) {
+                stickers.smoothScrollTo(childAt.getLeft() - calc.dp(16), 0);
             }
         }
 

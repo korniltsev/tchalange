@@ -64,13 +64,17 @@ public class MessagePanel extends FrameLayout {
             String strEmoji = emoji.toString(code);
             Editable text = input.getText();
             text.append(emoji.replaceEmoji(strEmoji));
+
         }
 
         @Override
-        public void stickerCLicked(String stickerFilePath, TdApi.Sticker sticker) {
-            presenter.sendSticker(stickerFilePath, sticker);
+        public void stickerCLicked(TdApi.Sticker sticker) {
+            presenter.sendSticker(sticker);
         }
     };
+
+
+
     private AttachPanelPopup attachPanelPopup;
     private FrameUnderMessagePanelController bottomFrame;
     private View rightButtons;
