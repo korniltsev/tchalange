@@ -8,30 +8,25 @@
 
     <include layout="@layout/toolbar"/>
 
-    <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:layout_marginTop="56dp"
-            style="@style/ToolbarShadow"
-            />
-    <TextView
-            android:id="@+id/empty_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:text="@string/empty_chat"
-            android:layout_gravity="center"
-            />
-
     <ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout
             android:id="@+id/list_and_message_panel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="56dp"
             android:orientation="vertical">
+        <TextView
+                android:id="@+id/empty_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="@string/empty_chat"
+                android:layout_gravity="center"
+                />
         <LinearLayout android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:orientation="vertical">
+            <include
+                    layout="@layout/view_mini_player"/>
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/list"
                     android:scrollbars="vertical"
@@ -144,7 +139,6 @@
 
                     />
 
-
             <ru.korniltsev.telegram.chat.bot.BotCommandsRecyclerView
                     android:id="@+id/bot_commands_list"
                     android:layout_width="match_parent"
@@ -157,7 +151,6 @@
                 android:id="@+id/voice_recording_overlay"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
 
             <FrameLayout
                     android:id="@+id/voice_panel"
@@ -192,8 +185,6 @@
                         android:layout_gravity="center_vertical|left"
                         android:layout_marginLeft="32dp"/>
 
-
-
             </FrameLayout>
             <View
                     android:id="@+id/anchor"
@@ -202,28 +193,24 @@
                     android:layout_gravity="right|bottom"
                     android:background="#ef0"/>
         </ru.korniltsev.telegram.chat.VoiceRecordingOverlay>
+        <View
+                android:id="@+id/scroll_down"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="56dp"
+                android:background="@drawable/ic_scroll"
+
+                />
+        <include layout="@layout/chat_item_bot_info"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="center_vertical"
+                />
     </ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout>
 
-
     <!-- frame to create translate animations-->
-
-
-    <View
-            android:id="@+id/scroll_down"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="bottom|right"
-            android:layout_marginRight="8dp"
-            android:layout_marginBottom="56dp"
-            android:background="@drawable/ic_scroll"
-
-            />
-
-    <include layout="@layout/chat_item_bot_info"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center_vertical"
-            />
 
     <FrameLayout
             android:id="@+id/bot_start_panel"
@@ -242,6 +229,7 @@
               android:layout_height="1dp"
               android:background="#ededed"/>
     </FrameLayout>
+
     <ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame
             android:id="@+id/frame_under_message_panel"
             android:layout_width="match_parent"
