@@ -57,6 +57,17 @@ android {
         incremental true
         preDexLibraries false
     }
+//    productFlavors {
+//        x86 {
+//            ndkConfig.abiFilters = ["x86"]
+//        }
+//        armeabi_v7a {
+//            ndkConfig.abiFilters = ["armeabi-v7a"]
+//        }
+//        fat {
+//
+//        }
+//    }
 }
 
 def serviceAccountEmailStr = System.getenv("SYSTEM_ACCOUNT_EMAIL")

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.squareup.picasso.Transformation;
-import ru.korniltsev.blur.rs.Blur;
 import ru.korniltsev.telegram.common.FastBlur;
 
 public class BlurTransformation implements Transformation {
