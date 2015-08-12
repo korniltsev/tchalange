@@ -50,7 +50,7 @@ public class GifView extends FrameLayout {
         //207x165
         dp207 = calc.dp(207);
         dp154 = calc.dp(154);
-        blur = new BlurTransformation(getContext().getApplicationContext(), 12f);
+        blur = new BlurTransformation(getContext().getApplicationContext(), 12);
     }
 
     @Override

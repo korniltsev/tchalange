@@ -42,7 +42,7 @@ public class DocumentView extends LinearLayout{
     public DocumentView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        blur = new BlurTransformation(getContext().getApplicationContext(), 12f);
+        blur = new BlurTransformation(getContext().getApplicationContext(), 12);
     }
 
     @Override

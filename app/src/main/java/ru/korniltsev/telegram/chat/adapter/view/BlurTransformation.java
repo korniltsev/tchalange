@@ -5,22 +5,22 @@ import android.graphics.Bitmap;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.squareup.picasso.Transformation;
 import ru.korniltsev.blur.rs.Blur;
+import ru.korniltsev.telegram.common.FastBlur;
 
 public class BlurTransformation implements Transformation {
     final Context appCtx;
-    private float radius;
+//    private float radius;
+    final int radius;
 
-    public BlurTransformation(Context appCtx, float radius) {
+    public BlurTransformation(Context appCtx, int radius) {
         this.appCtx = appCtx;
         this.radius = radius;
     }
 
     @Override
     public Bitmap transform(Bitmap source) {
-        final Bitmap result;
         try {
-
-            result = Blur.blur(appCtx, source, radius);
+            Bitmap result = FastBlur.doBlur( source, radius, false);
             source.recycle();
             return result;
         } catch (Throwable th) {

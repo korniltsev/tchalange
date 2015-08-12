@@ -6,7 +6,7 @@ include 'app'
 
 def libs = [
         'picasso',
-        'blur',
+//        'blur',
         'libphoneformat',
         'libsuperslim',
         'libtd',
