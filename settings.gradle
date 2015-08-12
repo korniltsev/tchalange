@@ -13,7 +13,6 @@ def libs = [
         'libgif',
         'libwebp',
         'libopus',
-        'libpagerslidingtabstrip2',
         'provided_res',
 
 ]

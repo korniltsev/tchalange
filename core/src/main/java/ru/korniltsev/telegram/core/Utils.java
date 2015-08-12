@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -25,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Iterator;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
@@ -41,16 +43,16 @@ public class Utils {
         // Target ~15% of the available heap.
         return 1024 * 1024 * memoryClass / 7;
     }
+
     public static String textFrom(EditText e) {
         return e.getText().toString();
     }
-    public static void hideKeyboard(EditText e){
-        InputMethodManager imm = (InputMethodManager)e.getContext().getSystemService(
+
+    public static void hideKeyboard(EditText e) {
+        InputMethodManager imm = (InputMethodManager) e.getContext().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(e.getWindowToken(), 0);
     }
-
-
 
     public static void copyFile(File source, File dest) throws IOException {
         InputStream is = null;
@@ -64,8 +66,12 @@ public class Utils {
                 os.write(buffer, 0, length);
             }
         } finally {
-            if (is != null) is.close();
-            if (os != null) os.close();
+            if (is != null) {
+                is.close();
+            }
+            if (os != null) {
+                os.close();
+            }
         }
     }
 
@@ -94,8 +100,7 @@ public class Utils {
 
         String[] projection = {MediaStore.Images.Media.DATA};
         Cursor c;
-        if(SDK_INT >= 19)
-        {
+        if (SDK_INT >= 19) {
             // Will return "image:x*"
             String wholeID = DocumentsContract.getDocumentId(selectedImage);
             // Split at colon, use second item in the array
@@ -110,8 +115,6 @@ public class Utils {
         String picturePath;
         if (c.moveToNext()) {
             picturePath = c.getString(c.getColumnIndex(MediaStore.Images.Media.DATA));
-
-
         } else {
             picturePath = null;
         }
@@ -124,7 +127,7 @@ public class Utils {
                 .log(Log.INFO, "Event", eventName);
     }
 
-    public static void setStatusBarColor(Activity a, int color){
+    public static void setStatusBarColor(Activity a, int color) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             a.getWindow().setStatusBarColor(color);
         }
@@ -137,21 +140,57 @@ public class Utils {
     }
 
     public static void showKeyboard(View anchor) {
-//        Context c = anchor.getContext();
-        InputMethodManager inputManager = (InputMethodManager)anchor.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        //        Context c = anchor.getContext();
+        InputMethodManager inputManager = (InputMethodManager) anchor.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(anchor, InputMethodManager.SHOW_IMPLICIT);
-//        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.showS(InputMethodManager.SHOW_FORCED, 0);
+        //        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+        //        imm.showS(InputMethodManager.SHOW_FORCED, 0);
     }
 
     public static void toggleKeyboard(View anchor) {
-        InputMethodManager inputManager = (InputMethodManager)anchor.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputManager = (InputMethodManager) anchor.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 
-            inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-
+        inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
     }
 
     public static void logDuration(long start, long end, String msg) {
         Log.d("Duration", msg + (end - start));
     }
+
+//    public static Iterable<View> childrenOf(final ViewGroup view) {
+//        return new Iterable<View>(){
+//
+//            @Override
+//            public Iterator<View> iterator() {
+//                return new ViewGroupChildIterator(view);
+//            }
+//        };
+//    }
+//    private static class ViewGroupChildIterator implements Iterator<View> {
+//        final ViewGroup root;
+//        private final int total;
+//        int current = 0;
+//
+//        public ViewGroupChildIterator(ViewGroup root) {
+//            this.root = root;
+//            total = root.getChildCount();
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return current < total;
+//        }
+//
+//        @Override
+//        public View next() {
+//            final View childAt = root.getChildAt(current);
+//            current++;
+//            return childAt;
+//        }
+//
+//        @Override
+//        public void remove() {
+//
+//        }
+//    }
 }

@@ -234,6 +234,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
                 presenter.openChatWithAuthorOf(msg);
             }
         });
+
+        messagePanel.getInput().requestFocus();
     }
 
     boolean scrollDownButtonIsVisible = false;

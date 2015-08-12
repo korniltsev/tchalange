@@ -73,6 +73,7 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
 
     @Singleton
     static class Presenter extends ViewPresenter<EnterPhoneView> {
+        public static final String CANNOT_CHANGE_PHONE_NUMBER_AFTER_AUTHORIZATION_OR_ENTERED_CODE = "Cannot change phone number after authorization or entered code";
         private RXClient client;
         private Observable<TdApi.TLObject> sendPhoneRequest;
         private String sentPhonenumber;
@@ -153,11 +154,20 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
                 return;
             }
             sendPhoneRequest = setPhoneObservable(phoneNumber)
+                    .map(new Func1<TdApi.TLObject, TdApi.TLObject>() {
+                        @Override
+                        public TdApi.TLObject call(TdApi.TLObject tlObject) {
+                            if (tlObject instanceof TdApi.AuthStateOk) {
+                                throw new RuntimeException(CANNOT_CHANGE_PHONE_NUMBER_AFTER_AUTHORIZATION_OR_ENTERED_CODE);
+                            }
+                            return tlObject;
+                        }
+                    })
             .onErrorResumeNext(new Func1<Throwable, Observable<? extends TdApi.TLObject>>() {
                 @Override
                 public Observable<? extends TdApi.TLObject> call(Throwable throwable) {
                     String message = throwable.getMessage();
-                    if (message.contains("Cannot change phone number after authorization or entered code")) {
+                    if (message.contains(CANNOT_CHANGE_PHONE_NUMBER_AFTER_AUTHORIZATION_OR_ENTERED_CODE)) {
                         return client.sendRx(new TdApi.ResetAuth())
                                 .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
                                     @Override

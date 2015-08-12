@@ -25,6 +25,7 @@ import ru.korniltsev.telegram.core.emoji.Emoji;
 import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
 import ru.korniltsev.telegram.core.emoji.EmojiTextView;
 import ru.korniltsev.telegram.core.emoji.Stickers;
+import ru.korniltsev.telegram.core.emoji.strip.EmojiPagerStripView;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.BootReceiver;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
@@ -59,6 +60,7 @@ import java.util.concurrent.Executors;
 
 
                 EmojiKeyboardView.class,
+                EmojiPagerStripView.class,
 
                 DownloadView.class,
                 EmojiTextView.class,

@@ -8,7 +8,7 @@ apply plugin: 'com.github.triplet.play'
 dependencies {
     compile project(':core')
     compile project(':libgif')
-    compile project(':libsuperslim')
+
 
     compile project(':picasso')
     compile project(':blur')
