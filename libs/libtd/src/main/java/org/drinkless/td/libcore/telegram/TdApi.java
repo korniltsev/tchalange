@@ -28,6 +28,7 @@ public class TdApi {
         public int duration;
         public String title;
         public String performer;
+        public PhotoSize albumCoverThumb;
         public String fileName;
         public String mimeType;
         public File audio;
@@ -35,20 +36,21 @@ public class TdApi {
         public Audio() {
         }
 
-        public Audio(int duration, String title, String performer, String fileName, String mimeType, File audio) {
+        public Audio(int duration, String title, String performer, PhotoSize albumCoverThumb, String fileName, String mimeType, File audio) {
             this.duration = duration;
             this.title = title;
             this.performer = performer;
+            this.albumCoverThumb = albumCoverThumb;
             this.fileName = fileName;
             this.mimeType = mimeType;
             this.audio = audio;
         }
 
-        public static final int CONSTRUCTOR = 1801952842;
+        public static final int CONSTRUCTOR = -495790369;
 
         @Override
         public int getConstructor() {
-            return 1801952842;
+            return -495790369;
         }
 
         @Override
@@ -58,6 +60,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("duration").append(" = ").append(duration).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("performer").append(" = ").append(performer).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("albumCoverThumb").append(" = "); albumCoverThumb.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fileName").append(" = ").append(fileName).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("mimeType").append(" = ").append(mimeType).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("audio").append(" = "); audio.toStringBuilder(shift, s);
@@ -4349,6 +4352,33 @@ public class TdApi {
         }
     }
 
+    public static class ChangeUsername extends TLFunction {
+        public String username;
+
+        public ChangeUsername() {
+        }
+
+        public ChangeUsername(String username) {
+            this.username = username;
+        }
+
+        public static final int CONSTRUCTOR = 2015886676;
+
+        @Override
+        public int getConstructor() {
+            return 2015886676;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("ChangeUsername").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public static class CheckAuthPassword extends TLFunction {
         public String password;
 
@@ -5277,6 +5307,33 @@ public class TdApi {
             s.append("SearchStickerSet").append(" {\n");
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchUser extends TLFunction {
+        public String username;
+
+        public SearchUser() {
+        }
+
+        public SearchUser(String username) {
+            this.username = username;
+        }
+
+        public static final int CONSTRUCTOR = 1973882035;
+
+        @Override
+        public int getConstructor() {
+            return 1973882035;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchUser").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("username").append(" = ").append(username).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
