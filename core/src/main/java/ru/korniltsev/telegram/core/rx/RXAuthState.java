@@ -112,6 +112,8 @@ public class RXAuthState {
             int uid = prefs.getInt(ME_UID, -1);
             TdApi.User user = getCurrentUser();
             if (user == null) {
+                CrashlyticsCore.getInstance()
+                        .logException(new IllegalStateException("ftw"));
                 state = new StateLogout();
             } else {
                 state = new StateAuthorized(uid, user, false);

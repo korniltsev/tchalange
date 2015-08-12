@@ -114,6 +114,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {
+        AppUtils.logEvent("EnterCode.onLoad");
         if (!isGroupChat && ((TdApi.PrivateChatInfo) chat.type).user.type instanceof TdApi.UserTypeBot) {
             getView().setBot(true);
         }

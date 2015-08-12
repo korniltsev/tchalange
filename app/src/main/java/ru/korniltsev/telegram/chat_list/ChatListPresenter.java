@@ -7,6 +7,7 @@ import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.Emoji;
@@ -21,7 +22,6 @@ import rx.subscriptions.CompositeSubscription;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertTrue;
@@ -69,6 +69,7 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     @Override
     protected void onLoad(Bundle savedInstanceState) {
         super.onLoad(savedInstanceState);
+        AppUtils.logEvent("ChatListPresenter.onLoad");
         meRequest = authState.getMe(client);
         if (!chatDB.isRequestInProgress()) {
             if (!chatDB.isAtLeastOneResponseReturned()) {

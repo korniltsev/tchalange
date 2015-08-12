@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Toast;
+import com.crashlytics.android.answers.Answers;
 import flow.Flow;
 import flow.History;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -246,5 +247,9 @@ public class AppUtils {
     @NonNull
     public static File getTmpFileForCamera() {
         return new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+    }
+
+    public static void logEvent(String event) {
+        Answers.getInstance().logEvent(event);
     }
 }

@@ -16,6 +16,7 @@ import ru.korniltsev.telegram.auth.code.EnterCode;
 import ru.korniltsev.telegram.auth.country.Countries;
 import ru.korniltsev.telegram.auth.country.SelectCountry;
 import ru.korniltsev.telegram.auth.name.EnterName;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.RootModule;
@@ -93,6 +94,7 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
         @Override
         protected void onLoad(Bundle savedInstanceState) {
             super.onLoad(savedInstanceState);
+            AppUtils.logEvent("EnterPhoneFragment.onLoad");
             path.loadCounter++;
             Context ctx = getView().getContext();
             selectCountry(ctx);

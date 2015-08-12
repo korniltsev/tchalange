@@ -11,6 +11,7 @@ import dagger.Provides;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
@@ -92,6 +93,7 @@ public class EnterCode extends BasePath implements Serializable {
 
         @Override
         protected void onLoad(Bundle savedInstanceState) {
+            AppUtils.logEvent("EnterCode.onLoad");
             if (request != null) {
                 subscribe();
             }
