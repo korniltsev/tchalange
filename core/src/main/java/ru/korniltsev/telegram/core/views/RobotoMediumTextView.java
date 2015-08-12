@@ -23,5 +23,15 @@ public class RobotoMediumTextView extends TextView {
         }
     }
 
-
+    public static Typeface sGetTypeface(Context ctx) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+            if (loadedFont == null) {
+                AssetManager assets = ctx.getAssets();
+                loadedFont = Typeface.createFromAsset(assets, FONT);
+            }
+            return loadedFont;
+        } else {
+            return Typeface.create("sans-serif-medium", Typeface.NORMAL);
+        }
+    }
 }

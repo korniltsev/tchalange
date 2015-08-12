@@ -29,6 +29,7 @@ import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
+import ru.korniltsev.telegram.core.audio.MiniPlayerView;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.adapter.Adapter;
@@ -112,6 +113,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     private View botCommandsShadow;
     private VoiceRecordingOverlay voiceOverlay;
     private DaySplitter splitter;
+    private View toolbarShadow;
+    private MiniPlayerView miniPlayerView;
 
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -236,6 +239,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         });
 
         messagePanel.getInput().requestFocus();
+        toolbarShadow = findViewById(R.id.toolbar_shadow);
+        miniPlayerView = ((MiniPlayerView) findViewById(R.id.mini_player));
+        miniPlayerView.setShadow(toolbarShadow);
+
     }
 
     boolean scrollDownButtonIsVisible = false;

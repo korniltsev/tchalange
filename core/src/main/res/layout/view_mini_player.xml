@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ru.korniltsev.telegram.core.audio.MiniPlayerView
+        android:id="@+id/mini_player"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -12,14 +13,20 @@
             />
 
     <TextView
+            android:id="@+id/text"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
+            android:textColor="#333"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:gravity="center_vertical"/>
 
     <ImageButton
             android:id="@+id/btn_stop"
             android:layout_width="61dp"
             android:layout_height="match_parent"
+            android:src="@drawable/ic_closeplayer"
             android:background="@drawable/bg_keyboard_tab"/>
 </ru.korniltsev.telegram.core.audio.MiniPlayerView>

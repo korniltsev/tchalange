@@ -12,6 +12,7 @@ public class AudioPLayer {
     final Context ctx;
     private final PublishSubject<State> currentState = PublishSubject.create();
     private TdApi.File currentFile;
+    private TdApi.Audio currentAudio;
     private boolean paused;
 
     public AudioPLayer(Context ctx) {
@@ -20,12 +21,12 @@ public class AudioPLayer {
 
     @Nullable MediaPlayer current = null;
 
-    public void play(TdApi.File fileLocal) {
+    public void play(TdApi.Audio audio, TdApi.File fileLocal) {
         cleanup();
-        startNewPlayer(fileLocal);
+        startNewPlayer(audio, fileLocal);
     }
 
-    private void startNewPlayer(final TdApi.File fileLocal) {
+    private void startNewPlayer(final TdApi.Audio audio, TdApi.File fileLocal) {
         try {
 
             final MediaPlayer mp = new MediaPlayer();
@@ -37,9 +38,12 @@ public class AudioPLayer {
                     cleanup();
                 }
             });
+
             mp.start();
             current = mp;
             currentFile = fileLocal;
+            currentAudio = audio;
+            currentState.onNext(new StatePlaying(audio));
         } catch (Exception e) {
             CrashlyticsCore.getInstance().logException(e);
         }
@@ -47,11 +51,9 @@ public class AudioPLayer {
 
     private void cleanup() {
         if (current != null) {
-
-
             current.stop();
             current.release();
-            currentState.onNext(new StateCompleted(currentFile));
+            currentState.onNext(new StateStopped(currentAudio));
             currentFile = null;
             current = null;
             paused = false;
@@ -59,81 +61,79 @@ public class AudioPLayer {
 
     }
 
-    public boolean isPLaying(TdApi.File fileLocal) {
+    public boolean isPLaying() {
         if (current == null) {
-            return false;
-        }
-        if (!currentFile.path.equals(fileLocal.path)){
             return false;
         }
         return current.isPlaying();
     }
 
-    public void pause(TdApi.File fileLocal) {
+    public void pause() {
         if (current == null){
             return;
         }
-        if (!currentFile.path.equals(fileLocal.path)){
-            return;
-        }
+
         if (current.isPlaying()) {
             current.pause();
             paused = true;
+            currentState.onNext(new StatePaused(currentAudio));
         }
     }
 
-    public boolean isPaused(TdApi.File fileLocal) {
+    public boolean isPaused() {
         if (current == null) {
-            return false;
-        }
-        if (!currentFile.path.equals(fileLocal.path)){
             return false;
         }
         return paused;
-//        current.pause();
-//        return current.isPlaying();
-
     }
 
-    public void resume(TdApi.File fileLocal) {
+    public void resume() {
         if (current == null) {
             return;
-        }
-        if (!currentFile.path.equals(fileLocal.path)){
-            return ;
         }
         if (!paused){
             return;
         }
         paused = false;
         current.start();
+        currentState.onNext(new StatePlaying(currentAudio));
     }
 
     public Observable<State> currentState() {
         return currentState;
     }
 
+    public void stop() {
+        cleanup();
+    }
 
-
+    public TdApi.Audio getCurrentAudio() {
+        return currentAudio;
+    }
 
     public static abstract class State {
-        public final TdApi.File file;
+        public final TdApi.Audio audio;
 
-        protected State(TdApi.File  file) {
-            this.file = file;
+        protected State(TdApi.Audio audio) {
+            this.audio = audio;
         }
     }
-    public static class StateCompleted extends State{
-
-        public StateCompleted(TdApi.File  file) {
-            super(file);
+    public static class StateStopped extends State {
+        public StateStopped(TdApi.Audio audio) {
+            super(audio);
         }
     }
 
-    public static class StateStarted extends State {
+    public static class StatePlaying extends State {
 
-        public StateStarted(TdApi.File  file) {
-            super(file);
+        public StatePlaying(TdApi.Audio audio) {
+            super(audio);
+        }
+    }
+    public static class StatePaused extends State {
+
+        public StatePaused(TdApi.Audio audio) {
+            super(audio);
         }
     }
 

@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat.adapter.view;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import rx.Observer;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 
+import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.common.AppUtils.kb;
 
 public class AudioMessageView extends LinearLayout {
@@ -47,7 +49,11 @@ public class AudioMessageView extends LinearLayout {
         subscription.unsubscribe();
         subscribe();
         songName.setText(audio.audio.title);
-        songSinger.setText(audio.audio.performer);
+        final String performer = audio.audio.performer;
+        if (isEmpty(performer)){
+
+        }
+        songSinger.setText(performer);
 
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
         downloadView.bind(audio.audio.audio, cfg, new DownloadView.CallBack() {
@@ -59,22 +65,23 @@ public class AudioMessageView extends LinearLayout {
             @Override
             public void onFinished(TdApi.File fileLocal, boolean justDownloaded) {
                 songName.setText(audio.audio.title);
-                if (player.isPLaying(fileLocal)) {
+                if (player.isPLaying()) {
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, false);
                 }
             }
 
             @Override
             public void play(TdApi.File fileLocal) {
-                if (player.isPLaying(fileLocal)) {
-                    player.pause(fileLocal);
+                final TdApi.Audio currentAudio = player.getCurrentAudio();
+                if (player.isPLaying() && currentAudio.audio.id == fileLocal.id) {
+                    player.pause();
                     downloadView.setLevel(DownloadView.LEVEL_PLAY, true);
-                } else if (player.isPaused(fileLocal)) {
-                    player.resume(fileLocal);
+                } else if (player.isPaused()&& currentAudio.audio.id == fileLocal.id) {
+                    player.resume();
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
                 } else{
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
-                    player.play(fileLocal);
+                    player.play(audio.audio, fileLocal);
                 }
             }
         }, downloadView);
@@ -90,13 +97,16 @@ public class AudioMessageView extends LinearLayout {
         return new ObserverAdapter<AudioPLayer.State>(){
             @Override
             public void onNext(AudioPLayer.State response) {
-                if (audio.audio.audio.id != response.file.id){
+                if (audio.audio.audio.id != response.audio.audio.id){
                     return;
                 }
-                if (response instanceof AudioPLayer.StateCompleted){
+
+                if (response instanceof AudioPLayer.StateStopped){
                     downloadView.setLevel(DownloadView.LEVEL_PLAY, true);
-                } else if (response instanceof AudioPLayer.StateStarted){
+                } else if (response instanceof AudioPLayer.StatePlaying){
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
+                } else if (response instanceof AudioPLayer.StatePaused){
+                    downloadView.setLevel(DownloadView.LEVEL_PLAY, true);
                 }
             }
         };
