@@ -51,9 +51,10 @@ public class AudioMessageView extends LinearLayout {
         songName.setText(audio.audio.title);
         final String performer = audio.audio.performer;
         if (isEmpty(performer)){
-
+            songSinger.setText(audio.audio.fileName);
+        } else {
+            songSinger.setText(performer);
         }
-        songSinger.setText(performer);
 
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
         downloadView.bind(audio.audio.audio, cfg, new DownloadView.CallBack() {

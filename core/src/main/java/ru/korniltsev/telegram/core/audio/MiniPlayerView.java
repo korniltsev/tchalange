@@ -1,7 +1,11 @@
 package ru.korniltsev.telegram.core.audio;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableString;
@@ -21,24 +25,34 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.views.RobotoMediumTextView;
 import ru.korniltsev.telegram.utils.R;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subscriptions.Subscriptions;
+
+import java.util.concurrent.TimeUnit;
 
 import static android.text.TextUtils.isEmpty;
+import static rx.Observable.timer;
 
 public class MiniPlayerView extends LinearLayout {
 
     private final AudioPLayer audioPLayer;
     private final DpCalculator calc;
+    private final int dp1point5;
     private Subscription subscription;
     private ImageButton btnPlay;
     private ImageButton btnStop;
     private TextView title;
     @Nullable private View shadow;
+    private float progress;
+    private Paint paint;
 
     public MiniPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         final MyApp from = MyApp.from(context);
         audioPLayer = from.audioPLayer;
         calc = from.dpCalculator;
+        setWillNotDraw(false);
+        dp1point5 = calc.dp(1.5f);
 
     }
 
@@ -69,16 +83,41 @@ public class MiniPlayerView extends LinearLayout {
         final TdApi.Audio currentAudio = audioPLayer.getCurrentAudio();
         setState(pLaying, paused, currentAudio);
 
+        paint = new Paint();
+        paint.setColor(0xFF66ACDF);
     }
 
+    final Rect r = new Rect();
+    @Override
+    protected void onDraw(Canvas canvas) {
+        int bottom = getBottom();
+        int top = bottom - dp1point5;
+        int left = 0;
+        int right = (int) (getWidth() * progress);
+        r.set(left, top, right, bottom);
+        canvas.drawRect(r, paint);
+    }
+
+    Subscription timerSubscription = Subscriptions.empty();
 
 
-    public void setState(boolean playing, boolean paused, TdApi.Audio currentAudio){
-        if (playing || paused){
+
+    public void setState(boolean playing, boolean paused, TdApi.Audio currentAudio) {
+        timerSubscription.unsubscribe();
+        updateProgress();
+        if (playing || paused) {
             setVisibility(View.VISIBLE);
-              title.setText(getTitle(currentAudio));
-            if (playing){
+            title.setText(getTitle(currentAudio));
+            if (playing) {
                 btnPlay.setImageResource(R.drawable.ic_pausepl);
+                timerSubscription = timer(0, 1, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new ObserverAdapter<Long>() {
+                            @Override
+                            public void onNext(Long response) {
+                                updateProgress();
+                            }
+                        });
             } else {
                 btnPlay.setImageResource(R.drawable.ic_playpl);
             }
@@ -87,6 +126,19 @@ public class MiniPlayerView extends LinearLayout {
             setVisibility(View.GONE);
             updateShadowState(false);
         }
+    }
+
+    private void updateProgress() {
+        this.progress = 0f;
+        final MediaPlayer current = audioPLayer.current;
+        if (current == null) {
+            progress = 0f;
+        } else {
+            final int currentPosition = current.getCurrentPosition();
+            final int duration = current.getDuration();
+            progress = (float) currentPosition / duration;
+        }
+        invalidate();
     }
 
     @NonNull
