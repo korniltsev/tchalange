@@ -151,6 +151,7 @@
     <string name="message_voice">Voice</string>
     <string name="name_not_modified">Name not modified</string>
     <string name="chat_title">Chat title</string>
+    <string name="first_name_must_be_non_empty">First name must be non-empty</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

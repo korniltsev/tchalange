@@ -106,6 +106,9 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 final TdApi.TLObject boundObject = fakeToolbar.image.boundObject;
                 if (boundObject instanceof TdApi.User) {
                     final TdApi.User u = (TdApi.User) boundObject;
+                    if (u.profilePhoto.big.id == TdApi.File.NO_FILE_ID){
+                        return;
+                    }
                     Flow.get(getContext())
                             .set(new PhotoView(u.profilePhoto));
                 }

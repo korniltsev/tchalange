@@ -9,9 +9,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.rx.RXClient;
-import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
-import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -57,7 +55,10 @@ public class EditNamePresenter extends ViewPresenter<EditNameView> {
                         if (th instanceof RXClient.RxClientException){
                             final TdApi.Error err = ((RXClient.RxClientException) th).error;
                             if (err.text.equals("NAME_NOT_MODIFIED")) {
-                                showNotModifiedError();
+                                showNotModifiedError(R.string.name_not_modified);
+                                return;
+                            } else if (err.text.contains("First name must be non-empty")){
+                                showNotModifiedError(R.string.first_name_must_be_non_empty);
                                 return;
                             }
                         }
@@ -66,8 +67,8 @@ public class EditNamePresenter extends ViewPresenter<EditNameView> {
                 }));
     }
 
-    private void showNotModifiedError() {
-        Toast.makeText(getView().getContext(), R.string.name_not_modified, Toast.LENGTH_SHORT).show();
+    private void showNotModifiedError(int name_not_modified) {
+        Toast.makeText(getView().getContext(), name_not_modified, Toast.LENGTH_SHORT).show();
     }
 
     @Override

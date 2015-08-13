@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Presenter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
@@ -19,7 +20,7 @@ public class PhotoMessageView extends ImageView {
     //    private final int atmost;
     @Inject RxGlide picasso;
     @Inject Presenter presenter;
-    @Inject DpCalculator calc;
+    DpCalculator calc;
     private TdApi.Photo photo;
     private int dip207;
     private int dip154;
@@ -29,6 +30,7 @@ public class PhotoMessageView extends ImageView {
     public PhotoMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
+        calc = MyApp.from(context).dpCalculator;
         dip207 = calc.dp(207);
         dip154 = calc.dp(154);
     }
