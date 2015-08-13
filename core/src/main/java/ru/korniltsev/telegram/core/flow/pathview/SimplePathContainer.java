@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import com.crashlytics.android.core.CrashlyticsCore;
 import dagger.ObjectGraph;
 import flow.Flow;
 import flow.path.Path;
@@ -36,6 +37,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.utils.Utils;
 
 import static flow.Flow.Direction.REPLACE;
+import static ru.korniltsev.telegram.core.Utils.event;
 
 /**
  * Provides basic right-to-left transitions. Saves and restores view state.
@@ -84,6 +86,7 @@ public class SimplePathContainer extends PathContainer {
       skipAnimation = false;
     }
 
+    event("newView is " + newView.getClass().getSimpleName());
     if (fromView == null || direction == REPLACE || skipAnimation) {
       containerView.removeAllViews();
       containerView.addView(newView);
