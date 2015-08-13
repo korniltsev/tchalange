@@ -97,7 +97,12 @@ public class PhotoViewPresenter extends ViewPresenter<PhotoViewView> {
     }
 
     public void saveToGallery() {
-        galleryService.saveToGallery(path.photo)
-                .subscribe(new ObserverAdapter<File>());
+        if (path.photo != null){
+            galleryService.saveToGallery(path.photo)
+                    .subscribe(new ObserverAdapter<File>());
+        } else if (path.profilePhoto != null){
+            galleryService.saveToGallery(path.profilePhoto.big)
+                    .subscribe(new ObserverAdapter<File>());
+        }
     }
 }

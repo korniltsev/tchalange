@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.photoview;
 
+import android.support.annotation.Nullable;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
@@ -15,10 +16,10 @@ import static junit.framework.Assert.assertTrue;
 public class PhotoView extends BasePath implements Serializable {
 
     public static final int NO_MESSAGE = 0;
-    public final TdApi.Photo photo;
+    @Nullable public final TdApi.Photo photo;
     public final int messageId;
     public final long chatId;
-    public final TdApi.ProfilePhoto profilePhoto;
+    @Nullable public final TdApi.ProfilePhoto profilePhoto;
 
     public PhotoView(TdApi.Photo photo) {
         profilePhoto = null;

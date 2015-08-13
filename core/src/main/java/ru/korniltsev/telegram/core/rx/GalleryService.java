@@ -1,18 +1,15 @@
 package ru.korniltsev.telegram.core.rx;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
-import ru.korniltsev.telegram.core.utils.Preconditions;
 import rx.Observable;
-import rx.Subscriber;
 import rx.functions.Func1;
 
 import javax.inject.Inject;
@@ -22,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
-import static ru.korniltsev.telegram.core.utils.Preconditions.checkNotMainThread;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 import static rx.schedulers.Schedulers.io;
 
@@ -49,20 +45,20 @@ public class GalleryService {
         return counter;
     }
 
-    public Observable<File> saveToGallery(final TdApi.Photo photo) {
-        return saveToGallerySync(photo);
+    public Observable<File> saveToGallery(@NonNull final TdApi.Photo photo) {
+        TdApi.PhotoSize biggestSize = PhotoUtils.findBiggestSize(photo);
+        final TdApi.File photo1 = biggestSize.photo;
+        return impl(photo1);
     }
 
-    private Observable<File> saveToGallerySync(TdApi.Photo photo) {
-        TdApi.PhotoSize biggestSize = PhotoUtils.findBiggestSize(photo);
-        return downloader.download(biggestSize.photo)
+    @NonNull
+    private Observable<File> impl(TdApi.File photo1) {
+        return downloader.download(photo1)
                 .compose(RxDownloadManager.ONLY_RESULT)
                 .observeOn(io())
                 .flatMap(new Func1<TdApi.File, Observable<File>>() {
                     @Override
                     public Observable<File> call(TdApi.File fileLocal) {
-                        checkNotMainThread();
-
                         return Observable.just(
                                 copyFileToGallery(fileLocal));
                     }
@@ -98,5 +94,9 @@ public class GalleryService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Observable<File> saveToGallery(TdApi.File big) {
+        return impl(big);
     }
 }
