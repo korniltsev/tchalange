@@ -13,6 +13,10 @@ import android.widget.TextView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.audio.LinearLayoutWithShadow;
+import ru.korniltsev.telegram.core.audio.MiniPlayerView;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.recycler.CheckRecyclerViewSpan;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.ChatDB;
@@ -32,8 +36,8 @@ import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
 public class ChatListView extends DrawerLayout {
 
+    private final DpCalculator calc;
     @Inject ChatListPresenter presenter;
-    @Inject RXClient client;
     @Inject ChatDB chatDb;
     @Inject PhoneFormat phoneFormat;
     @Inject UserHolder userHolder;
@@ -50,11 +54,14 @@ public class ChatListView extends DrawerLayout {
     private View btnLogout;
     private View btnContacts;
     private View btnSettings;
-
+    private MiniPlayerView miniPlayer;
+    private LinearLayoutWithShadow toolbarShadow;
 
     public ChatListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
+        calc = MyApp.from(context).dpCalculator;
+
     }
 
     @Override
@@ -126,7 +133,10 @@ public class ChatListView extends DrawerLayout {
             }
         });
 
-
+        miniPlayer = ((MiniPlayerView) findViewById(R.id.mini_player));
+        toolbarShadow = ((LinearLayoutWithShadow) findViewById(R.id.toolbar_shadow));
+        toolbarShadow.setShadowOffset(calc.dp(56f));
+        miniPlayer.setShadow(toolbarShadow);
 
     }
 

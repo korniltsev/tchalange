@@ -66,7 +66,8 @@ public class AudioMessageView extends LinearLayout {
             @Override
             public void onFinished(TdApi.File fileLocal, boolean justDownloaded) {
                 songName.setText(audio.audio.title);
-                if (player.isPLaying()) {
+                final TdApi.Audio currentAudio = player.getCurrentAudio();
+                if (player.isPLaying() && currentAudio.audio.id == fileLocal.id) {
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, false);
                 }
             }
@@ -80,7 +81,7 @@ public class AudioMessageView extends LinearLayout {
                 } else if (player.isPaused()&& currentAudio.audio.id == fileLocal.id) {
                     player.resume();
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
-                } else{
+                } else {
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
                     player.play(audio.audio, fileLocal);
                 }

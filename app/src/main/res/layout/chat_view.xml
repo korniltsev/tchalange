@@ -31,10 +31,11 @@
                 android:text="@string/empty_chat"
                 android:layout_gravity="center"
                 />
-        <LinearLayout
+        <ru.korniltsev.telegram.core.audio.LinearLayoutWithShadow
+                android:id="@+id/toolbar_shadow"
                 android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:orientation="vertical">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
             <include
                     layout="@layout/view_mini_player"/>
             <android.support.v7.widget.RecyclerView
@@ -132,7 +133,7 @@
 
             </ru.korniltsev.telegram.chat.adapter.view.MessagePanel>
 
-        </LinearLayout>
+        </ru.korniltsev.telegram.core.audio.LinearLayoutWithShadow>
         <FrameLayout
                 android:id="@+id/bot_commands_list_container"
                 android:layout_width="match_parent"
@@ -218,13 +219,13 @@
                  android:layout_height="wrap_content"
                  android:layout_gravity="center_vertical"
                 />
-        <FrameLayout
-                android:id="@+id/toolbar_shadow"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                style="@style/ToolbarShadow">
+        <!--<FrameLayout-->
+                <!--android:id="@+id/toolbar_shadow"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--style="@style/ToolbarShadow">-->
 
-        </FrameLayout>
+        <!--</FrameLayout>-->
     </ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout>
 
     <!-- frame to create translate animations-->

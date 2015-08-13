@@ -13,11 +13,13 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -42,9 +44,10 @@ public class MiniPlayerView extends LinearLayout {
     private ImageButton btnPlay;
     private ImageButton btnStop;
     private TextView title;
-    @Nullable private View shadow;
+    @Nullable private LinearLayoutWithShadow shadow;
     private float progress;
     private Paint paint;
+    private int dp;
 
     public MiniPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,7 +56,6 @@ public class MiniPlayerView extends LinearLayout {
         calc = from.dpCalculator;
         setWillNotDraw(false);
         dp1point5 = calc.dp(1.5f);
-
     }
 
     @Override
@@ -85,24 +87,34 @@ public class MiniPlayerView extends LinearLayout {
 
         paint = new Paint();
         paint.setColor(0xFF66ACDF);
+        dp = calc.dp(16);
     }
 
     final Rect r = new Rect();
+
     @Override
     protected void onDraw(Canvas canvas) {
+
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
         int bottom = getBottom();
-        int top = bottom - dp1point5;
+        int top2 = getBottom() - getTop()-dp1point5;
+
+//        int top = getHeight()/2 + dp;
         int left = 0;
         int right = (int) (getWidth() * progress);
-        r.set(left, top, right, bottom);
+        r.set(left, top2, right, bottom);
         canvas.drawRect(r, paint);
+        Log.d("MiniPlayerView", "draw " + progress);
     }
 
     Subscription timerSubscription = Subscriptions.empty();
 
-
-
     public void setState(boolean playing, boolean paused, TdApi.Audio currentAudio) {
+        Log.d("MiniPlayerView", "progress");
         timerSubscription.unsubscribe();
         updateProgress();
         if (playing || paused) {
@@ -110,12 +122,14 @@ public class MiniPlayerView extends LinearLayout {
             title.setText(getTitle(currentAudio));
             if (playing) {
                 btnPlay.setImageResource(R.drawable.ic_pausepl);
+                Log.d("MiniPlayerView", "subscribe");
                 timerSubscription = timer(0, 1, TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new ObserverAdapter<Long>() {
                             @Override
                             public void onNext(Long response) {
                                 updateProgress();
+
                             }
                         });
             } else {
@@ -134,10 +148,15 @@ public class MiniPlayerView extends LinearLayout {
         if (current == null) {
             progress = 0f;
         } else {
-            final int currentPosition = current.getCurrentPosition();
-            final int duration = current.getDuration();
-            progress = (float) currentPosition / duration;
+            try {
+                final int currentPosition = current.getCurrentPosition();
+                final int duration = current.getDuration();
+                progress = (float) currentPosition / duration;
+            } catch (Exception e) {
+                CrashlyticsCore.getInstance().logException(e);
+            }
         }
+        Log.d("MiniPlayerView", "progress " + progress);
         invalidate();
     }
 
@@ -147,16 +166,16 @@ public class MiniPlayerView extends LinearLayout {
         final String title = currentAudio.title;
         final boolean performerEmpty = isEmpty(performer);
         final boolean titleEmpty = isEmpty(title);
-        if (performerEmpty && titleEmpty){
+        if (performerEmpty && titleEmpty) {
             if (isEmpty(currentAudio.fileName)) {
                 return "Unknown audio";
             } else {
                 return currentAudio.fileName;
             }
         } else {
-            if (performerEmpty){
+            if (performerEmpty) {
                 return title;
-            } else if (titleEmpty){
+            } else if (titleEmpty) {
                 return performer;
             } else {
                 final SpannableStringBuilder sb = new SpannableStringBuilder();
@@ -168,8 +187,6 @@ public class MiniPlayerView extends LinearLayout {
                 return sb;
             }
         }
-
-
     }
 
     @Override
@@ -186,30 +203,25 @@ public class MiniPlayerView extends LinearLayout {
                 });
     }
 
-
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         subscription.unsubscribe();
     }
 
-    public void setShadow(View toolbarShadow) {
+    public void setShadow(LinearLayoutWithShadow toolbarShadow) {
         this.shadow = toolbarShadow;
         updateShadowState(getVisibility() == View.VISIBLE);
-
     }
 
     private void updateShadowState(boolean playerVisible) {
-        if (shadow == null){
+        if (shadow == null) {
             return;
         }
-        final FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) shadow.getLayoutParams();
-        if (playerVisible){
-            lp.topMargin = calc.dp(35f);
+        if (playerVisible) {
+            shadow.setShadowPadding(calc.dp(35f));
         } else {
-            lp.topMargin = 0;
+            shadow.setShadowPadding(0);
         }
-        shadow.setLayoutParams(lp);
     }
 }
