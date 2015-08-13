@@ -30,16 +30,19 @@ abstract class BaseAvatarVH extends RealBaseVH {
     public BaseAvatarVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
         root = itemView;
-        itemView.avatarView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final ChatListItem item = adapter.getItem(getAdapterPosition());
-                if (item instanceof MessageItem){
-                    final TdApi.Message msg = ((MessageItem) item).msg;
-                    adapter.cb.avatarOfMessageClicked(msg);
+        if (adapter.isGroup){
+            itemView.avatarView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final ChatListItem item = adapter.getItem(getAdapterPosition());
+                    if (item instanceof MessageItem){
+                        final TdApi.Message msg = ((MessageItem) item).msg;
+                        adapter.cb.avatarOfMessageClicked(msg);
+                    }
                 }
-            }
-        });
+            });
+        }
+
 
     }
 

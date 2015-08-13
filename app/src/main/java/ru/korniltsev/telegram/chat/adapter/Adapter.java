@@ -43,6 +43,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     final RxGlide picasso;
     private final Chat chatPath;
+    public final boolean isGroup;
     private long lastReadOutbox;
 
     RxChat chat;
@@ -57,6 +58,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
         this.userHodler = userHodler;
         setHasStableIds(true);
         this.chatPath = chat;
+        isGroup = chat.chat.type instanceof TdApi.GroupChatInfo;
     }
 
     public void setLastReadOutbox(long lastReadOutbox) {
