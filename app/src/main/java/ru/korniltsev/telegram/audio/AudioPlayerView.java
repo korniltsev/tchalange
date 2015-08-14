@@ -17,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.squareup.picasso.Callback;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.Duration;
@@ -72,7 +73,7 @@ public class AudioPlayerView extends LinearLayout {
     private int radius;
     private int trackHeight;
     private ToolbarUtils toolbar;
-    private boolean hasCover;
+//    private boolean hasCover;
     private TextView durationText;
     private TextView positionText;
 
@@ -242,14 +243,26 @@ public class AudioPlayerView extends LinearLayout {
         presenter.dropView(this);
         timerSubscription.unsubscribe();
     }
-
+    boolean grayToolbar = true;
     public void bind(final TdApi.Audio currentAudio) {
         final TdApi.File thumb = currentAudio.albumCoverThumb.photo;
-        hasCover = thumb.id != TdApi.File.NO_FILE_ID;
+        final boolean hasCover = thumb.id != TdApi.File.NO_FILE_ID;
+        grayToolbar = true;
         if (hasCover) {
             if (!downloader.isDownloaded(currentAudio.audio)) {
                 glide.loadPhoto(thumb, false)
-                        .into(cover);
+                        .into(cover, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                grayToolbar = false;
+                                updateButtonsColors();
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
             }
         }
         updateButtonsColors();
@@ -293,15 +306,14 @@ public class AudioPlayerView extends LinearLayout {
         final int white = Color.WHITE;
         final int gray = 0xff818181;
         final int blue = 0xFF69ABDB;
-        if (hasCover) {
-            //white
-            setColor(white, backIcon);
-            setColor(white, playlistIcon);
-            updateShuffleRepeateButtons(white, blue);
-        } else {
+        if (grayToolbar) {
             setColor(gray, backIcon);
             setColor(gray, playlistIcon);
             updateShuffleRepeateButtons(gray, blue);
+        } else {
+            setColor(white, backIcon);
+            setColor(white, playlistIcon);
+            updateShuffleRepeateButtons(white, blue);
         }
     }
 
@@ -323,10 +335,22 @@ public class AudioPlayerView extends LinearLayout {
     }
 
     private void loadCover(TdApi.File fileLocal) {
+
         glide.getPicasso()
                 .load(new AlbumCoverRequestHandler.Uri(fileLocal))
                 .noPlaceholder()
                 .stableKey("mp3_cover:" + fileLocal.id)
-                .into(cover);
+                .into(cover, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        grayToolbar = false;
+                        updateButtonsColors();
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
     }
 }
