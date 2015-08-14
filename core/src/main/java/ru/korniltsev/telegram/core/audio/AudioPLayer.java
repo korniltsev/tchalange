@@ -162,6 +162,19 @@ public class AudioPLayer {
         return 0;
     }
 
+    public void seekTo(float seekTo) {
+        if (current == null){
+            return;
+        }
+        try {
+            final int duration = current.getDuration();
+            final int targetSeek = (int) (duration * seekTo);
+            current.seekTo(targetSeek);
+        } catch (Exception e) {
+            CrashlyticsCore.getInstance().logException(e);
+        }
+    }
+
     public static abstract class State {
         public final TdApi.Audio audio;
 

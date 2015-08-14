@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -56,6 +57,7 @@ public class AudioPlayerView extends LinearLayout {
     private final Drawable backIcon;
     private final Drawable repeatIcon;
     private final Drawable playlistIcon;
+    private final int motionHeight;
     @Inject AudioPlayerPresenter presenter;
     @Inject RxGlide glide;
     @Inject RxDownloadManager downloader;
@@ -76,6 +78,8 @@ public class AudioPlayerView extends LinearLayout {
 //    private boolean hasCover;
     private TextView durationText;
     private TextView positionText;
+    private boolean handleTouch;
+    private boolean skipNextTimerTick;
 
     public AudioPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -99,7 +103,7 @@ public class AudioPlayerView extends LinearLayout {
         backIcon = res.getDrawable(R.drawable.ic_back);
         playlistIcon = res.getDrawable(R.drawable.ic_playlist_white);
 
-
+        motionHeight = calc.dp(16f);
     }
 
     @Override
@@ -200,6 +204,9 @@ public class AudioPlayerView extends LinearLayout {
                 .subscribe(new ObserverAdapter<Long>() {
                     @Override
                     public void onNext(Long response) {
+                        if (skipNextTimerTick) {
+                            skipNextTimerTick = false;
+                        }
                         updateProgress();
                     }
                 });
@@ -207,11 +214,11 @@ public class AudioPlayerView extends LinearLayout {
         audioPLayer.currentState().subscribe(new ObserverAdapter<AudioPLayer.State>() {
             @Override
             public void onNext(AudioPLayer.State response) {
-                if (response instanceof AudioPLayer.StateStopped){
+                if (response instanceof AudioPLayer.StateStopped) {
                     play.setLevel(DownloadView.LEVEL_PLAY, true);
-                } else if (response instanceof AudioPLayer.StatePlaying){
+                } else if (response instanceof AudioPLayer.StatePlaying) {
                     play.setLevel(DownloadView.LEVEL_PAUSE, true);
-                } else if (response instanceof AudioPLayer.StatePaused){
+                } else if (response instanceof AudioPLayer.StatePaused) {
                     play.setLevel(DownloadView.LEVEL_PLAY, true);
                 }
             }
@@ -227,6 +234,9 @@ public class AudioPlayerView extends LinearLayout {
             .toFormatter();;
 
     private void updateProgress() {
+        if (handleTouch){
+            return;
+        }
         progress = audioPLayer.getProgress();
         final long duration = audioPLayer.getDuration();
         final long position = (int) (progress * duration);
@@ -352,5 +362,47 @@ public class AudioPlayerView extends LinearLayout {
 
                     }
                 });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        final int actionMasked = event.getActionMasked();
+        if (actionMasked == MotionEvent.ACTION_UP) {
+            handleTouch = false;
+            float seekTo = event.getX() / getWidth();
+            audioPLayer.seekTo(seekTo);
+            skipNextTimerTick = true;
+            invalidate();
+            return false;
+        }
+        if (actionMasked == MotionEvent.ACTION_CANCEL) {
+            handleTouch = false;
+            invalidate();
+            return false;
+        }
+
+        if (actionMasked == MotionEvent.ACTION_DOWN) {
+            handleTouch = false;
+            int top = square.getBaseline() - motionHeight;
+            int bottom = top + motionHeight * 2;
+            final float y = event.getY();
+            if (y > top || y < bottom) {
+                handleTouch = true;
+
+                setTouchProgress(event);
+                return true;
+            }
+        } else if (handleTouch && actionMasked == MotionEvent.ACTION_MOVE){
+            setTouchProgress(event);
+            return true;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private void setTouchProgress(MotionEvent event) {
+        final float x = event.getX();
+        final int width = getWidth();
+        progress = x / width;
+        invalidate();
     }
 }
