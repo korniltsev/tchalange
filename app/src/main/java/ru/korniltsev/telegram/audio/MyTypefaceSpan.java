@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.audio;
+package ru.korniltsev.telegram.audio;
 
 import android.graphics.Paint;
 import android.graphics.Typeface;

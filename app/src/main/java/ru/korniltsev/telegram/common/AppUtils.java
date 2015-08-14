@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static android.text.TextUtils.isEmpty;
+
 public class AppUtils {
     public static final int REQUEST_CHOOS_FROM_GALLERY = 1;
     public static final int REQUEST_TAKE_PHOTO = 2;
@@ -251,5 +253,13 @@ public class AppUtils {
 
     public static void logEvent(String event) {
         Answers.getInstance().logEvent(event);
+    }
+
+    public static String performerOf(TdApi.Audio currentAudio) {
+        if (isEmpty(currentAudio.performer)) {
+            return currentAudio.fileName;
+        } else {
+            return currentAudio.performer;
+        }
     }
 }

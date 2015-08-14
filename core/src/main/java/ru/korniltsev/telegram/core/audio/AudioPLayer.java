@@ -139,5 +139,8 @@ public class AudioPLayer {
         }
     }
 
-
+    @Nullable
+    public MediaPlayer getCurrent() {
+        return current;
+    }
 }

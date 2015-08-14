@@ -204,7 +204,7 @@ public class RxDownloadManager {
         }
     }
 
-    public TdApi.File getDownloadedFile(TdApi.File f){
+    @Nullable public TdApi.File getDownloadedFile(TdApi.File f){
         if (!f.isEmpty()){
             return f;
         } else {

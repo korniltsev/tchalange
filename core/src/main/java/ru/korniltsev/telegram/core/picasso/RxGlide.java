@@ -45,6 +45,7 @@ public class RxGlide {
         picasso = new Picasso.Builder(ctx)
                 .memoryCache(cache)
                 .addRequestHandler(new TDFileRequestHandler(downlaoder))
+                .addRequestHandler(new AlbumCoverRequestHandler())
 //                .addRequestHandler(new VideoThumbnailRequestHandler())
                 .build();
 

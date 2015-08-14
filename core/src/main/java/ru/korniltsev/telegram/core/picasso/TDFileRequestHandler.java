@@ -21,30 +21,10 @@ import static junit.framework.Assert.assertTrue;
 
 public class TDFileRequestHandler extends RequestHandler {
 
-    public static final String TD_FILE = "td.file";
-    public static final String FILE_PATH = "file_path";
-    public static final String WEBP = "webp";
-    public static final String ID = "id";
     private static final long TIMEOUT = 25000;
 
     public static TDFileUri load(TdApi.File f, boolean webp) {
         return new TDFileUri(f, webp);
-//        if (f.isLocal()) {
-//            return new Uri.Builder()
-//                    .scheme(TD_FILE)
-//                    .appendQueryParameter(FILE_PATH, f.path)
-//                    .appendQueryParameter(WEBP, String.valueOf(webp))
-//                    .build();
-//        } else {
-//
-////            Log.e("SomeCrazyTag", "create uri for id " + e.id, new Throwable());
-//            assertTrue(f.id != 0);
-//            return new Uri.Builder()
-//                    .scheme(TD_FILE)
-//                    .appendQueryParameter(ID, String.valueOf(f.id))
-//                    .appendQueryParameter(WEBP, String.valueOf(webp))
-//                    .build();
-//        }
     }
 
     final RxDownloadManager downloader;
@@ -89,23 +69,17 @@ public class TDFileRequestHandler extends RequestHandler {
 
     private String downloadAndGetPath(int id) throws IOException {
         try {
-//            Log.e("TdFileRequestHandler", "begin id: " + RXClient.coolTagForFileId(id));
             TdApi.File first = downloader.download(id)
                     .compose(RxDownloadManager.ONLY_RESULT)
                     .first()
                     .toBlocking()
                     .toFuture()
                     .get(TIMEOUT, TimeUnit.MILLISECONDS);
-            //            if (function instanceof TdApi.DownloadFile) {
-//            Log.e("TdFileRequestHandler", "     finish id: " + RXClient.coolTagForFileId(id));
-
-            //            }
             return first.path;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IOException(e);
         } catch (TimeoutException e) {
-//            Log.e("TdFileRequestHandler", "<-> timeout " + RXClient.coolTagForFileId(id), e);
             throw new IOException(e);
         }catch (Throwable e) {
             Log.e("EmptyFileDataFetcher", "err", e);

@@ -5,11 +5,13 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toolbar;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
+import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.DownloadView;
 import rx.Observer;
 import rx.Subscription;
@@ -17,6 +19,7 @@ import rx.subscriptions.Subscriptions;
 
 import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.common.AppUtils.kb;
+import static ru.korniltsev.telegram.common.AppUtils.performerOf;
 
 public class AudioMessageView extends LinearLayout {
     private final AudioPLayer player;
@@ -36,6 +39,7 @@ public class AudioMessageView extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
         downloadView = ((DownloadView) findViewById(R.id.download_view));
         songName = ((TextView) findViewById(R.id.song_name));
         songSinger = ((TextView) findViewById(R.id.song_singer));
@@ -49,12 +53,8 @@ public class AudioMessageView extends LinearLayout {
         subscription.unsubscribe();
         subscribe();
         songName.setText(audio.audio.title);
-        final String performer = audio.audio.performer;
-        if (isEmpty(performer)){
-            songSinger.setText(audio.audio.fileName);
-        } else {
-            songSinger.setText(performer);
-        }
+        songSinger.setText(performerOf(audio.audio));
+
 
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
         downloadView.bind(audio.audio.audio, cfg, new DownloadView.CallBack() {

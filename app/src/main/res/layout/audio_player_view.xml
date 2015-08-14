@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ru.korniltsev.telegram.audio.AudioPlayerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fff"
+        >
+
+    <ru.korniltsev.telegram.audio.SquareFrameLayout android:layout_width="match_parent"
+                                                    android:layout_height="wrap_content">
+        <ImageView
+                android:id="@+id/cover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+
+        <!-- toolbar -->
+        <android.support.v7.widget.Toolbar
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:theme="@style/ToolBarStyle"
+                app:popupTheme="@style/Theme.AppCompat.Light"
+                android:background="@null"
+                />
+
+
+        <ImageButton
+                android:id="@+id/btn_shuffle"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_keyboard_tab"
+                android:layout_gravity="bottom|left"
+                android:layout_margin="16dp"
+                />
+        <ImageButton
+                android:id="@+id/btn_loop"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_keyboard_tab"
+                android:layout_gravity="bottom|right"
+                android:layout_margin="16dp"
+                />
+
+    </ru.korniltsev.telegram.audio.SquareFrameLayout>
+
+    <View android:layout_width="match_parent"
+          android:layout_height="0dp"
+          android:layout_weight="1"/>
+
+    <ru.korniltsev.telegram.core.views.RobotoMediumTextView
+            android:id="@+id/performer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="#333333"
+            android:layout_marginBottom="6dp"/>
+    <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="#333333"/>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:gravity="center">
+        <ImageButton
+                android:id="@+id/btn_next"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_keyboard_tab"
+                android:src="@drawable/ic_skip_previous"
+
+                />
+        <ru.korniltsev.telegram.core.views.DownloadView
+                android:id="@+id/btn_play"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="35dp"
+                android:layout_marginRight="35dp"
+                />
+        <ImageButton
+                android:id="@+id/btn_prev"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_keyboard_tab"
+                android:src="@drawable/ic_skip_next"
+                />
+    </LinearLayout>
+</ru.korniltsev.telegram.audio.AudioPlayerView>

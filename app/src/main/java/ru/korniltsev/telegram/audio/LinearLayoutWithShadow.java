@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.audio;
+package ru.korniltsev.telegram.audio;
 
 import android.content.Context;
 import android.graphics.Canvas;

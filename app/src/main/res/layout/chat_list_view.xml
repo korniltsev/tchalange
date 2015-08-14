@@ -8,7 +8,7 @@
         style="@style/PathRoot"
         >
 
-    <ru.korniltsev.telegram.core.audio.LinearLayoutWithShadow
+    <ru.korniltsev.telegram.audio.LinearLayoutWithShadow
             android:id="@+id/toolbar_shadow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -34,7 +34,7 @@
 
                 />
 
-    </ru.korniltsev.telegram.core.audio.LinearLayoutWithShadow>
+    </ru.korniltsev.telegram.audio.LinearLayoutWithShadow>
 
     <LinearLayout
             android:layout_width="304dp"

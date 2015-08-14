@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.audio;
+package ru.korniltsev.telegram.audio;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,19 +10,18 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
-import android.text.style.TypefaceSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.crashlytics.android.core.CrashlyticsCore;
+import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.audio.AudioPLayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.views.RobotoMediumTextView;
 import ru.korniltsev.telegram.utils.R;
@@ -88,6 +87,14 @@ public class MiniPlayerView extends LinearLayout {
         paint = new Paint();
         paint.setColor(0xFF66ACDF);
         dp = calc.dp(16);
+
+        title.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Flow.get(getContext())
+                        .set(new AudioPlayerPath());
+            }
+        });
     }
 
     final Rect r = new Rect();
@@ -124,6 +131,7 @@ public class MiniPlayerView extends LinearLayout {
                 btnPlay.setImageResource(R.drawable.ic_pausepl);
                 Log.d("MiniPlayerView", "subscribe");
                 timerSubscription = timer(0, 1, TimeUnit.SECONDS)
+                        .onBackpressureDrop()
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new ObserverAdapter<Long>() {
                             @Override
@@ -144,7 +152,7 @@ public class MiniPlayerView extends LinearLayout {
 
     private void updateProgress() {
         this.progress = 0f;
-        final MediaPlayer current = audioPLayer.current;
+        final MediaPlayer current = audioPLayer.getCurrent();
         if (current == null) {
             progress = 0f;
         } else {
@@ -224,4 +232,6 @@ public class MiniPlayerView extends LinearLayout {
             shadow.setShadowPadding(0);
         }
     }
+
+
 }

@@ -86,6 +86,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         slideToCanel = findViewById(R.id.slide_to_cancel);
         dp48 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics());
         everySecond = Observable.timer(0, 1, TimeUnit.SECONDS)
+                .onBackpressureDrop()
                 .observeOn(AndroidSchedulers.mainThread());
 
         redDotAnimation = ObjectAnimator.ofFloat(redDot, ALPHA, 1f, 0.2f);
