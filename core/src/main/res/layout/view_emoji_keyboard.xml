@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.korniltsev.telegram.core.emoji.EmojiKeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
+<ru.korniltsev.telegram.emoji.EmojiKeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
                                                      android:orientation="vertical"
                                                      android:layout_width="match_parent"
                                                      android:layout_height="wrap_content"
                                                      android:background="@color/bg_keyboard"
         >
 
-    <ru.korniltsev.telegram.core.emoji.strip.EmojiPagerStripView
+    <ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="48dp"
@@ -18,4 +18,4 @@
             android:layout_height="match_parent"
             />
 
-</ru.korniltsev.telegram.core.emoji.EmojiKeyboardView>
+</ru.korniltsev.telegram.emoji.EmojiKeyboardView>

@@ -7,7 +7,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.core.emoji.Emoji;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import rx.subjects.PublishSubject;
 
 import javax.inject.Inject;
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Singleton
+
 public class EmojiParser {
     final Emoji emoji;
     //guarded by client thread
@@ -28,7 +28,7 @@ public class EmojiParser {
 
     private PublishSubject<BotCommand> clickedSpans = PublishSubject.create();
 
-    @Inject
+
     public EmojiParser(Emoji emoji) {
         this.emoji = emoji;
     }

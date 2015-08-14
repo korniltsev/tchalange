@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.chat_list;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -10,7 +11,8 @@ import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.emoji.Emoji;
+import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
@@ -45,10 +47,10 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     private RXAuthState.StateAuthorized me;
 
     @Inject
-    public ChatListPresenter(ChatList cl, RXClient client, Emoji emoji, RXAuthState authState, PasscodeManager passcodeManager, ChatDB chatDB) {
+    public ChatListPresenter(Context ctx, ChatList cl, RXClient client, RXAuthState authState, PasscodeManager passcodeManager, ChatDB chatDB) {
         this.cl = cl;
         this.client = client;
-        this.emoji = emoji;
+        this.emoji = MyApp.from(ctx).emoji;
         this.authState = authState;
         this.passcodeManager = passcodeManager;
         this.chatDB = chatDB;

@@ -17,6 +17,8 @@ import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
+import ru.korniltsev.telegram.emoji.EmojiKeyboardView;
+import ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView;
 
 import java.io.Serializable;
 
@@ -60,6 +62,8 @@ public class Chat extends BasePath implements Serializable, NamedPath {
                     ForwardedMessageView.class ,
                     CustomCeilLayout.class,
                     VoiceRecordingOverlay.class,
+                    EmojiKeyboardView.class,
+                    EmojiPagerStripView.class,
 
             },
             addsTo = RootModule.class)

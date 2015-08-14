@@ -1,17 +1,13 @@
 package ru.korniltsev.telegram.chat.adapter;
 
-import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
-import android.view.View;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.common.AppUtils;
-import ru.korniltsev.telegram.core.emoji.EmojiTextView;
+import ru.korniltsev.telegram.emoji.EmojiTextView;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;

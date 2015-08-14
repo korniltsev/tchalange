@@ -23,10 +23,11 @@ import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelControlle
 import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyBottomFrame;
 import ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.emoji.Emoji;
-import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
-import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
+import ru.korniltsev.telegram.emoji.EmojiKeyboardView;
+import ru.korniltsev.telegram.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
@@ -50,8 +51,8 @@ public class MessagePanel extends FrameLayout {
 
     @Inject Presenter presenter;
     @Inject ActivityOwner activityOwner;
-    @Inject Emoji emoji;
-    @Inject DpCalculator calc;
+    Emoji emoji;
+    DpCalculator calc;
 
     private EmojiKeyboardView.CallBack emojiKeyboardCallback = new EmojiKeyboardView.CallBack() {
         @Override
@@ -94,6 +95,9 @@ public class MessagePanel extends FrameLayout {
         ObjectGraphService.inject(context, this);
         setWillNotDraw(false);
 
+        final MyApp app = MyApp.from(context);
+        emoji = app.emoji;
+        calc = app.dpCalculator;
         dip1 = calc.dp(1);
     }
 

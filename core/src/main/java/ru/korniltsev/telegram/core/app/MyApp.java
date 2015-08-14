@@ -19,10 +19,14 @@ import net.danlew.android.joda.JodaTimeAndroid;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 
 import java.lang.reflect.Constructor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +44,9 @@ public class MyApp extends Application {
     public DpCalculator dpCalculator;
     public RxGlide rxGlide;
     public AudioPLayer audioPLayer;
+    private ExecutorService emojiExecutorService;
+    public Emoji emoji;
+    public EmojiParser emojiParser;
 
     @Override
     public void onCreate() {
@@ -62,7 +69,10 @@ public class MyApp extends Application {
         dpCalculator = new DpCalculator(density);
         audioPLayer = new AudioPLayer(this);
         staticLayoutCache = new StaticLayoutCache();
-
+        final AndroidBackgroundPriorityThreadFactory factory = new AndroidBackgroundPriorityThreadFactory("Emoji/AudioPlayer singleton executor");
+        emojiExecutorService = Executors.newSingleThreadExecutor(factory);
+        emoji = new Emoji(this, dpCalculator, emojiExecutorService);
+        emojiParser = new EmojiParser(emoji);
 
         ObjectGraph graph = ObjectGraph.create(
                 new RootModule(this,  dpCalculator));

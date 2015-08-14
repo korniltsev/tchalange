@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.emoji.strip;
+package ru.korniltsev.telegram.emoji.strip;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -19,7 +19,7 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.emoji.StickerAdapter;
+import ru.korniltsev.telegram.emoji.StickerAdapter;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.utils.R;
 

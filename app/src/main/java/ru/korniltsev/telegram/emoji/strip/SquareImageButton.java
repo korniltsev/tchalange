@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.emoji.strip;
+package ru.korniltsev.telegram.emoji.strip;
 
 import android.content.Context;
 import android.widget.ImageButton;

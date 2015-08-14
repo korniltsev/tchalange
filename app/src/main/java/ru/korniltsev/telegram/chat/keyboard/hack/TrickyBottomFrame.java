@@ -4,10 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
-import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
+import ru.korniltsev.telegram.emoji.ObservableLinearLayout;
 
 public class TrickyBottomFrame extends FrameLayout {
 

@@ -13,9 +13,9 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.emoji.Emoji;
-import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
-import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
+import ru.korniltsev.telegram.emoji.EmojiKeyboardView;
+import ru.korniltsev.telegram.emoji.ObservableLinearLayout;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;

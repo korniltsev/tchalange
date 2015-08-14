@@ -6,7 +6,7 @@
  * Copyright Nikolai Kudashov, 2013.
  */
 
-package ru.korniltsev.telegram.core.emoji;
+package ru.korniltsev.telegram.emoji;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,11 +20,10 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 
-import javax.inject.Inject;
 import java.lang.reflect.Field;
 
 public class ObservableLinearLayout extends FrameLayout {

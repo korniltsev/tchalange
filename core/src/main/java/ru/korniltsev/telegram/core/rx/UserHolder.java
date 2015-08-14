@@ -14,6 +14,7 @@ public class UserHolder {
     final RXClient client;
     final ConcurrentHashMap<Integer, User> users = new ConcurrentHashMap<>();
     final Context ctx;
+
     @Inject
     public UserHolder(RXClient client, RXAuthState auth, Context ctx) {
         this.client = client;

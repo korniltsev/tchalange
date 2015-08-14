@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.emoji;
+package ru.korniltsev.telegram.emoji;
 
 import android.view.View;
 import android.view.ViewGroup;

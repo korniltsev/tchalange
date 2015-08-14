@@ -75,16 +75,15 @@ public class Presenter extends ViewPresenter<ChatView>
     }
 
     private final ActivityOwner owner;
-    private final Stickers stickers;
+
     final UserHolder uerHolder;
 
     @Inject
-    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, Stickers stickers, UserHolder uerHolder) {
+    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, UserHolder uerHolder) {
         path = c;
         this.client = client;
         this.nm = nm;
         this.owner = owner;
-        this.stickers = stickers;
         this.uerHolder = uerHolder;
         this.chat = path.chat;
         rxChat = chatDB.getRxChat(chat.id);

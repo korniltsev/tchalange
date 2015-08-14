@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.core.emoji;
+package ru.korniltsev.telegram.emoji;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,9 +17,11 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.app.MyApp;
-import ru.korniltsev.telegram.core.emoji.strip.EmojiPagerStripView;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.emoji.Stickers;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
+import ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
-import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.utils.R;
 
 import javax.inject.Inject;
@@ -37,9 +39,9 @@ public class EmojiKeyboardView extends LinearLayout {
     public final RecentSmiles recentStickers;
     private final SharedPreferences prefs;
     private ViewPager pager;
-    @Inject Emoji emoji;
-    @Inject Stickers stickers;
+    Emoji emoji;
     DpCalculator calc;
+    @Inject Stickers stickers;
     @Inject RxGlide picasso;
 
     public final LayoutInflater viewFactory;
@@ -55,6 +57,7 @@ public class EmojiKeyboardView extends LinearLayout {
         final MyApp from = MyApp.from(context);
         calc = from.dpCalculator;
         displayWidth = from.displayWidth;
+        emoji = from.emoji;
     }
 
     @Override

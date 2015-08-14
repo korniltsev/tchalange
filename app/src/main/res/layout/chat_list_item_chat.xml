@@ -74,7 +74,7 @@
             android:paddingRight="14dp"
             >
 
-        <ru.korniltsev.telegram.core.emoji.EmojiTextView
+        <ru.korniltsev.telegram.emoji.EmojiTextView
                 android:id="@+id/message"
                 android:layout_width="0dp"
                 android:layout_weight="1"

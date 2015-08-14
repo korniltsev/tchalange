@@ -21,11 +21,8 @@ import dagger.Provides;
 import phoneformat.PhoneFormat;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.emoji.Emoji;
-import ru.korniltsev.telegram.core.emoji.EmojiKeyboardView;
-import ru.korniltsev.telegram.core.emoji.EmojiTextView;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.emoji.Stickers;
-import ru.korniltsev.telegram.core.emoji.strip.EmojiPagerStripView;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.BootReceiver;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
@@ -53,22 +50,12 @@ import java.util.concurrent.Executors;
                 VoicePlayer.class,
                 DpCalculator.class,
                 ChatDB.class,
-                EmojiParser.class,
                 ActivityOwner.class,
                 Stickers.class,
-//                ContactsHelper.class,
-
-
-                EmojiKeyboardView.class,
-                EmojiPagerStripView.class,
-
                 DownloadView.class,
-                EmojiTextView.class,
                 BootReceiver.class  ,
                 PasscodeManager.class,
-//                ObservableLinearLayout.class,
                 UserHolder.class ,
-
         },
         library = true)
 public class RootModule {
@@ -79,6 +66,8 @@ public class RootModule {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;
     }
+
+
 
     @Singleton
     @Provides
@@ -101,12 +90,7 @@ public class RootModule {
         return dpCalculator;
     }
 
-    @Singleton
-    @Provides
-    ExecutorService provideExecutor() {
-        final AndroidBackgroundPriorityThreadFactory factory = new AndroidBackgroundPriorityThreadFactory("Emoji/AudioPlayer singleton executor");
-        return Executors.newSingleThreadExecutor(factory);
-    }
+
 
     @Provides @Singleton ActivityOwner provideActivityOwner() {
         return new ActivityOwner();

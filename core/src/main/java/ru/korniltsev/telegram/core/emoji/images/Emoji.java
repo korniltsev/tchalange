@@ -6,7 +6,7 @@
  * Copyright Nikolai Kudashov, 2013.
  */
 
-package ru.korniltsev.telegram.core.emoji;
+package ru.korniltsev.telegram.core.emoji.images;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,6 +24,7 @@ import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
@@ -47,7 +48,6 @@ import java.util.concurrent.Executors;
 //import org.telegram.messenger.Utilities;
 //import org.telegram.messenger.ApplicationLoader;
 
-@Singleton
 public class Emoji {
     private final HashMap<Long, DrawableInfo> rects = new HashMap<>();
     private final DpCalculator dpCalculator;
@@ -215,7 +215,7 @@ public class Emoji {
         return pageLoaded;
     }
     final ExecutorService service;
-    @Inject
+
     public Emoji(Context ctx, DpCalculator dpCalculator, ExecutorService service) {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;

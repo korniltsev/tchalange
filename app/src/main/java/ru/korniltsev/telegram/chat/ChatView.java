@@ -31,8 +31,9 @@ import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
 import ru.korniltsev.telegram.audio.LinearLayoutWithShadow;
 import ru.korniltsev.telegram.audio.MiniPlayerView;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.emoji.ObservableLinearLayout;
+import ru.korniltsev.telegram.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.adapter.Adapter;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
@@ -69,10 +70,13 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     public static final DecelerateInterpolator INTERPOLATOR = new DecelerateInterpolator(1.5f);
     @Inject Presenter presenter;
     @Inject RxGlide picasso;
-    @Inject DpCalculator calc;
     @Inject ActivityOwner activity;
-    @Inject EmojiParser emojiParser;
+
+
     @Inject UserHolder userHodler;
+
+    DpCalculator calc;
+    EmojiParser emojiParser;
 
     private RecyclerView list;
     private MessagePanel messagePanel;
@@ -120,6 +124,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     public ChatView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
+
+        final MyApp from = MyApp.from(context);
+        calc = from.dpCalculator;
+        emojiParser = from.emojiParser;
     }
 
     @Override
