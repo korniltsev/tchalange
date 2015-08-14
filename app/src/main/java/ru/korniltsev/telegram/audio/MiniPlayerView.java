@@ -151,20 +151,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void updateProgress() {
-        this.progress = 0f;
-        final MediaPlayer current = audioPLayer.getCurrent();
-        if (current == null) {
-            progress = 0f;
-        } else {
-            try {
-                final int currentPosition = current.getCurrentPosition();
-                final int duration = current.getDuration();
-                progress = (float) currentPosition / duration;
-            } catch (Exception e) {
-                CrashlyticsCore.getInstance().logException(e);
-            }
-        }
-        Log.d("MiniPlayerView", "progress " + progress);
+        progress = audioPLayer.getProgress();
         invalidate();
     }
 

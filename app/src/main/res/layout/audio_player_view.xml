@@ -7,8 +7,10 @@
         android:background="#fff"
         >
 
-    <ru.korniltsev.telegram.audio.SquareFrameLayout android:layout_width="match_parent"
-                                                    android:layout_height="wrap_content">
+    <ru.korniltsev.telegram.audio.SquareFrameLayout
+            android:id="@+id/square"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
         <ImageView
                 android:id="@+id/cover"
                 android:layout_width="match_parent"
@@ -26,7 +28,6 @@
                 app:popupTheme="@style/Theme.AppCompat.Light"
                 android:background="@null"
                 />
-
 
         <ImageButton
                 android:id="@+id/btn_shuffle"
@@ -47,6 +48,27 @@
 
     </ru.korniltsev.telegram.audio.SquareFrameLayout>
 
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="28dp"
+                  android:orientation="horizontal"
+                  android:paddingLeft="16dp"
+                  android:paddingRight="16dp"
+            >
+        <TextView
+                android:id="@+id/duration"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textColor="#599BCC"
+                android:layout_height="match_parent"
+                android:gravity="left|bottom"/>
+        <TextView
+                android:id="@+id/position"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:textColor="#B3B3B3"
+                android:gravity="right|bottom"/>
+    </LinearLayout>
     <View android:layout_width="match_parent"
           android:layout_height="0dp"
           android:layout_weight="1"/>

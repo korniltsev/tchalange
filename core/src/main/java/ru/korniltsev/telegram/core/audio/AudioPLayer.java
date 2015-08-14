@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.core.audio;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -9,14 +10,18 @@ import rx.Observable;
 import rx.subjects.PublishSubject;
 
 public class AudioPLayer {
+    public static final String PREF_LOOP = "pref_loop";
+    public static final String PREF_SHUFFLE = "pref_shuffle";
     final Context ctx;
     private final PublishSubject<State> currentState = PublishSubject.create();
+    private final SharedPreferences prefs;
     private TdApi.File currentFile;
     private TdApi.Audio currentAudio;
     private boolean paused;
 
     public AudioPLayer(Context ctx) {
         this.ctx = ctx;
+        prefs = ctx.getSharedPreferences("AudioPlayerPrefernces", Context.MODE_PRIVATE);
     }
 
     @Nullable MediaPlayer current = null;
@@ -111,6 +116,50 @@ public class AudioPLayer {
 
     public TdApi.Audio getCurrentAudio() {
         return currentAudio;
+    }
+
+    public float getProgress() {
+        if (current == null) {
+            return 0f;
+        } else {
+            try {
+                final int currentPosition = current.getCurrentPosition();
+                final int duration = current.getDuration();
+                return  (float) currentPosition / duration;
+            } catch (Exception e) {
+                CrashlyticsCore.getInstance().logException(e);
+                return 0f;
+            }
+        }
+    }
+
+    public boolean isLoopEnabled() {
+        return prefs.getBoolean(PREF_LOOP, false);
+    }
+
+    public boolean isShuffleEnabled() {
+        return prefs.getBoolean(PREF_SHUFFLE, false);
+    }
+
+    public void toggleLoop() {
+        final boolean loopEnabled = isLoopEnabled();
+        prefs.edit().putBoolean(PREF_LOOP, !loopEnabled).commit();
+    }
+
+    public void toggleShuffle() {
+        final boolean shuffleEnabled = isShuffleEnabled();
+        prefs.edit().putBoolean(PREF_SHUFFLE, !shuffleEnabled).commit();
+    }
+
+    public int getDuration() {
+        if (current != null){
+            try {
+                return current.getDuration();
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+        return 0;
     }
 
     public static abstract class State {

@@ -104,6 +104,7 @@ public class AudioMessageView extends LinearLayout {
                 }
 
                 if (response instanceof AudioPLayer.StateStopped){
+                    //todo looks like it is going to try animate twice if clicked
                     downloadView.setLevel(DownloadView.LEVEL_PLAY, true);
                 } else if (response instanceof AudioPLayer.StatePlaying){
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
