@@ -2,16 +2,16 @@ package ru.korniltsev.telegram.core.rx;
 
 import android.graphics.BitmapFactory;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
+import android.util.Patterns;
 import android.view.View;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import rx.subjects.PublishSubject;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -26,7 +26,7 @@ public class EmojiParser {
     //    https://github.com/regexps/mentions-regex/blob/master/index.js
     private final Pattern userReference = Pattern.compile("(?:^|[^a-zA-Z0-9_＠!@#$%&*])(?:(?:@|＠)(?!/))([a-zA-Z0-9/_]{1,15})(?:\\b(?!@|＠)|$)");
 
-    private PublishSubject<BotCommand> clickedSpans = PublishSubject.create();
+    private PublishSubject<ReferenceSpan> clickedSpans = PublishSubject.create();
 
 
     public EmojiParser(Emoji emoji) {
@@ -42,7 +42,6 @@ public class EmojiParser {
     }
     // parses commands of type "/foo_bar"
     private Pattern botCommandsParser = Pattern.compile("(?m)(\\s|^)(/[a-zA-Z@\\d_]{1,255})");
-
     private void pareImageSizes(TdApi.MessagePhoto message) {
         //todo rename the class
         for (TdApi.PhotoSize photo : message.photo.photos) {
@@ -73,6 +72,7 @@ public class EmojiParser {
             CharSequence parsed = emoji.replaceEmoji(key);
             Matcher matcher = userReference.matcher(key);
             final Matcher botCommandsMatcher = botCommandsParser.matcher(key);
+            final Matcher urlMatcher = Patterns.WEB_URL.matcher(key);
             Spannable s;
             if (parsed instanceof Spannable) {
                 s = (Spannable) parsed;
@@ -81,13 +81,21 @@ public class EmojiParser {
             }
 
             while (matcher.find()) {
-                s.setSpan(new ForegroundColorSpan(0xff427ab0), matcher.start(), matcher.end(), 0);
+                s.setSpan(new ReferenceSpan(matcher.group(), userId, TYPE_USER_NAME), matcher.start(), matcher.end(), 0);
             }
 
             while (botCommandsMatcher.find()) {
                 final int start = botCommandsMatcher.start(2);
                 final int end = botCommandsMatcher.end(2);
-                s.setSpan(new MyClickableSpan(userId, key, start, end), start, end, 0);
+                s.setSpan(new ReferenceSpan(botCommandsMatcher.group(), userId, TYPE_BOT_COMMAND),
+                        start, end, 0);
+            }
+
+            while (urlMatcher.find()){
+                final String url = urlMatcher.group();
+                s.setSpan(new ReferenceSpan(url, userId, TYPE_URL),
+                        urlMatcher.start(), urlMatcher.end(), 0);
+
             }
 
             cache.put(key, s);
@@ -95,43 +103,44 @@ public class EmojiParser {
         }
     }
 
-    public PublishSubject<BotCommand> getClickedSpans() {
+    public PublishSubject<ReferenceSpan> getClickedSpans() {
         return clickedSpans;
     }
 
-    private class MyClickableSpan extends ClickableSpan {
-        final int userId;
-        private final String key;
-        private final int start;
-        private final int end;
-
-        public MyClickableSpan(int userId, String key, int start, int end) {
-            this.userId = userId;
-            this.key = key;
-            this.start = start;
-            this.end = end;
-        }
-
-        @Override
-        public void onClick(View widget) {
-            final String cmd = key.substring(start, end);
-            clickedSpans.onNext( new BotCommand(cmd, userId));
-        }
-
-        @Override
-        public void updateDrawState(TextPaint ds) {
-            super.updateDrawState(ds);
-            ds.setUnderlineText(false);
-        }
-    }
-
-    public static class BotCommand {
-        public final String cmd;
+    public static final int TYPE_USER_NAME = 0;
+    public static final int TYPE_BOT_COMMAND= 1;
+    public static final int TYPE_URL = 2;
+    public class ReferenceSpan extends ForegroundColorSpan {
+        public final String reference;
         public final int userId;
+        public final int type;
 
-        BotCommand(String cmd, int userId) {
-            this.cmd = cmd;
+        public ReferenceSpan(String reference, int userId, int type) {
+            super(0xff427ab0);
+            this.reference = reference;
             this.userId = userId;
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return "ReferenceSpan{" +
+                    "reference='" + reference + '\'' +
+                    ", userId=" + userId +
+                    ", type=" + type +
+                    '}';
         }
     }
+
+
+
+//    public static class BotCommand {
+//        public final String cmd;
+//        public final int userId;
+//
+//        BotCommand(String cmd, int userId) {
+//            this.cmd = cmd;
+//            this.userId = userId;
+//        }
+//    }
 }

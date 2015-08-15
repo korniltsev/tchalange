@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -77,14 +79,16 @@ public class Presenter extends ViewPresenter<ChatView>
     private final ActivityOwner owner;
 
     final UserHolder uerHolder;
+    final ActivityOwner activity;
 
     @Inject
-    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, UserHolder uerHolder) {
+    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, UserHolder uerHolder, ActivityOwner activity) {
         path = c;
         this.client = client;
         this.nm = nm;
         this.owner = owner;
         this.uerHolder = uerHolder;
+        this.activity = activity;
         this.chat = path.chat;
         rxChat = chatDB.getRxChat(chat.id);
 
@@ -659,19 +663,47 @@ public class Presenter extends ViewPresenter<ChatView>
         }
     }
 
-    public void textSpanCLicked(EmojiParser.BotCommand cmd) {
-        if (isGroupChat) {
-            if (path.me.id == cmd.userId) {
-                sendText(cmd.cmd);
-            } else {
-                final TdApi.User user = uerHolder.getUser(cmd.userId);
-                if (user == null) {
-                    return;
+    public void textSpanCLicked(EmojiParser.ReferenceSpan cmd) {
+        final String ref = cmd.reference;
+        if (cmd.type == EmojiParser.TYPE_BOT_COMMAND){
+            if (isGroupChat) {
+                if (path.me.id == cmd.userId) {
+                    sendText(ref);
+                } else {
+                    final TdApi.User user = uerHolder.getUser(cmd.userId);
+                    if (user == null) {
+                        return;
+                    }
+                    sendText(ref + "@" + user.username);
                 }
-                sendText(cmd.cmd + "@" + user.username);
+            } else {
+                sendText(ref);
             }
+        } else if (cmd.type == EmojiParser.TYPE_URL) {
+            String url = ref;
+            openBrowser(url);
         } else {
-            sendText(cmd.cmd);
+            //todo open dialog with user
+        }
+
+    }
+
+    private void openBrowser(String url) {
+        try {
+            final Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            activity.expose().startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            try {
+                final Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("http://" + url));
+                activity.expose().startActivity(intent);
+            } catch (ActivityNotFoundException e1) {
+                Toast.makeText(getView().getContext(),
+                        "Faild to open the link. There is no browser on the phone. ;( ", Toast.LENGTH_LONG)
+                        .show();
+            }
+
         }
     }
 

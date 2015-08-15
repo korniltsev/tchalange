@@ -276,9 +276,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         super.onAttachedToWindow();
         presenter.takeView(this);
         clickedSpansSubscription = emojiParser.getClickedSpans()
-                .subscribe(new ObserverAdapter<EmojiParser.BotCommand>() {
+                .subscribe(new ObserverAdapter<EmojiParser.ReferenceSpan>(){
                     @Override
-                    public void onNext(EmojiParser.BotCommand response) {
+                    public void onNext(EmojiParser.ReferenceSpan response) {
                         presenter.textSpanCLicked(response);
                     }
                 });
