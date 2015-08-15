@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.photoview;
 
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -64,5 +65,10 @@ public class PhotoView extends BasePath implements Serializable {
         public PhotoView providePath() {
             return path;
         }
+    }
+
+    @Override
+    public int getBackgroundColor() {
+        return Color.BLACK;
     }
 }

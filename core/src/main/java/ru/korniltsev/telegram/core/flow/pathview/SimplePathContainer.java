@@ -126,9 +126,7 @@ public class SimplePathContainer extends PathContainer {
     }
   }
 
-  protected int getLayout(Path path) {
-    return ((BasePath) path).getRootLayout();
-  }
+
 
   private void runAnimation(final ViewGroup container, final View from, final View to,
       Flow.Direction direction, final Flow.TraversalCallback callback) {

@@ -33,7 +33,7 @@ public class ChatListViewFactory {
         final DpCalculator calc = from.dpCalculator;
         final ChatListView clv = new ChatListView(ctx, null);
         clv.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-        clv.setBackgroundColor(Color.WHITE);
+//        clv.setBackgroundColor(Color.WHITE);
 
         LinearLayout listRoot = createListRoot(ctx, calc);
         clv.addView(listRoot);
