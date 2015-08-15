@@ -152,7 +152,6 @@ public class PasscodeView extends FrameLayout implements HandlesBack , NoAnimati
 
     @Override
     public boolean shouldSkipAnimation() {
-        return presenter.path.type == PasscodePath.TYPE_LOCK
-                || presenter.path.type == PasscodePath.TYPE_LOCK_TO_CHANGE;
+        return presenter.path.type == PasscodePath.TYPE_LOCK;
     }
 }

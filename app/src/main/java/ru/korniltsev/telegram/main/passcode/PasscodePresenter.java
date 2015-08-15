@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import flow.Flow;
 import mortar.ViewPresenter;
+import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -46,8 +48,14 @@ public class PasscodePresenter extends ViewPresenter<PasscodeView> {
             if (path.type == PasscodePath.TYPE_LOCK){
                 flow.goBack();
             } else {
-                flow.goBack();
-                flow.set(new EditPasscode());
+                AppUtils.flowPushAndRemove(getView(), new EditPasscode(), new FlowHistoryStripper() {
+                    @Override
+                    public boolean shouldRemovePath(Object path) {
+                        return path instanceof PasscodePath;
+                    }
+                }, Flow.Direction.FORWARD);
+//                flow.goBack();
+//                flow.set(new EditPasscode());
             }
 
             return true;
