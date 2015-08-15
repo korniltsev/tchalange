@@ -383,10 +383,10 @@ public class AudioPlayerView extends LinearLayout {
 
         if (actionMasked == MotionEvent.ACTION_DOWN) {
             handleTouch = false;
-            int top = square.getBaseline() - motionHeight;
+            int top = square.getBottom() - motionHeight;
             int bottom = top + motionHeight * 2;
             final float y = event.getY();
-            if (y > top || y < bottom) {
+            if (y > top &&  y < bottom) {
                 handleTouch = true;
 
                 setTouchProgress(event);
