@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -35,6 +36,8 @@ public class ToolbarUtils {
     public static ToolbarUtils initToolbar(final View root) {
         Context ctx2 = root.getContext();
         Toolbar toolbar = (Toolbar) root.findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setSubtitleTextColor(Color.WHITE);
         return new ToolbarUtils(ctx2, toolbar);
     }
 
