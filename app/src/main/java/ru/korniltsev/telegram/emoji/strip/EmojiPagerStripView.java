@@ -121,13 +121,13 @@ public class EmojiPagerStripView extends ViewGroup {
         stickers.layout(l + w, t, r + w, b);
     }
 
-    public void init(final ViewPager pager, final Runnable onBackspaceClicked, List<TdApi.StickerSet> stickers) {
+    public void init(final ViewPager pager, final Runnable onBackspaceClicked, List<TdApi.StickerSet> stickers, Runnable openStickers) {
         pager.addOnPageChangeListener(new MyAnimator());
         initEmoji(pager, onBackspaceClicked);
-        initStickers(pager, stickers);
+        initStickers(pager, stickers, openStickers);
     }
 
-    private void initStickers(final ViewPager pager, List<TdApi.StickerSet> data) {
+    private void initStickers(final ViewPager pager, List<TdApi.StickerSet> data, final Runnable openStickers) {
         final Context ctx = getContext();
         stickerSetsButtonContainer = new LinearLayout(ctx);
         final int dp7 = calc.dp(7);
@@ -138,7 +138,8 @@ public class EmojiPagerStripView extends ViewGroup {
         smilesButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                pager.setCurrentItem(0, true);
+                openStickers.run();
+//                pager.setCurrentItem(0, true);
             }
         });
 

@@ -46,6 +46,7 @@ public class EmojiKeyboardView extends LinearLayout {
 
     public final LayoutInflater viewFactory;
     private EmojiPagerStripView tabs;
+    private Adapter adapter;
 
     public EmojiKeyboardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -71,13 +72,22 @@ public class EmojiKeyboardView extends LinearLayout {
             public void run() {
                 callback.backspaceClicked();
             }
-        }, stickers.getStickers());
-        Adapter adapter = new Adapter(getContext());
+        }, stickers.getStickers(), new Runnable() {
+            @Override
+            public void run() {
+                if (adapter.recentEmojiIds.isEmpty()){
+                    pager.setCurrentItem(1, true);
+                } else {
+                    pager.setCurrentItem(0, true);
+                }
+            }
+        });
+        adapter = new Adapter(getContext());
         pager.setAdapter(adapter);
 
         if (LAST_CLICK_STICKER.equals(prefs.getString(PREF_LAST_CLICK, LAST_CLICK_EMOJI))) {
             pager.setCurrentItem(6, false);
-        } else if (adapter.ids.size() == 0) {
+        } else if (adapter.recentEmojiIds.size() == 0) {
             pager.setCurrentItem(1);
         }
     }
@@ -104,18 +114,18 @@ public class EmojiKeyboardView extends LinearLayout {
     class Adapter extends PagerAdapter {
 
         private final LayoutInflater viewFactory;
-        private final ArrayList<Long> ids;
+        private final ArrayList<Long> recentEmojiIds;
         private Context context;
 
         public Adapter(Context context) {
             this.context = context;
             final List<RecentSmiles.Entry> recent = recentEmoji.getRecent();
 
-            ids = new ArrayList<>();
+            recentEmojiIds = new ArrayList<>();
             for (int i = 0, recentSize = recent.size(); i < recentSize; i++) {
                 RecentSmiles.Entry entry = recent.get(i);
                 try {
-                    ids.add(
+                    recentEmojiIds.add(
                             Long.parseLong(entry.code));
                 } catch (NumberFormatException e) {
                     CrashlyticsCore.getInstance()
@@ -135,9 +145,9 @@ public class EmojiKeyboardView extends LinearLayout {
         @Override
         public View instantiateItem(ViewGroup container, int position) {
             if (position == 0) {
-                final long[] longs = new long[ids.size()];
-                for (int i = 0, idsSize = ids.size(); i < idsSize; i++) {
-                    Long id = ids.get(i);
+                final long[] longs = new long[recentEmojiIds.size()];
+                for (int i = 0, idsSize = recentEmojiIds.size(); i < idsSize; i++) {
+                    Long id = recentEmojiIds.get(i);
                     longs[i] = id;
                 }
 
