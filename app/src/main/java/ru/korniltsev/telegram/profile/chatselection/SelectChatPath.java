@@ -3,7 +3,7 @@ package ru.korniltsev.telegram.profile.chatselection;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout;
+//import ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
@@ -32,7 +32,7 @@ public class SelectChatPath extends BasePath implements Serializable{
             addsTo = RootModule.class,
             injects = {
                     SelectChatView.class,
-                    DividerRelativeLayout.class,
+//                    DividerRelativeLayout.class,
             }
     )
     public static final class Module {

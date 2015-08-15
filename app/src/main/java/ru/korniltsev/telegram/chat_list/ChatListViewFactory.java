@@ -162,7 +162,7 @@ public class ChatListViewFactory {
 
         final MyPhoneView drawerName = new MyPhoneView(ctx,  calc.dp(16f), true);
         drawerName.setId(R.id.drawer_name);
-        final LinearLayout.LayoutParams drawerNameLP = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+        final LinearLayout.LayoutParams drawerNameLP = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         drawerNameLP.leftMargin = dip18;
         drawerNameLP.rightMargin = dip18;
         drawerNameLP.topMargin = dip16;
@@ -171,7 +171,7 @@ public class ChatListViewFactory {
 
         final MyPhoneView myPhoneView = new MyPhoneView(ctx,  calc.dp(14f), false);
         myPhoneView.setId(R.id.drawer_phone);
-        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+        final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.leftMargin = dip18;
         myPhoneView.setLayoutParams(params);
         blueHeader.addView(myPhoneView);

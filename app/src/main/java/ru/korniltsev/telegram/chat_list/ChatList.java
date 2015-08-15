@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.FrameLayout;
 import dagger.Provides;
-import ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout;
+//import ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
@@ -26,7 +26,7 @@ public class ChatList extends BasePath implements Serializable {
 
     @dagger.Module(injects = {
             ChatListView.class,
-            DividerRelativeLayout.class,
+//            DividerRelativeLayout.class,
     }, addsTo = RootModule.class)
     public static class Module {
         final ChatList path;

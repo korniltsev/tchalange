@@ -56,7 +56,7 @@ public class SimplePathContainer extends PathContainer {
   @Override protected void performTraversal(final ViewGroup containerView,
       final TraversalState traversalState, final Flow.Direction direction,
       final Flow.TraversalCallback callback) {
-//    Debug.startMethodTracing("traversal");
+    Debug.startMethodTracing("traversal");
 
     final PathContext context;
     final PathContext oldPath;
@@ -98,13 +98,14 @@ public class SimplePathContainer extends PathContainer {
       skipAnimation = false;
     }
 
+//    Debug.startMethodTracing("animation");
     event("newView is " + newView.getClass().getSimpleName());
     if (fromView == null || direction == REPLACE || skipAnimation) {
       containerView.removeAllViews();
       containerView.addView(newView);
       oldPath.destroyNotIn(context, contextFactory);
       callback.onTraversalCompleted();
-//      Debug.stopMethodTracing();
+      Debug.stopMethodTracing();
     } else {
       containerView.addView(newView);
       final View finalFromView = fromView;
@@ -117,7 +118,7 @@ public class SimplePathContainer extends PathContainer {
               containerView.removeView(finalFromView);
               oldPath.destroyNotIn(context, contextFactory);
               callback.onTraversalCompleted();
-//              Debug.stopMethodTracing();
+              Debug.stopMethodTracing();
             }
           });
         }
