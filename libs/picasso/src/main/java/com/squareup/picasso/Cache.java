@@ -43,6 +43,7 @@ public interface Cache {
   /** Remove items whose key is prefixed with {@code keyPrefix}. */
   void clearKeyUri(String keyPrefix);
 
+  void entryEvicted(Bitmap bitmap);
   /** A cache which does not store any values. */
   Cache NONE = new Cache() {
     @Override public Bitmap get(String key) {
@@ -65,6 +66,11 @@ public interface Cache {
     }
 
     @Override public void clearKeyUri(String keyPrefix) {
+    }
+
+    @Override
+    public void entryEvicted(Bitmap bitmap) {
+
     }
   };
 }

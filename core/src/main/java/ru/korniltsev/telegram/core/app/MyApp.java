@@ -23,6 +23,7 @@ import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
+import ru.korniltsev.telegram.core.utils.bitmap.BitmapPool;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.ExecutorService;
@@ -47,6 +48,7 @@ public class MyApp extends Application {
     private ExecutorService emojiExecutorService;
     public Emoji emoji;
     public EmojiParser emojiParser;
+    public BitmapPool bitmapPool;
 
     @Override
     public void onCreate() {
@@ -73,9 +75,10 @@ public class MyApp extends Application {
         emojiExecutorService = Executors.newSingleThreadExecutor(factory);
         emoji = new Emoji(this, dpCalculator, emojiExecutorService);
         emojiParser = new EmojiParser(emoji);
+        bitmapPool = new BitmapPool();
 
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this,  dpCalculator));
+                new RootModule(this,  dpCalculator, bitmapPool));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");

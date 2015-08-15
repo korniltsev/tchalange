@@ -78,6 +78,7 @@ public class LruCache implements Cache {
       previous = map.put(key, bitmap);
       if (previous != null) {
         size -= Utils.getBitmapBytes(previous);
+        entryEvicted(previous);
       }
     }
 
@@ -101,6 +102,7 @@ public class LruCache implements Cache {
         Map.Entry<String, Bitmap> toEvict = map.entrySet().iterator().next();
         key = toEvict.getKey();
         value = toEvict.getValue();
+        entryEvicted(value);
         map.remove(key);
         size -= Utils.getBitmapBytes(value);
         evictionCount++;
@@ -135,6 +137,7 @@ public class LruCache implements Cache {
       int newlineIndex = key.indexOf(KEY_SEPARATOR);
       if (newlineIndex == uriLength && key.substring(0, newlineIndex).equals(uri)) {
         i.remove();
+        entryEvicted(value);
         size -= Utils.getBitmapBytes(value);
         sizeChanged = true;
       }
@@ -142,6 +145,11 @@ public class LruCache implements Cache {
     if (sizeChanged) {
       trimToSize(maxSize);
     }
+  }
+
+  @Override
+  public void entryEvicted(Bitmap bitmap) {
+
   }
 
   /** Returns the number of times {@link #get} returned a value. */

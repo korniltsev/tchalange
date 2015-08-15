@@ -3,15 +3,16 @@ package ru.korniltsev.telegram.emoji;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import com.squareup.picasso.Picasso;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.utils.R;
+import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StickerAdapter extends BaseAdapter {
     private EmojiKeyboardView emojiKeyboardView;
+    private final DpCalculator calc;
     final List<Item> data;
 
     public List<Item> getData() {
@@ -20,8 +21,9 @@ public class StickerAdapter extends BaseAdapter {
 
     private final int numColumns;
 
-    StickerAdapter(EmojiKeyboardView emojiKeyboardView, List<List<TdApi.Sticker>> sets, List<TdApi.Sticker> recentStickers) {
+    StickerAdapter(EmojiKeyboardView emojiKeyboardView, List<List<TdApi.Sticker>> sets, List<TdApi.Sticker> recentStickers, DpCalculator calc) {
         this.emojiKeyboardView = emojiKeyboardView;
+        this.calc = calc;
         this.data = new ArrayList<>();
         numColumns = emojiKeyboardView.displayWidth / emojiKeyboardView.getContext().getResources().getDimensionPixelSize(R.dimen.sticker_size);
 
@@ -81,12 +83,13 @@ public class StickerAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        EmojiAdapterVH vh;
+        StickerVH vh;
         final Item item = getItem(position);
         if (convertView == null) {
             if (item instanceof Data){
                 View v = emojiKeyboardView.viewFactory.inflate(R.layout.grid_item_sticker, parent, false);
-                vh = new EmojiAdapterVH(emojiKeyboardView, v);
+                vh = new StickerVH(emojiKeyboardView, v);
+                vh.img.setSize(calc.dp(66f));
                 v.setTag(vh);
             } else {
                 View v = emojiKeyboardView.viewFactory.inflate(R.layout.view_sticker_section, parent, false);
@@ -94,7 +97,7 @@ public class StickerAdapter extends BaseAdapter {
             }
 
         } else {
-            vh = (EmojiAdapterVH) convertView.getTag();
+            vh = (StickerVH) convertView.getTag();
         }
         if (item instanceof Section){
             return convertView;
@@ -104,14 +107,13 @@ public class StickerAdapter extends BaseAdapter {
         return vh.img;
     }
 
-    private void onBindVH(final EmojiAdapterVH vh, int position) {
+    private void onBindVH(final StickerVH vh, int position) {
         final TdApi.Sticker s = ((Data) getItem(position)).sticker;
         vh.o = s;
-        emojiKeyboardView.picasso.loadPhoto(s.thumb.photo, true)
-                .priority(Picasso.Priority.HIGH)
-                .into(vh.img);
 
-        emojiKeyboardView.picasso.fetch(s.sticker);
+        vh.img.bind(s.thumb.photo, true);
+
+//        emojiKeyboardView.picasso.fetch(s.sticker);
     }
 
     public abstract class Item {

@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.core.picasso;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.annotation.Nullable;
 import android.widget.ImageView;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
@@ -13,6 +14,7 @@ import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.AndroidBackgroundPriorityThreadFactory;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
+import ru.korniltsev.telegram.core.utils.bitmap.BitmapPool;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.core.views.RoundTransformation;
 import rx.functions.Action1;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static junit.framework.Assert.assertTrue;
+import static ru.korniltsev.telegram.core.Utils.calculateMemoryCacheSize;
 
 @Singleton
 public class RxGlide {
@@ -38,13 +41,13 @@ public class RxGlide {
     private Context ctx;
 
     @Inject
-    public RxGlide(Context ctx, RxDownloadManager downlaoder, final RXAuthState auth) {
+    public RxGlide(Context ctx, RxDownloadManager downlaoder, final RXAuthState auth, BitmapPool pool) {
         this.ctx = ctx;
 
-        cache = new LruCache(Utils.calculateMemoryCacheSize(ctx));
+        cache = pool.createPicassoCache(calculateMemoryCacheSize(ctx));
         picasso = new Picasso.Builder(ctx)
                 .memoryCache(cache)
-                .addRequestHandler(new TDFileRequestHandler(downlaoder))
+                .addRequestHandler(new TDFileRequestHandler(downlaoder, pool))
                 .addRequestHandler(new AlbumCoverRequestHandler())
 //                .addRequestHandler(new VideoThumbnailRequestHandler())
                 .build();
@@ -210,14 +213,7 @@ public class RxGlide {
 
     private final Map<StubKey, StubDrawable> stubs = new HashMap<>();
 
-    public void fetch(TdApi.File sticker) {
-        if (!sticker.isEmpty()) {
-            return;
-        }
-//        TdApi.FileEmpty sticker1 = (TdApi.FileEmpty) sticker;
-        picasso.load(TDFileRequestHandler.load(sticker, true))
-                .fetch();
-    }
+
 
     public class StubKey {
         final int id;
@@ -260,9 +256,13 @@ public class RxGlide {
     }
 
     public RequestCreator loadPhoto(TdApi.File f, boolean webp) {
+        return loadPhoto(f, webp, null);
+    }
+
+    public RequestCreator loadPhoto(TdApi.File f, boolean webp, @Nullable BitmapPool.Size size) {
         assertTrue(f.id != 0);
 //        long start = System.nanoTime();
-        final TDFileRequestHandler.TDFileUri load = TDFileRequestHandler.load(f, webp);
+        final TDFileRequestHandler.TDFileUri load = TDFileRequestHandler.load(f, webp, size);
 //        long end = System.nanoTime();
 //        if ((end - start) != 0){
 //            System.out.println();

@@ -33,6 +33,7 @@ import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.utils.bitmap.BitmapPool;
 import ru.korniltsev.telegram.core.views.DownloadView;
 
 import javax.inject.Singleton;
@@ -61,12 +62,18 @@ import java.util.concurrent.Executors;
 public class RootModule {
     private Context ctx;
     private final DpCalculator dpCalculator;
+    private final BitmapPool bitmapPool;
 
-    public RootModule(Context ctx, DpCalculator dpCalculator) {
+    public RootModule(Context ctx, DpCalculator dpCalculator, BitmapPool bitmapPool) {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;
+        this.bitmapPool = bitmapPool;
     }
 
+    @Singleton
+    @Provides BitmapPool provideBitmapPool() {
+        return bitmapPool;
+    }
 
 
     @Singleton

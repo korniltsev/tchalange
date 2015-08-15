@@ -1,8 +1,10 @@
 package ru.korniltsev.telegram.core.picasso;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Request;
@@ -10,6 +12,7 @@ import com.squareup.picasso.RequestHandler;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
+import ru.korniltsev.telegram.core.utils.bitmap.BitmapPool;
 import webp.SupportBitmapFactory;
 
 import java.io.FileInputStream;
@@ -23,14 +26,16 @@ public class TDFileRequestHandler extends RequestHandler {
 
     private static final long TIMEOUT = 25000;
 
-    public static TDFileUri load(TdApi.File f, boolean webp) {
-        return new TDFileUri(f, webp);
+    public static TDFileUri load(TdApi.File f, boolean webp, BitmapPool.Size size) {
+        return new TDFileUri(f, webp, size);
     }
 
     final RxDownloadManager downloader;
+    private final BitmapPool pool;
 
-    public TDFileRequestHandler(RxDownloadManager downloader) {
+    public TDFileRequestHandler(RxDownloadManager downloader, BitmapPool pool) {
         this.downloader = downloader;
+        this.pool = pool;
     }
 
     @Override
@@ -62,7 +67,16 @@ public class TDFileRequestHandler extends RequestHandler {
                 return new Result(new FileInputStream(path), Picasso.LoadedFrom.NETWORK);
             }
         } else {
-            return new Result(new FileInputStream(path), Picasso.LoadedFrom.NETWORK);
+            if (BitmapPool.BITMAP_REUSE_SUPPORTED && uri.size != null){
+                final Bitmap inBitmap = pool.get();
+                final BitmapFactory.Options opts = new BitmapFactory.Options();
+                opts.inBitmap = inBitmap;
+                final Bitmap decoded = BitmapFactory.decodeFile(path, opts);
+                assertTrue(inBitmap == decoded);
+                return new Result(decoded, Picasso.LoadedFrom.NETWORK);
+            } else {
+                return new Result(new FileInputStream(path), Picasso.LoadedFrom.NETWORK);
+            }
         }
     }
 
@@ -90,10 +104,12 @@ public class TDFileRequestHandler extends RequestHandler {
     public static class TDFileUri {
         final TdApi.File file;
         final boolean webp;
+        @Nullable private final BitmapPool.Size size;
 
-        public TDFileUri(TdApi.File file, boolean webp) {
+        public TDFileUri(TdApi.File file, boolean webp, @Nullable BitmapPool.Size size) {
             this.file = file;
             this.webp = webp;
+            this.size = size;
         }
     }
 }

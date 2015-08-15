@@ -16,13 +16,13 @@ import android.widget.LinearLayout;
 import com.crashlytics.android.core.CrashlyticsCore;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
-import ru.korniltsev.telegram.utils.R;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -150,7 +150,9 @@ public class EmojiKeyboardView extends LinearLayout {
                             Arrays.asList(s.stickers));
                 }
                 final ArrayList<TdApi.Sticker> recentStickers = getRecentStickers(stickers);
-                GridView res = createGridPage(container, position, new StickerAdapter(EmojiKeyboardView.this, sets, recentStickers), R.dimen.sticker_size);
+                final StickerAdapter adapter = new StickerAdapter(EmojiKeyboardView.this, sets, recentStickers, calc);
+                GridView res = createGridPage(container, position, adapter, R.dimen.sticker_size);
+                res.setNumColumns(GridView.AUTO_FIT);
                 res.setVerticalSpacing(calc.dp(16));
                 res.setClipToPadding(false);
                 int dip8 = calc.dp(8);
@@ -214,12 +216,12 @@ public class EmojiKeyboardView extends LinearLayout {
             this.longs = longs;
         }
 
-        public EmojiAdapterVH onCreateViewHolder(ViewGroup parent) {
+        public EmojiVH onCreateViewHolder(ViewGroup parent) {
             View v = viewFactory.inflate(R.layout.grid_item_emoji, parent, false);
-            return new EmojiAdapterVH(EmojiKeyboardView.this, v);
+            return new EmojiVH(EmojiKeyboardView.this, v);
         }
 
-        public void onBindViewHolder(EmojiAdapterVH holder, int position) {
+        public void onBindViewHolder(EmojiVH holder, int position) {
             holder.o = longs[position];
             Drawable d = emoji.getEmojiBigDrawable(longs[position]);
             holder.img.setImageDrawable(d);
@@ -242,12 +244,12 @@ public class EmojiKeyboardView extends LinearLayout {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            EmojiAdapterVH vh;
+            EmojiVH vh;
             if (convertView == null) {
                 vh = onCreateViewHolder(parent);
                 vh.img.setTag(vh);
             } else {
-                vh = (EmojiAdapterVH) convertView.getTag();
+                vh = (EmojiVH) convertView.getTag();
             }
             onBindViewHolder(vh, position);
             return vh.img;
