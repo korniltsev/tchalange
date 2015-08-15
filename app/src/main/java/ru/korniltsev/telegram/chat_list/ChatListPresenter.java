@@ -3,7 +3,6 @@ package ru.korniltsev.telegram.chat_list;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Debug;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
@@ -89,15 +88,15 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
         }
 
         subscribe();
-        bindLockButton();
+        bindToolbar();
 
 //        Debug.stopMethodTracing();
     }
 
-    private void bindLockButton() {
+    private void bindToolbar() {
         final boolean locked = passcodeManager.isLocked();
         final boolean enabled = passcodeManager.passCodeEnabled();
-        getView().bindLockButton(locked, enabled);
+        getView().bindToolbar(locked, enabled);
 
 
     }
@@ -220,6 +219,6 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
         boolean locked = passcodeManager.isLocked();
         passcodeManager.setLocked(!locked);
         getView()
-                .bindLockButton(!locked, passcodeManager.passCodeEnabled());
+                .bindToolbar(!locked, passcodeManager.passCodeEnabled());
     }
 }

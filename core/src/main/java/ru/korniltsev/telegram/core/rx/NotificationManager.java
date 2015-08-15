@@ -27,16 +27,23 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 public class NotificationManager {
     final RXClient client;
     final Context ctx;
-    private final Ringtone ringtone;
+//    private final Ringtone ringtone;
     private final Observable<TdApi.UpdateNotificationSettings> settingsUpdate;
+    private final Uri notification;
+    private final ThreadLocal<Ringtone> ringtone;
     private RXAuthState.AuthState state;
 
     @Inject
-    public NotificationManager(RXClient client, Context ctx, RXAuthState auth) {
+    public NotificationManager(RXClient client, final Context ctx, RXAuthState auth) {
         this.client = client;
         this.ctx = ctx;
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        ringtone = RingtoneManager.getRingtone(ctx, notification);
+        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        ringtone = new ThreadLocal<Ringtone>(){
+            @Override
+            protected Ringtone initialValue() {
+                return RingtoneManager.getRingtone(ctx, notification);
+            }
+        };
         state = auth.getState();
         auth.listen().subscribe(new Action1<RXAuthState.AuthState>() {
             @Override
@@ -180,7 +187,7 @@ public class NotificationManager {
 
     private void notifyNewMessageImpl() {
         try {
-            ringtone.play();
+            ringtone.get().play();
         } catch (Exception e) {
             CrashlyticsCore.getInstance().logException(e);
         }

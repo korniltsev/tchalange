@@ -59,7 +59,6 @@ public class ChatListView extends DrawerLayout {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         calc = MyApp.from(context).dpCalculator;
-
     }
 
     @Override
@@ -79,7 +78,7 @@ public class ChatListView extends DrawerLayout {
         super.onFinishInflate();
         injectViews();
         //list
-        adapter = new ChatListAdapter(getContext(),presenter.getCl().myId.id, new Action1<TdApi.Chat>() {
+        adapter = new ChatListAdapter(getContext(), presenter.getCl().myId.id, new Action1<TdApi.Chat>() {
             @Override
             public void call(TdApi.Chat chat) {
                 presenter.openChat(chat);
@@ -96,30 +95,17 @@ public class ChatListView extends DrawerLayout {
                     }
                 }));
 
-        //toolbar
-        toolbar = initToolbar(this)
-                .addMenuItem(R.menu.chat_list, R.id.menu_lock_unlock, new Runnable() {
-                    @Override
-                    public void run() {
-                        presenter.lockUnlock();
-                    }
-                })
-                .setDrawer(this, R.string.navigation_drawer_open, R.string.navigation_drawer_close);//todo what is open and clos?
-
-
         btnLogout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 event("btnLogout.Click");
                 presenter.logout();
-//                closeDrawer(Gravity.LEFT);
             }
         });
         btnContacts.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 presenter.openContacts();
-//                closeDrawer(Gravity.LEFT);
             }
         });
 
@@ -127,7 +113,6 @@ public class ChatListView extends DrawerLayout {
             @Override
             public void onClick(View v) {
                 presenter.openSettings();
-//                closeDrawer(Gravity.LEFT);
             }
         });
 
@@ -135,7 +120,6 @@ public class ChatListView extends DrawerLayout {
         toolbarShadow = ((LinearLayoutWithShadow) findViewById(R.id.toolbar_shadow));
         toolbarShadow.setShadowOffset(calc.dp(56f));
         miniPlayer.setShadow(toolbarShadow);
-
     }
 
     private void injectViews() {
@@ -147,7 +131,6 @@ public class ChatListView extends DrawerLayout {
         btnContacts = this.findViewById(R.id.btn_contacts);
         btnSettings = this.findViewById(R.id.btn_settings);
     }
-
 
     public ChatListAdapter getAdapter() {
         return adapter;
@@ -181,29 +164,36 @@ public class ChatListView extends DrawerLayout {
         });
     }
 
-    public void bindLockButton(boolean locked, boolean enabled) {
-        final MenuItem menu = toolbar.toolbar.getMenu().findItem(R.id.menu_lock_unlock);
-        if (enabled){
-            if (locked) {
-                menu.setIcon(R.drawable.ic_lock_close);
-                menu.setTitle(R.string.action_unlock);
-            } else {
-                menu.setIcon(R.drawable.ic_lock_open);
-                menu.setTitle(R.string.action_lock);
-            }
-            menu.setVisible(true);
-        } else {
-            menu.setVisible(false);
+    public void bindToolbar(boolean locked, boolean enabled) {
+        if (!enabled) {
+            toolbar = initToolbar(this)
+                    .setDrawer(this, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            return;
+        }
+        if (toolbar == null) {
+            toolbar = initToolbar(this)
+                    .addMenuItem(R.menu.chat_list, R.id.menu_lock_unlock, new Runnable() {
+                        @Override
+                        public void run() {
+                            presenter.lockUnlock();
+                        }
+                    })
+                    .setDrawer(this, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         }
 
-
-
-
+        final MenuItem menu = toolbar.toolbar.getMenu().findItem(R.id.menu_lock_unlock);
+        if (locked) {
+            menu.setIcon(R.drawable.ic_lock_close);
+            menu.setTitle(R.string.action_unlock);
+        } else {
+            menu.setIcon(R.drawable.ic_lock_open);
+            menu.setTitle(R.string.action_lock);
+        }
     }
 
     @Override
     protected Parcelable onSaveInstanceState() {
         super.onSaveInstanceState();
-        return  new SavedState(BaseSavedState.EMPTY_STATE);//do not save state at all
+        return new SavedState(BaseSavedState.EMPTY_STATE);//do not save state at all
     }
 }
