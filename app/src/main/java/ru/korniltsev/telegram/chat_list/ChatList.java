@@ -43,7 +43,7 @@ public class ChatList extends BasePath implements Serializable {
 
     @Override
     public int getRootLayout() {
-        return R.layout.chat_list_view;
+        throw new RuntimeException("unimplemented");
     }
 
     @Override

@@ -3,4 +3,10 @@
 
 
     <item type="id" name="mini_player"/>
+    <item type="id" name="btn_contacts"/>
+    <item type="id" name="btn_settings"/>
+    <item type="id" name="btn_logout"/>
+    <item type="id" name="drawer_avatar"/>
+    <item type="id" name="drawer_name"/>
+    <item type="id" name="drawer_phone"/>
 </resources>
