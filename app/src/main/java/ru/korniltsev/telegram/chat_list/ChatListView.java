@@ -15,7 +15,6 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
 import ru.korniltsev.telegram.audio.MiniPlayerViewFactory;
-import ru.korniltsev.telegram.chat_list.view.ChatListDividerItemDecorator;
 import ru.korniltsev.telegram.chat_list.view.MyPhoneView;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -138,7 +137,7 @@ public class ChatListView extends DrawerLayout {
         toolbarShadow.setShadowOffset(calc.dp(56f));
         miniPlayer.setShadow(toolbarShadow);
 
-        list.addItemDecoration(new ChatListDividerItemDecorator(calc.dp(72)));
+//        list.addItemDecoration(new ChatListDividerItemDecorator(calc.dp(72)));
     }
 
 
