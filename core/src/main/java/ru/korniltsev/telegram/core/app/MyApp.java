@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.core.app;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Debug;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -51,6 +52,7 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+//        Debug.startMethodTracing("startup");
         System.setProperty("rx.scheduler.jdk6.purge-force", "true");
         maximizeCurrentThreadPriority();
         //        final CrashlyticsCore.Builder builder = new CrashlyticsCore.Builder();

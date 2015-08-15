@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.DebugUtils;
+import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
+import org.json.JSONObject;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -32,6 +35,7 @@ public class RXAuthState {
     public static final String PREF_AUTHORIZED = "pref_authorized";
     public static final String RX_CLIENT = "rx_client";
     public static final String ME_UID = "ME_UID";
+    public static final String ME_JSON = "ME_JSON";
     private final SharedPreferences prefs;
 
 
@@ -161,6 +165,17 @@ public class RXAuthState {
 
     @Nullable
     private TdApi.User getCurrentUser() {
+        long start = System.nanoTime();
+        final String serializedMe = prefs.getString(ME_JSON, null);
+        if (serializedMe != null) {
+            final TdApi.User deserialized = FastUserSerialization.deserialize(serializedMe);
+            if (deserialized != null){
+                long end = System.nanoTime();
+                Log.d("Duration", (end - start) + " deserialization");
+                return deserialized;
+            }
+        }
+
         ObjectInputStream i = null;
         try {
             i = new ObjectInputStream(new FileInputStream(getCurrentUserFile()));
@@ -175,16 +190,25 @@ public class RXAuthState {
     }
 
     public void saveToDisk(TdApi.User user) {
-        try {
+        long start = System.nanoTime();
+        final String serializedUser = FastUserSerialization.serialize(user);
+        prefs.edit().putString(ME_JSON, serializedUser).apply();
+        long end = System.nanoTime();
+        Log.d("Duration", (end - start) + " serialization");
 
-            ObjectOutputStream out = new ObjectOutputStream(
-                    new FileOutputStream(
-                            getCurrentUserFile()));
-            out.writeObject(user);
-            out.close();
-        } catch (IOException e) {
-            CrashlyticsCore.getInstance().logException(e);
-        }
+        //        final JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("firstName", user.firstName);
+//        jsonObject.put("lastName", user.firstName);
+//        try {
+//
+//            ObjectOutputStream out = new ObjectOutputStream(
+//                    new FileOutputStream(
+//                            getCurrentUserFile()));
+//            out.writeObject(user);
+//            out.close();
+//        } catch (IOException e) {
+//            CrashlyticsCore.getInstance().logException(e);
+//        }
     }
 
     public Observable<AuthState> listen() {

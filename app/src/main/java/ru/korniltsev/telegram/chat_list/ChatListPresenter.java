@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.chat_list;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Debug;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
@@ -89,6 +90,8 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
 
         subscribe();
         bindLockButton();
+
+//        Debug.stopMethodTracing();
     }
 
     private void bindLockButton() {
