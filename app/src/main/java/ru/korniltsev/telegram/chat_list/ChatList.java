@@ -1,5 +1,8 @@
 package ru.korniltsev.telegram.chat_list;
 
+import android.content.Context;
+import android.view.View;
+import android.widget.FrameLayout;
 import dagger.Provides;
 import ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
@@ -11,6 +14,7 @@ import ru.korniltsev.telegram.core.rx.RXAuthState;
 import java.io.Serializable;
 
 import static junit.framework.Assert.assertTrue;
+import static ru.korniltsev.telegram.chat_list.ChatListViewFactory.construct;
 
 @WithModule(ChatList.Module.class)
 public class ChatList extends BasePath implements Serializable {
@@ -31,7 +35,8 @@ public class ChatList extends BasePath implements Serializable {
             this.path = path;
         }
 
-        @Provides ChatList providePath(){
+        @Provides
+        ChatList providePath() {
             return path;
         }
     }
@@ -40,4 +45,11 @@ public class ChatList extends BasePath implements Serializable {
     public int getRootLayout() {
         return R.layout.chat_list_view;
     }
+
+    @Override
+    public View constructViewManually(Context ctx, FrameLayout root) {
+        return construct(ctx);
+    }
+
+
 }

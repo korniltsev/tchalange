@@ -21,10 +21,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.os.Debug;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.FrameLayout;
 import com.crashlytics.android.core.CrashlyticsCore;
 import dagger.ObjectGraph;
 import flow.Flow;
@@ -54,7 +56,8 @@ public class SimplePathContainer extends PathContainer {
   @Override protected void performTraversal(final ViewGroup containerView,
       final TraversalState traversalState, final Flow.Direction direction,
       final Flow.TraversalCallback callback) {
-    Debug.startMethodTracing("traversal");
+//    Debug.startMethodTracing("traversal");
+
     final PathContext context;
     final PathContext oldPath;
     if (containerView.getChildCount() > 0) {
@@ -63,15 +66,23 @@ public class SimplePathContainer extends PathContainer {
       oldPath = PathContext.root(containerView.getContext());
     }
 
-    Path to = traversalState.toPath();
+    BasePath to = (BasePath) traversalState.toPath();
 
     View newView;
     context = PathContext.create(oldPath, to, contextFactory);
-    int layout = getLayout(to);
-    newView = LayoutInflater.from(context)
-        .cloneInContext(context)
-        .inflate(layout, containerView, false);
 
+    long start = System.nanoTime();
+
+    newView = to.constructViewManually(context, (FrameLayout) containerView);
+    if (newView == null){
+      int layout = to.getRootLayout();
+      newView = LayoutInflater.from(context)
+              .cloneInContext(context)
+              .inflate(layout, containerView, false);
+    }
+
+    long end = System.nanoTime();
+    Log.d("SimplePathContainer", "view inflate in " + (end - start));
     View fromView = null;
     if (traversalState.fromPath() != null) {
       fromView = containerView.getChildAt(0);
@@ -92,7 +103,7 @@ public class SimplePathContainer extends PathContainer {
       containerView.addView(newView);
       oldPath.destroyNotIn(context, contextFactory);
       callback.onTraversalCompleted();
-      Debug.stopMethodTracing();
+//      Debug.stopMethodTracing();
     } else {
       containerView.addView(newView);
       final View finalFromView = fromView;
@@ -105,7 +116,7 @@ public class SimplePathContainer extends PathContainer {
               containerView.removeView(finalFromView);
               oldPath.destroyNotIn(context, contextFactory);
               callback.onTraversalCompleted();
-              Debug.stopMethodTracing();
+              //              Debug.stopMethodTracing();
             }
           });
         }
