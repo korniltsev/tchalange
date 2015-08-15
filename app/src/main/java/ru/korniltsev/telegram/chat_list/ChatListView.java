@@ -13,6 +13,7 @@ import dagger.ObjectGraph;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.audio.MiniPlayerViewFactory;
 import ru.korniltsev.telegram.chat_list.view.MyPhoneView;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -128,11 +129,15 @@ public class ChatListView extends DrawerLayout {
             }
         });
 
-        miniPlayer = ((MiniPlayerView) findViewById(R.id.mini_player));
         toolbarShadow = ((LinearLayoutWithShadow) findViewById(R.id.toolbar_shadow));
+
+        miniPlayer = MiniPlayerViewFactory.construct(getContext(), calc);
+        toolbarShadow.addView(miniPlayer, 1);
         toolbarShadow.setShadowOffset(calc.dp(56f));
         miniPlayer.setShadow(toolbarShadow);
     }
+
+
 
     private void injectViews() {
         list = (RecyclerView) this.findViewById(R.id.list);

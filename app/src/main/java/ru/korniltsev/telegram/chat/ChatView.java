@@ -22,6 +22,7 @@ import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
+import ru.korniltsev.telegram.audio.MiniPlayerViewFactory;
 import ru.korniltsev.telegram.chat.adapter.TextMessageVH;
 import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.chat.keyboard.hack.FrameUnderMessagePanelController;
@@ -233,7 +234,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         });
         list.setItemAnimator(null);
         voiceOverlay = ((VoiceRecordingOverlay) findViewById(R.id.voice_recording_overlay));
-        messagePanel.getInput().addTextChangedListener(new TextWatcherAdapter(){
+        messagePanel.getInput().addTextChangedListener(new TextWatcherAdapter() {
             @Override
             public void afterTextChanged(Editable s) {
                 voiceOverlay.setStateEnabled(s.length() == 0);
@@ -249,7 +250,11 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
 
         messagePanel.getInput().requestFocus();
         toolbarShadow = ((LinearLayoutWithShadow) findViewById(R.id.toolbar_shadow));
-        miniPlayerView = ((MiniPlayerView) findViewById(R.id.mini_player));
+
+
+        miniPlayerView = MiniPlayerViewFactory.construct(getContext(), calc);
+        toolbarShadow.addView(miniPlayerView, 0);
+
         miniPlayerView.setShadow(toolbarShadow);
 
     }

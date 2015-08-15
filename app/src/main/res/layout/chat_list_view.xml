@@ -25,7 +25,7 @@
                 android:paddingRight="4dp"
                 />
 
-        <include layout="@layout/view_mini_player"/>
+
         <android.support.v7.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"

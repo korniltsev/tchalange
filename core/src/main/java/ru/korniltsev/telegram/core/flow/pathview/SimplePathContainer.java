@@ -72,7 +72,7 @@ public class SimplePathContainer extends PathContainer {
     context = PathContext.create(oldPath, to, contextFactory);
 
     long start = System.nanoTime();
-
+    Debug.startMethodTracing("create_view");
     newView = to.constructViewManually(context, (FrameLayout) containerView);
     if (newView == null){
       int layout = to.getRootLayout();
@@ -80,10 +80,11 @@ public class SimplePathContainer extends PathContainer {
               .cloneInContext(context)
               .inflate(layout, containerView, false);
     }
-
+    Debug.stopMethodTracing();
     long end = System.nanoTime();
-//    Log.d("SimplePathContainer", "view inflate in " + (end - start));
-    View fromView = null;
+    Log.d("SimplePathContainer", "view inflate in " + (end - start));
+    View fromView =
+            null;
     if (traversalState.fromPath() != null) {
       fromView = containerView.getChildAt(0);
       traversalState.saveViewState(fromView);
@@ -103,7 +104,7 @@ public class SimplePathContainer extends PathContainer {
       containerView.addView(newView);
       oldPath.destroyNotIn(context, contextFactory);
       callback.onTraversalCompleted();
-      Debug.stopMethodTracing();
+//      Debug.stopMethodTracing();
     } else {
       containerView.addView(newView);
       final View finalFromView = fromView;
@@ -116,7 +117,7 @@ public class SimplePathContainer extends PathContainer {
               containerView.removeView(finalFromView);
               oldPath.destroyNotIn(context, contextFactory);
               callback.onTraversalCompleted();
-                            Debug.stopMethodTracing();
+//              Debug.stopMethodTracing();
             }
           });
         }

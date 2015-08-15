@@ -65,8 +65,8 @@ public class ChatListViewFactory {
 //        toolbar.setTitleTextAppearance();
 
 
-        final MiniPlayerView miniPlayer = MiniPlayerViewFactory.construct(ctx, calc);
-        result.addView(miniPlayer);
+//        final MiniPlayerView miniPlayer = MiniPlayerViewFactory.construct(ctx, calc);
+//        result.addView(miniPlayer);
 
         final RecyclerView list = new RecyclerView(ctx);
         list.setId(R.id.list);

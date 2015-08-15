@@ -1,24 +1,33 @@
 package ru.korniltsev.telegram.audio;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Layout;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.audio.helper.SimpleImageButtonView;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
@@ -29,40 +38,78 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.Subscriptions;
 
+import java.text.Normalizer;
 import java.util.concurrent.TimeUnit;
 
+import static android.text.TextUtils.ellipsize;
 import static android.text.TextUtils.isEmpty;
+import static android.view.View.MeasureSpec.makeMeasureSpec;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static rx.Observable.timer;
 
-public class MiniPlayerView extends LinearLayout {
+public class MiniPlayerView extends ViewGroup {
 
+    public static final int PAUSE = 0;
+    public static final int PLAY = 1;
     private final AudioPLayer audioPLayer;
     private final DpCalculator calc;
     private final int dp1point5;
+    private final int spaceForSongName;
+    private final TextPaint textPaint;
+    private final int leftRightButtonWidth;
+    private final int textpadding;
     private Subscription subscription;
-    private ImageButton btnPlay;
-    private ImageButton btnStop;
-    private TextView title;
+    private SimpleImageButtonView btnPlay;
+    private SimpleImageButtonView btnStop;
+//    private TextView title;
     @Nullable private LinearLayoutWithShadow shadow;
     private float progress;
     private Paint paint;
     private int dp;
+    private StaticLayout songNameLayout;
+    private int songNameLayoutHeight;
 
-    public MiniPlayerView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        final MyApp from = MyApp.from(context);
+    public MiniPlayerView(Context ctx, AttributeSet attrs) {
+        super(ctx, attrs);
+        final MyApp from = MyApp.from(ctx);
         audioPLayer = from.audioPLayer;
         calc = from.dpCalculator;
         setWillNotDraw(false);
         dp1point5 = calc.dp(1.5f);
+
+
+
+        btnPlay = new SimpleImageButtonView(ctx);
+        btnPlay.setBackgroundResource(R.drawable.bg_keyboard_tab);
+        addView(btnPlay);
+
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setTextSize(calc.dp(14f));
+        textPaint.setColor(0xFF333333);
+
+        btnStop = new SimpleImageButtonView(ctx);
+        btnStop.setBackgroundResource(R.drawable.bg_keyboard_tab);
+        setBackgroundResource(R.drawable.bg_keyboard_tab);
+        addView(btnStop);
+
+        leftRightButtonWidth = calc.dp(61);
+        textpadding = calc.dp(4);
+        spaceForSongName = from.displayWidth - leftRightButtonWidth *2 - textpadding * 2;
+
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        title = (TextView) findViewById(R.id.text);
-        btnPlay = ((ImageButton) findViewById(R.id.btn_play));
-        btnStop = ((ImageButton) findViewById(R.id.btn_stop));
+        final Resources res = getResources();
+//        title = (TextView) findViewById(R.id.text);
+        btnPlay.setDs(new Drawable[]{
+                res.getDrawable(R.drawable.ic_pausepl),
+                res.getDrawable(R.drawable.ic_playpl)
+        });
+        btnStop.setDs(new Drawable[]{res.getDrawable(R.drawable.ic_closeplayer)});
+        btnStop.setCurrent(0);
+
         btnStop.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,7 +135,7 @@ public class MiniPlayerView extends LinearLayout {
         paint.setColor(0xFF66ACDF);
         dp = calc.dp(16);
 
-        title.setOnClickListener(new OnClickListener() {
+        setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Flow.get(getContext())
@@ -99,10 +146,7 @@ public class MiniPlayerView extends LinearLayout {
 
     final Rect r = new Rect();
 
-    @Override
-    protected void onDraw(Canvas canvas) {
 
-    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -116,6 +160,15 @@ public class MiniPlayerView extends LinearLayout {
         r.set(left, top2, right, bottom);
         canvas.drawRect(r, paint);
         Log.d("MiniPlayerView", "draw " + progress);
+
+        if (songNameLayout!= null) {
+            canvas.save();
+            int ty = (getHeight() - this.songNameLayoutHeight) / 2;
+            final int tx = leftRightButtonWidth + textpadding;
+            canvas.translate(tx, ty);
+            songNameLayout.draw(canvas);
+            canvas.restore();
+        }
     }
 
     Subscription timerSubscription = Subscriptions.empty();
@@ -126,9 +179,9 @@ public class MiniPlayerView extends LinearLayout {
         updateProgress();
         if (playing || paused) {
             setVisibility(View.VISIBLE);
-            title.setText(getTitle(currentAudio));
+            setText(getTitle(currentAudio));
             if (playing) {
-                btnPlay.setImageResource(R.drawable.ic_pausepl);
+                btnPlay.setCurrent(PAUSE);
                 Log.d("MiniPlayerView", "subscribe");
                 timerSubscription = timer(0, 1, TimeUnit.SECONDS)
                         .onBackpressureDrop()
@@ -141,7 +194,7 @@ public class MiniPlayerView extends LinearLayout {
                             }
                         });
             } else {
-                btnPlay.setImageResource(R.drawable.ic_playpl);
+                btnPlay.setCurrent(PLAY);
             }
             updateShadowState(true);
         } else {
@@ -149,6 +202,14 @@ public class MiniPlayerView extends LinearLayout {
             updateShadowState(false);
         }
     }
+
+    private void setText(CharSequence title) {
+        final CharSequence ellipsized = ellipsize(title, textPaint, spaceForSongName, TextUtils.TruncateAt.END);
+        songNameLayout = new StaticLayout(ellipsized, textPaint, spaceForSongName, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        songNameLayoutHeight = songNameLayout.getHeight();
+    }
+
+
 
     private void updateProgress() {
         progress = audioPLayer.getProgress();
@@ -202,6 +263,24 @@ public class MiniPlayerView extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         subscription.unsubscribe();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        final int btnWidth = makeMeasureSpec(leftRightButtonWidth, MeasureSpec.EXACTLY);
+        btnPlay.measure(btnWidth, heightMeasureSpec);
+        btnStop.measure(btnWidth, heightMeasureSpec);
+        setMeasuredDimension(width, height);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        btnPlay.layout(l, t, leftRightButtonWidth, b);
+        int left = r - leftRightButtonWidth;
+        btnStop.layout(left, t, r, b);
+
     }
 
     public void setShadow(LinearLayoutWithShadow toolbarShadow) {
