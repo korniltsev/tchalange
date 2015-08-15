@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.provider.Telephony;
 import android.text.Editable;
 import dagger.Provides;
+import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.auth.password.EnterPassword;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
@@ -137,12 +139,12 @@ public class EnterCode extends BasePath implements Serializable {
         }
 
         public void checkCode(String code) {
-            if (request != null){
+            if (request != null) {
                 return;
             }
             atLeastOneRequestSent = true;
             TdApi.SetAuthCode f = new TdApi.SetAuthCode(code);
-            request = authorizeAndGetMe(f);
+            request = authorizeAndGetMe(client, f);
             subscribe();
         }
 
@@ -153,14 +155,20 @@ public class EnterCode extends BasePath implements Serializable {
             subscription = request.subscribe(new ObserverAdapter<TdApi.User>() {
                 @Override
                 public void onError(Throwable th) {
-                    getView().showError(th);
                     pd.dismiss();
                     request = null;
+                    if (th instanceof PasswordException) {
+                        Flow.get(getView())
+                                .set(new EnterPassword());
+                    } else {
+                        getView().showError(th);
+                    }
                 }
 
                 @Override
                 public void onNext(TdApi.User response) {
                     auth.authorized(response);
+                    hideKeyboard(getView());
                     pd.dismiss();
                     request = null;
                 }
@@ -178,29 +186,6 @@ public class EnterCode extends BasePath implements Serializable {
             pd.show();
         }
 
-        private Observable<TdApi.User> authorizeAndGetMe(TdApi.SetAuthCode f) {
-            return client.sendRx(f)
-                    .map(new Func1<TdApi.TLObject, TdApi.AuthStateOk>() {
-                        @Override
-                        public TdApi.AuthStateOk call(TdApi.TLObject tlObject) {
-                            return (TdApi.AuthStateOk) tlObject;
-                        }
-                    })
-                    .flatMap(new Func1<TdApi.AuthStateOk, Observable<TdApi.TLObject>>() {
-                        @Override
-                        public Observable<TdApi.TLObject> call(TdApi.AuthStateOk authStateOk) {
-                            return client.sendRx(new TdApi.GetMe());
-                        }
-                    }).map(new Func1<TdApi.TLObject, TdApi.User>() {
-                        @Override
-                        public TdApi.User call(TdApi.TLObject tlObject) {
-                            return (TdApi.User) tlObject;
-                        }
-                    })
-                    .cache()
-                    .observeOn(mainThread());
-        }
-
         public void codeEntered(Editable s) {
             if (atLeastOneRequestSent) {
                 return;
@@ -209,5 +194,35 @@ public class EnterCode extends BasePath implements Serializable {
                 checkCode(s.toString());
             }
         }
+    }
+
+    public static Observable<TdApi.User> authorizeAndGetMe(final RXClient client, TdApi.TLFunction f) {
+        return client.sendRx(f)
+                .observeOn(mainThread())
+                .map(new Func1<TdApi.TLObject, TdApi.AuthStateOk>() {
+                    @Override
+                    public TdApi.AuthStateOk call(TdApi.TLObject tlObject) {
+                        if (tlObject instanceof TdApi.AuthStateWaitPassword) {
+                            throw new PasswordException();
+                        }
+                        return (TdApi.AuthStateOk) tlObject;
+                    }
+                })
+                .flatMap(new Func1<TdApi.AuthStateOk, Observable<TdApi.TLObject>>() {
+                    @Override
+                    public Observable<TdApi.TLObject> call(TdApi.AuthStateOk authStateOk) {
+                        return client.sendRx(new TdApi.GetMe());
+                    }
+                }).map(new Func1<TdApi.TLObject, TdApi.User>() {
+                    @Override
+                    public TdApi.User call(TdApi.TLObject tlObject) {
+                        return (TdApi.User) tlObject;
+                    }
+                })
+                .cache()
+                .observeOn(mainThread());
+    }
+
+    private static class PasswordException extends RuntimeException {//todo this is fucking awful
     }
 }

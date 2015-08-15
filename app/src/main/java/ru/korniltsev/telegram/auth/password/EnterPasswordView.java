@@ -1,4 +1,4 @@
-package ru.korniltsev.telegram.auth.code;
+package ru.korniltsev.telegram.auth.password;
 
 import android.content.Context;
 import android.text.Editable;
@@ -18,26 +18,26 @@ import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
-public class EnterCodeView extends LinearLayout {
-    private final String errorMessageUnknown;
-    private final String errorMessageInvalidCode;
-    private final String errorMessageEmptyCode;
-    @Inject EnterCode.Presenter presenter;
-    private EditText smsCode;
+public class EnterPasswordView extends LinearLayout {
+//    private final String errorMessageUnknown;
+//    private final String errorMessageInvalidCode;
+//    private final String errorMessageEmptyCode;
+    @Inject EnterPassword.Presenter presenter;
+    private EditText password;
 
-    public EnterCodeView(Context ctx, AttributeSet attrs) {
+    public EnterPasswordView(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
         ObjectGraphService.inject(ctx, this);
-        errorMessageUnknown = ctx.getString(R.string.unknown_error);
-        errorMessageInvalidCode = ctx.getString(R.string.invalid_code);
-        errorMessageEmptyCode = ctx.getString(R.string.invalid_code_empty);
+//        errorMessageUnknown = ctx.getString(R.string.unknown_error);
+//        errorMessageInvalidCode = ctx.getString(R.string.invalid_code);
+//        errorMessageEmptyCode = ctx.getString(R.string.invalid_code_empty);
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         initToolbar(this)
-                .setTitle(R.string.sms_code)
+                .setTitle(R.string.password)
                 .addMenuItem(
                         R.menu.auth_send_code,
                         R.id.menu_send_code,
@@ -48,12 +48,9 @@ public class EnterCodeView extends LinearLayout {
                             }
                         }
                 );
-        smsCode = ((EditText) findViewById(R.id.sms_code));
-        TextView weHaveSentCode = ((TextView) findViewById(R.id.we_have_sent));
-        String string = getResources().getString(R.string.we_ve_sent, presenter.getPath().phoneNumber);
-        weHaveSentCode.setText(string);
-        smsCode.requestFocus();
-        smsCode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        password = ((EditText) findViewById(R.id.sms_code));
+        password.requestFocus();
+        password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -63,21 +60,21 @@ public class EnterCodeView extends LinearLayout {
                 return false;
             }
         });
-        smsCode.addTextChangedListener(new TextWatcherAdapter(){
-            @Override
-            public void afterTextChanged(Editable s) {
-                presenter.codeEntered(s);
-            }
-        });
+//        password.addTextChangedListener(new TextWatcherAdapter() {
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                presenter.codeEntered(s);
+//            }
+//        });
     }
 
     private void sendCode() {
-        presenter.checkCode(textFrom(smsCode));
+        presenter.checkPassword(textFrom(password));
     }
 
-    public EditText getSmsCode() {
-        return smsCode;
-    }
+//    public EditText getPassword() {
+//        return password;
+//    }
 
     @Override
     protected void onAttachedToWindow() {
@@ -92,20 +89,20 @@ public class EnterCodeView extends LinearLayout {
     }
 
     public void showError(Throwable th) {
-        smsCode.setError(gerErrorMessageForException(th));
-        smsCode.requestFocus();
+        password.setError(gerErrorMessageForException(th));
+        password.requestFocus();
     }
 
     private String gerErrorMessageForException(Throwable th) {
         String message = th.getMessage();
-        if (isEmpty(message)) {
-            return errorMessageUnknown;
-        } else if (message.contains("PHONE_CODE_INVALID")) {
-            return errorMessageInvalidCode;
-        } else if (message.contains("PHONE_CODE_EMPTY")) {
-            return errorMessageEmptyCode;
-        } else {
+//        if (isEmpty(message)) {
+//            return errorMessageUnknown;
+//        } else if (message.contains("PHONE_CODE_INVALID")) {
+//            return errorMessageInvalidCode;
+//        } else if (message.contains("PHONE_CODE_EMPTY")) {
+//            return errorMessageEmptyCode;
+//        } else {
             return message;
-        }
+//        }
     }
 }

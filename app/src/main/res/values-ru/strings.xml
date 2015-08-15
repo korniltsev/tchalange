@@ -170,4 +170,7 @@
     <string name="chat_title">Chat title</string>
     <string name="first_name_must_be_non_empty">First name must be non-empty</string>
     <string name="playlist">Playlist</string>
+    <string name="enter_your_pass">Please enter your personal password</string>
+    <string name="password">Password</string>
+    <string name="sms_code">SMS code</string>
 </resources>

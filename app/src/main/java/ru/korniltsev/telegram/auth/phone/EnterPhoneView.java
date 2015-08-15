@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import static ru.korniltsev.telegram.core.Utils.event;
 import static ru.korniltsev.telegram.core.Utils.showKeyboard;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
+import static ru.korniltsev.telegram.core.Utils.toggleKeyboard;
 import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
 public class EnterPhoneView extends LinearLayout {
@@ -238,8 +239,10 @@ public class EnterPhoneView extends LinearLayout {
     public void focusOn(boolean secondField) {
         if (secondField){
             userPhone.requestFocus();
+            toggleKeyboard(userPhone);
         } else {
             phoneCode.requestFocus();
+            toggleKeyboard(phoneCode);
         }
     }
 }
