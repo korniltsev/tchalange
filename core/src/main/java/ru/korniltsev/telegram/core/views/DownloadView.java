@@ -46,7 +46,7 @@ public class DownloadView extends FrameLayout {
     public static final Interpolator INTERPOLATOR = new AccelerateDecelerateInterpolator();
     public static final int BG_BLUE = 0xffecf4F9;
     public static final int BG_BLACK = 0xB1000000;
-    public static final int BG_DARKEN_BLUE = 0xff579cda;
+    public static final int BG_DARKEN_BLUE = 0xff6BAEDF;
     public static final int DARKEN_BLUE_DURATION = 208;
     public static final int FADE_PROGRESS_DURATION = 208;
     public static final int SCALE_DOWN_DURATION = 80;

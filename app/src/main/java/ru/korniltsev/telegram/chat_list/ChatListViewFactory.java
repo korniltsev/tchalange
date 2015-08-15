@@ -151,7 +151,7 @@ public class ChatListViewFactory {
         blueHeader.setBackgroundColor(0xFF5D96C0);
         blueHeader.setOrientation(LinearLayout.VERTICAL);
 
-        final AvatarView avatarView = new AvatarView(ctx, calc.dp(68), from);
+        final AvatarView avatarView = new AvatarView(ctx, calc.dp(64), from);
         avatarView.setId(R.id.drawer_avatar);
         final LinearLayout.LayoutParams avatarLP = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         avatarLP.leftMargin = calc.dp(16);
@@ -169,7 +169,7 @@ public class ChatListViewFactory {
         drawerName.setLayoutParams(drawerNameLP);
         blueHeader.addView(drawerName);
 
-        final MyPhoneView myPhoneView = new MyPhoneView(ctx,  calc.dp(14f), false);
+        final MyPhoneView myPhoneView = new MyPhoneView(ctx,  calc.dp(13f), false);
         myPhoneView.setId(R.id.drawer_phone);
         final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         params.leftMargin = dip18;

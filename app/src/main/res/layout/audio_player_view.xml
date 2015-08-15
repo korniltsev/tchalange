@@ -41,7 +41,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_keyboard_tab"
-                android:layout_gravity="bottom|left"
+                android:layout_gravity="bottom|right"
                 android:layout_margin="16dp"
                 />
         <ImageButton
@@ -49,7 +49,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_keyboard_tab"
-                android:layout_gravity="bottom|right"
+                android:layout_gravity="bottom|left"
                 android:layout_margin="16dp"
                 />
 
@@ -97,7 +97,7 @@
             android:textColor="#333333"/>
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="132dp"
             android:gravity="center">
         <ImageButton
                 android:id="@+id/btn_next"

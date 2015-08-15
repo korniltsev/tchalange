@@ -38,7 +38,7 @@ public class DrawerButtonView extends View {
         this.icon = icon;
         this.text = new StaticLayout(text, textPaint, displayWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0, false);
         ty = (height - this.text.getHeight())/2;
-        tx = calc.dp(56);
+        tx = calc.dp(71);
         int iconTy = (height - icon.getIntrinsicHeight())/2;
         int left = dip16;
         int right = left + icon.getIntrinsicWidth();
