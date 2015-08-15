@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.chat_list;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
@@ -56,7 +57,7 @@ public class ChatListView extends DrawerLayout {
 
     //drawer
     private AvatarView drawerAvatar;
-    private TextView drawerName;
+    private MyPhoneView drawerName;
     private MyPhoneView drawerPhone;
     private View btnLogout;
     private View btnContacts;
@@ -139,10 +140,11 @@ public class ChatListView extends DrawerLayout {
 
 
 
+
     private void injectViews() {
         list = (RecyclerView) this.findViewById(R.id.list);
         drawerAvatar = (AvatarView) this.findViewById(R.id.drawer_avatar);
-        drawerName = ((TextView) this.findViewById(R.id.drawer_name));
+        drawerName = ((MyPhoneView) this.findViewById(R.id.drawer_name));
         drawerPhone = ((MyPhoneView) this.findViewById(R.id.drawer_phone));
         btnLogout = this.findViewById(R.id.btn_logout);
         btnContacts = this.findViewById(R.id.btn_contacts);

@@ -56,7 +56,7 @@ public class SimplePathContainer extends PathContainer {
   @Override protected void performTraversal(final ViewGroup containerView,
       final TraversalState traversalState, final Flow.Direction direction,
       final Flow.TraversalCallback callback) {
-    Debug.startMethodTracing("traversal");
+//    Debug.startMethodTracing("traversal");
 
     final PathContext context;
     final PathContext oldPath;
@@ -72,7 +72,7 @@ public class SimplePathContainer extends PathContainer {
     context = PathContext.create(oldPath, to, contextFactory);
 
     long start = System.nanoTime();
-    Debug.startMethodTracing("create_view");
+//    Debug.startMethodTracing("create_view");
     newView = to.constructViewManually(context, (FrameLayout) containerView);
     if (newView == null){
       int layout = to.getRootLayout();
@@ -80,7 +80,7 @@ public class SimplePathContainer extends PathContainer {
               .cloneInContext(context)
               .inflate(layout, containerView, false);
     }
-    Debug.stopMethodTracing();
+//    Debug.stopMethodTracing();
     long end = System.nanoTime();
     Log.d("SimplePathContainer", "view inflate in " + (end - start));
     View fromView =

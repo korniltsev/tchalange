@@ -29,7 +29,7 @@ public class NotificationManager {
     final Context ctx;
 //    private final Ringtone ringtone;
     private final Observable<TdApi.UpdateNotificationSettings> settingsUpdate;
-    private final Uri notification;
+//    private final Uri notification;
     private final ThreadLocal<Ringtone> ringtone;
     private RXAuthState.AuthState state;
 
@@ -37,11 +37,12 @@ public class NotificationManager {
     public NotificationManager(RXClient client, final Context ctx, RXAuthState auth) {
         this.client = client;
         this.ctx = ctx;
-        notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         ringtone = new ThreadLocal<Ringtone>(){
             @Override
             protected Ringtone initialValue() {
-                return RingtoneManager.getRingtone(ctx, notification);
+                return RingtoneManager.getRingtone(ctx,
+                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
             }
         };
         state = auth.getState();

@@ -16,8 +16,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import ru.korniltsev.telegram.audio.LinearLayoutWithShadow;
-import ru.korniltsev.telegram.audio.MiniPlayerView;
-import ru.korniltsev.telegram.audio.MiniPlayerViewFactory;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat_list.view.DrawerButtonView;
 import ru.korniltsev.telegram.chat_list.view.MyPhoneView;
@@ -161,12 +159,9 @@ public class ChatListViewFactory {
         avatarView.setLayoutParams(avatarLP);
         blueHeader.addView(avatarView);
 
-        final TextView drawerName = new TextView(ctx);
+
+        final MyPhoneView drawerName = new MyPhoneView(ctx,  calc.dp(16f), true);
         drawerName.setId(R.id.drawer_name);
-        drawerName.setTextColor(Color.WHITE);
-        drawerName.setTextSize(TypedValue.COMPLEX_UNIT_PX, dip16);
-        drawerName.setTypeface(null, Typeface.BOLD);
-        drawerName.setSingleLine();
         final LinearLayout.LayoutParams drawerNameLP = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         drawerNameLP.leftMargin = dip18;
         drawerNameLP.rightMargin = dip18;
@@ -174,7 +169,7 @@ public class ChatListViewFactory {
         drawerName.setLayoutParams(drawerNameLP);
         blueHeader.addView(drawerName);
 
-        final MyPhoneView myPhoneView = new MyPhoneView(ctx, null);
+        final MyPhoneView myPhoneView = new MyPhoneView(ctx,  calc.dp(14f), false);
         myPhoneView.setId(R.id.drawer_phone);
         final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         params.leftMargin = dip18;
