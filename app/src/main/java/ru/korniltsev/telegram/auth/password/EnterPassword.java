@@ -121,8 +121,8 @@ public class EnterPassword extends BasePath implements Serializable {
 
                 @Override
                 public void onNext(TdApi.User response) {
-                    auth.authorized(response);
                     hideKeyboard(getView());
+                    auth.authorized(response);
                     pd.dismiss();
                     request = null;
                 }

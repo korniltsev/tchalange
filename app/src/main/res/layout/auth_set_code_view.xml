@@ -32,7 +32,7 @@
                     android:layout_marginRight="18dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:textCursorDrawable="@null"
+
                     />
 
             <EditText
@@ -44,6 +44,7 @@
                     android:digits="0123456789"
                     android:layout_marginLeft="16dp"
                     android:imeOptions="actionDone"
+                    android:textCursorDrawable="@null"
                     />
 
         </RelativeLayout>

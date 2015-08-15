@@ -8,9 +8,14 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
+import ru.korniltsev.telegram.auth.phone.EnterPhoneFragment;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.adapters.TextWatcherAdapter;
+import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 
 import javax.inject.Inject;
 
@@ -18,7 +23,7 @@ import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 
-public class EnterPasswordView extends LinearLayout {
+public class EnterPasswordView extends LinearLayout implements HandlesBack{
 //    private final String errorMessageUnknown;
 //    private final String errorMessageInvalidCode;
 //    private final String errorMessageEmptyCode;
@@ -66,6 +71,7 @@ public class EnterPasswordView extends LinearLayout {
 //                presenter.codeEntered(s);
 //            }
 //        });
+
     }
 
     private void sendCode() {
@@ -104,5 +110,16 @@ public class EnterPasswordView extends LinearLayout {
 //        } else {
             return message;
 //        }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        AppUtils.flowPushAndRemove(this, null, new FlowHistoryStripper() {
+            @Override
+            public boolean shouldRemovePath(Object path) {
+                return !(path instanceof EnterPhoneFragment);
+            }
+        }, Flow.Direction.BACKWARD);
+        return true;
     }
 }

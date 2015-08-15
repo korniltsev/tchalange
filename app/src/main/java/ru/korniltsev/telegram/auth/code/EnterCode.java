@@ -149,8 +149,8 @@ public class EnterCode extends BasePath implements Serializable {
         }
 
         private void subscribe() {
-            hideKeyboard(getView()
-                    .getSmsCode());
+//            hideKeyboard(getView()
+//                    .getSmsCode());
             pd = new ProgressDialog(getView().getContext());
             subscription = request.subscribe(new ObserverAdapter<TdApi.User>() {
                 @Override
@@ -167,8 +167,8 @@ public class EnterCode extends BasePath implements Serializable {
 
                 @Override
                 public void onNext(TdApi.User response) {
-                    auth.authorized(response);
                     hideKeyboard(getView());
+                    auth.authorized(response);
                     pd.dismiss();
                     request = null;
                 }
