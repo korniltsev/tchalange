@@ -129,6 +129,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         final MyApp from = MyApp.from(context);
         calc = from.dpCalculator;
         emojiParser = from.emojiParser;
+        AppUtils.rtlPerformanceFix(this);
     }
 
     @Override

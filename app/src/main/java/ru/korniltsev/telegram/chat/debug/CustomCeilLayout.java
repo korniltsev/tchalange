@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.text.BoringLayout;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -15,22 +14,14 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.TextView;
-import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.utils.Colors;
 import ru.korniltsev.telegram.core.views.AvatarView;
 
-import javax.inject.Inject;
-
-import java.util.Objects;
-
-import static android.view.View.MeasureSpec.AT_MOST;
 import static android.view.View.MeasureSpec.EXACTLY;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 
@@ -120,6 +111,7 @@ public class CustomCeilLayout extends ViewGroup {
 
         marginBetweenNickAndContentView = calc.dp(4);
         setWillNotDraw(false);
+        AppUtils.rtlPerformanceFix(this);
     }
 
     public void addContentView(View v) {
@@ -290,4 +282,16 @@ public class CustomCeilLayout extends ViewGroup {
     public void setBottomMarginEnabled(boolean bottomMarginEnabled) {
         this.bottomMarginEnabled = bottomMarginEnabled;
     }
+
+    @Override
+    public boolean canResolveLayoutDirection() {
+        return false;
+    }
+
+    @Override
+    public boolean isLayoutDirectionResolved() {
+        return super.isLayoutDirectionResolved();
+    }
+
+
 }

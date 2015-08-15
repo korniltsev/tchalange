@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.*;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
 import com.crashlytics.android.core.CrashlyticsCore;
 import dagger.ObjectGraph;
@@ -30,10 +29,11 @@ import rx.Observable;
 import rx.Subscription;
 import rx.subjects.PublishSubject;
 
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static mortar.bundler.BundleServiceRunner.getBundleServiceRunner;
 import static ru.korniltsev.telegram.core.Utils.event;
 
-public class MainActivity extends ActionBarActivity implements ActivityOwner.AnActivity {
+public class MainActivity extends Activity implements ActivityOwner.AnActivity {
 
     private MortarScreenSwitcherFrame container;
     private FlowDelegate flow;
@@ -44,7 +44,7 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
     private ActivityOwner activityOwner;
     private static boolean firstRun = true;
     private BundleServiceRunner bundleServiceRunner;
-    private View statusBarBg;
+//    private View statusBarBg;
     private PasscodeManager passCodeManager;
 
     @Override
@@ -56,9 +56,11 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
         }
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.main_root_layout);
-        setupStatusBarForKitkat();
-        container = ((MortarScreenSwitcherFrame) findViewById(R.id.container));
+        final MortarScreenSwitcherFrame root = new MortarScreenSwitcherFrame(this, null);
+        root.setLayoutParams(new ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        setContentView(root);
+
+        container = root;
 
         MortarScope parentScope = MortarScope.getScope(getApplication());
 
@@ -93,23 +95,23 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
         getWindow().getDecorView().setBackgroundDrawable(null);
     }
 
-    private void setupStatusBarForKitkat() {
-        statusBarBg = findViewById(R.id.status_bar_for_kitkat);
-        ViewGroup.LayoutParams lp = statusBarBg.getLayoutParams();
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-            int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-            if (resourceId <= 0) {
-                return;
-            }
-            int statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-            lp.height = statusBarHeight;
-        } else {
-            lp.height = 0;
-        }
-        statusBarBg.setLayoutParams(lp);
-        int colorDark = getResources().getColor(R.color.primary_dark);
-        setStatusBarColor(colorDark);
-    }
+//    private void setupStatusBarForKitkat() {
+////        statusBarBg = findViewById(R.id.status_bar_for_kitkat);
+////        ViewGroup.LayoutParams lp = statusBarBg.getLayoutParams();
+//        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+//            int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+//            if (resourceId <= 0) {
+//                return;
+//            }
+////            int statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+////            lp.height = statusBarHeight;
+//        } else {
+////            lp.height = 0;
+//        }
+////        statusBarBg.setLayoutParams(lp);
+//        int colorDark = getResources().getColor(R.color.primary_dark);
+//        setStatusBarColor(colorDark);
+//    }
 
     private Object getScreenForAuthState(RXAuthState.AuthState state) {
         if (state instanceof RXAuthState.StateAuthorized) {
@@ -254,7 +256,7 @@ public class MainActivity extends ActionBarActivity implements ActivityOwner.AnA
     @Override
     public void setStatusBarColor(int color) {
         if (Build.VERSION_CODES.KITKAT == Build.VERSION.SDK_INT) {
-            statusBarBg.setBackgroundColor(color);
+//            statusBarBg.setBackgroundColor(color);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(color);
         }

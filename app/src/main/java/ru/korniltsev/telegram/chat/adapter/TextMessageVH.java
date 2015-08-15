@@ -5,6 +5,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.chat.adapter.view.TextMessageView;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.emoji.EmojiTextView;
@@ -17,17 +18,20 @@ import static ru.korniltsev.telegram.chat.debug.CustomCeilLayout.SquareDumbResou
 
 public class TextMessageVH extends BaseAvatarVH {
 
-    private final EmojiTextView message;
+//    private final EmojiTextView message;
+    private final TextMessageView message;
 
 
     public TextMessageVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
 
-        message = new EmojiTextView(itemView.getContext());
-        message.setTextColor(Color.BLACK);
-        message.setPadding(0, 0, root.calc.dp(8), 0);
-        message.setMovementMethod(LinkMovementMethod.getInstance());
-        applyTextStyle(message);
+//        message = new EmojiTextView(itemView.getContext());
+//        message.setTextColor(Color.BLACK);
+//        message.setPadding(0, 0, root.calc.dp(8), 0);
+//        message.setMovementMethod(LinkMovementMethod.getInstance());
+//
+//        applyTextStyle(message);
+        message = new TextMessageView(itemView.getContext());
         root.addContentView(message);
 
 

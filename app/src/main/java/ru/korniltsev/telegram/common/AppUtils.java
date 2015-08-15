@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -261,5 +262,11 @@ public class AppUtils {
         } else {
             return currentAudio.performer;
         }
+    }
+
+    public static void rtlPerformanceFix(View v) {
+//        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1){
+//            v.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+//        }
     }
 }

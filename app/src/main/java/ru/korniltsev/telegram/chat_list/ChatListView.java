@@ -70,6 +70,7 @@ public class ChatListView extends DrawerLayout {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         calc = MyApp.from(context).dpCalculator;
+        AppUtils.rtlPerformanceFix(this);
     }
 
     @Override
