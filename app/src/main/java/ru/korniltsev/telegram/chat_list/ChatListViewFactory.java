@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.chat_list;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -18,6 +19,7 @@ import ru.korniltsev.telegram.audio.LinearLayoutWithShadow;
 import ru.korniltsev.telegram.audio.MiniPlayerView;
 import ru.korniltsev.telegram.audio.MiniPlayerViewFactory;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.chat_list.view.DrawerButtonView;
 import ru.korniltsev.telegram.chat_list.view.MyPhoneView;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
@@ -60,10 +62,8 @@ public class ChatListViewFactory {
         toolbar.setPopupTheme(R.style.Theme_AppCompat_Light);
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setSubtitleTextColor(Color.WHITE);
-        toolbar.setTitleTextAppearance();
-        //todo
-        //        app:theme="@style/ToolBarStyle"
-        //        app:popupTheme="@style/Theme.AppCompat.Light"
+//        toolbar.setTitleTextAppearance();
+
 
         final MiniPlayerView miniPlayer = MiniPlayerViewFactory.construct(ctx, calc);
         result.addView(miniPlayer);
@@ -120,24 +120,27 @@ public class ChatListViewFactory {
     }
 
     static void createButton(Context ctx, DpCalculator calc, LinearLayout result, int id, int text, int icon) {
-        int dip16 = calc.dp(16f);
-        final TextView textView = new TextView(ctx);
-        textView.setId(id);
-        textView.setText(text);
-        final Drawable d = ctx.getResources()
+        final Resources res = ctx.getResources();
+        final int height = calc.dp(54);
+        final DrawerButtonView btn = new DrawerButtonView(ctx, height, calc.dp(304), calc, res.getString(text), res.getDrawable(icon));
+        //        final TextView textView = new TextView(ctx);
+        btn.setId(id);
+//        textView.setText(text);
+        final Drawable d = res
                 .getDrawable(icon);
         assert d != null;
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-        textView.setCompoundDrawables(d, null, null, null);
-        textView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, calc.dp(54)));
+//        textView.setCompoundDrawables(d, null, null, null);
 
-        textView.setCompoundDrawablePadding(dip16);
-        textView.setPadding(dip16, 0, 0, 0);
-        textView.setBackgroundResource(R.drawable.bg_keyboard_tab);
-        textView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-        textView.setTextColor(0xFF222222);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dip16);
-        result.addView(textView);
+        btn.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+
+//        textView.setCompoundDrawablePadding(dip16);
+//        textView.setPadding(dip16, 0, 0, 0);
+        btn.setBackgroundResource(R.drawable.bg_keyboard_tab);
+//        textView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+//        textView.setTextColor();
+//        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dip16);
+        result.addView(btn);
 
     }
 

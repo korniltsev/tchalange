@@ -56,7 +56,7 @@ public class SimplePathContainer extends PathContainer {
   @Override protected void performTraversal(final ViewGroup containerView,
       final TraversalState traversalState, final Flow.Direction direction,
       final Flow.TraversalCallback callback) {
-//    Debug.startMethodTracing("traversal");
+    Debug.startMethodTracing("traversal");
 
     final PathContext context;
     final PathContext oldPath;
@@ -82,7 +82,7 @@ public class SimplePathContainer extends PathContainer {
     }
 
     long end = System.nanoTime();
-    Log.d("SimplePathContainer", "view inflate in " + (end - start));
+//    Log.d("SimplePathContainer", "view inflate in " + (end - start));
     View fromView = null;
     if (traversalState.fromPath() != null) {
       fromView = containerView.getChildAt(0);
@@ -103,7 +103,7 @@ public class SimplePathContainer extends PathContainer {
       containerView.addView(newView);
       oldPath.destroyNotIn(context, contextFactory);
       callback.onTraversalCompleted();
-//      Debug.stopMethodTracing();
+      Debug.stopMethodTracing();
     } else {
       containerView.addView(newView);
       final View finalFromView = fromView;
@@ -116,7 +116,7 @@ public class SimplePathContainer extends PathContainer {
               containerView.removeView(finalFromView);
               oldPath.destroyNotIn(context, contextFactory);
               callback.onTraversalCompleted();
-              //              Debug.stopMethodTracing();
+                            Debug.stopMethodTracing();
             }
           });
         }
