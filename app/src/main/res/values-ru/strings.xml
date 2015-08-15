@@ -161,16 +161,16 @@
     <string name="message_joined_by_link">вступил в группу по пригласительной ссылке</string>
     <string name="user_status_bot">бот</string>
     <string name="what_the_bot_can_do">Что этот бот может делать?</string>
-    <string name="bot_about">About</string>
-    <string name="bot_add_to_group">Add to group</string>
+    <string name="bot_about">О боте</string>
+    <string name="bot_add_to_group">Добавить в группу</string>
     <string name="select_group">Выберите группу</string>
     <string name="slide_to_cancel">Смахните чтобы отменить</string>
-    <string name="message_voice">Voice</string>
-    <string name="name_not_modified">Name not modified</string>
-    <string name="chat_title">Chat title</string>
-    <string name="first_name_must_be_non_empty">First name must be non-empty</string>
+    <string name="message_voice">Голос</string>
+    <string name="name_not_modified">Имя не изменилось</string>
+    <string name="chat_title">Заголовок чата</string>
+    <string name="first_name_must_be_non_empty">Имя не может быть пустым</string>
     <string name="playlist">Playlist</string>
-    <string name="enter_your_pass">Please enter your personal password</string>
-    <string name="password">Password</string>
-    <string name="sms_code">SMS code</string>
+    <string name="enter_your_pass">Пожалуйста, введите Ваш пароль</string>
+    <string name="password">Пароль</string>
+    <string name="sms_code">SMS код</string>
 </resources>
