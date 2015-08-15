@@ -36,43 +36,13 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class PhoneFormat {
-    public byte[] data;
-    public ByteBuffer buffer;
-    public String defaultCountry;
+    public final byte[] data;
+    public final ByteBuffer buffer;
+    public final String defaultCountry;
     public String defaultCallingCode;
-    public HashMap<String, Integer> callingCodeOffsets;
-    public HashMap<String, ArrayList<String>> callingCodeCountries;
-    public HashMap<String, CallingCodeInfo> callingCodeData;
-    public HashMap<String, String> countryCallingCode;
-
-    public static String strip(String str) {
-        StringBuilder res = new StringBuilder(str);
-        String phoneChars = "0123456789+*#";
-        for (int i = res.length() - 1; i >= 0; i--) {
-            if (!phoneChars.contains(res.substring(i, i + 1))) {
-                res.deleteCharAt(i);
-            }
-        }
-        return res.toString();
-    }
-
-    public static String stripExceptNumbers(String str, boolean includePlus) {
-        StringBuilder res = new StringBuilder(str);
-        String phoneChars = "0123456789";
-        if (includePlus) {
-            phoneChars += "+";
-        }
-        for (int i = res.length() - 1; i >= 0; i--) {
-            if (!phoneChars.contains(res.substring(i, i + 1))) {
-                res.deleteCharAt(i);
-            }
-        }
-        return res.toString();
-    }
-
-    public static String stripExceptNumbers(String str) {
-        return stripExceptNumbers(str, false);
-    }
+    public final HashMap<String, Integer> callingCodeOffsets;
+    public final HashMap<String, ArrayList<String>> callingCodeCountries;
+    public final HashMap<String, CallingCodeInfo> callingCodeData;
 
     public PhoneFormat(Context ctx) {
         InputStream stream = null;
@@ -114,6 +84,37 @@ public class PhoneFormat {
         countryCallingCode = new HashMap<>(255);
 
         parseDataHeader();
+    }
+
+    public HashMap<String, String> countryCallingCode;
+
+    public static String strip(String str) {
+        StringBuilder res = new StringBuilder(str);
+        String phoneChars = "0123456789+*#";
+        for (int i = res.length() - 1; i >= 0; i--) {
+            if (!phoneChars.contains(res.substring(i, i + 1))) {
+                res.deleteCharAt(i);
+            }
+        }
+        return res.toString();
+    }
+
+    public static String stripExceptNumbers(String str, boolean includePlus) {
+        StringBuilder res = new StringBuilder(str);
+        String phoneChars = "0123456789";
+        if (includePlus) {
+            phoneChars += "+";
+        }
+        for (int i = res.length() - 1; i >= 0; i--) {
+            if (!phoneChars.contains(res.substring(i, i + 1))) {
+                res.deleteCharAt(i);
+            }
+        }
+        return res.toString();
+    }
+
+    public static String stripExceptNumbers(String str) {
+        return stripExceptNumbers(str, false);
     }
 
     public String defaultCallingCode() {

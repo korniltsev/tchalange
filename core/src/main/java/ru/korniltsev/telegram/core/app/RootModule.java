@@ -56,6 +56,7 @@ import java.util.concurrent.Executors;
                 BootReceiver.class  ,
                 PasscodeManager.class,
                 UserHolder.class ,
+                PhoneFormat.class
         },
         library = true)
 public class RootModule {

@@ -9,9 +9,12 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import dagger.ObjectGraph;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
+import ru.korniltsev.telegram.chat_list.view.MyPhoneView;
+import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.audio.LinearLayoutWithShadow;
 import ru.korniltsev.telegram.audio.MiniPlayerView;
@@ -24,7 +27,12 @@ import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.schedulers.Schedulers;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -37,7 +45,7 @@ public class ChatListView extends DrawerLayout {
     private final DpCalculator calc;
     @Inject ChatListPresenter presenter;
     @Inject ChatDB chatDb;
-    @Inject PhoneFormat phoneFormat;
+    //    @Inject PhoneFormat phoneFormat;
     @Inject UserHolder userHolder;
 
     private RecyclerView list;
@@ -48,12 +56,13 @@ public class ChatListView extends DrawerLayout {
     //drawer
     private AvatarView drawerAvatar;
     private TextView drawerName;
-    private TextView drawerPhone;
+    private MyPhoneView drawerPhone;
     private View btnLogout;
     private View btnContacts;
     private View btnSettings;
     private MiniPlayerView miniPlayer;
     private LinearLayoutWithShadow toolbarShadow;
+    private Subscription subscription;
 
     public ChatListView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -71,6 +80,9 @@ public class ChatListView extends DrawerLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         presenter.dropView(this);
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
     }
 
     @Override
@@ -126,7 +138,7 @@ public class ChatListView extends DrawerLayout {
         list = (RecyclerView) this.findViewById(R.id.list);
         drawerAvatar = (AvatarView) this.findViewById(R.id.drawer_avatar);
         drawerName = ((TextView) this.findViewById(R.id.drawer_name));
-        drawerPhone = ((TextView) this.findViewById(R.id.drawer_phone));
+        drawerPhone = ((MyPhoneView) this.findViewById(R.id.drawer_phone));
         btnLogout = this.findViewById(R.id.btn_logout);
         btnContacts = this.findViewById(R.id.btn_contacts);
         btnSettings = this.findViewById(R.id.btn_settings);
@@ -145,8 +157,29 @@ public class ChatListView extends DrawerLayout {
         if (!phoneNumber.startsWith("+")) {
             phoneNumber = "+" + phoneNumber;
         }
-        drawerPhone.setText(
-                phoneFormat.format(phoneNumber));
+        drawerPhone.setText(phoneNumber);
+
+        subscription = parsePhone(getContext().getApplicationContext(), phoneNumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new ObserverAdapter<String>() {
+                    @Override
+                    public void onNext(String response) {
+                        drawerPhone.setText(response);
+                    }
+                });
+    }
+
+    public Observable<String> parsePhone(final Context appCtx, final String phoneNumber) {
+        return Observable.defer(new Func0<Observable<String>>() {
+            @Override
+            public Observable<String> call() {
+                final ObjectGraph objectGraph = ObjectGraphService.getObjectGraph(appCtx);
+                final PhoneFormat formatter = objectGraph.get(PhoneFormat.class);//expensive operation
+                final String result = formatter.format(phoneNumber);
+                return Observable.just(result);
+            }
+        });
     }
 
     public void updateNetworkStatus(boolean connected) {
