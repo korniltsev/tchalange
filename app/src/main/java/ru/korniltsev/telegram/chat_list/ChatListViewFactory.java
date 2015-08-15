@@ -143,7 +143,6 @@ public class ChatListViewFactory {
     }
 
     static LinearLayout createBlueHeader(Context ctx, DpCalculator calc, MyApp from) {
-        final int dip16 = calc.dp(16f);
         final int dip18 = calc.dp(18f);
 
         final LinearLayout blueHeader = new LinearLayout(ctx);
@@ -165,7 +164,7 @@ public class ChatListViewFactory {
         final LinearLayout.LayoutParams drawerNameLP = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
         drawerNameLP.leftMargin = dip18;
         drawerNameLP.rightMargin = dip18;
-        drawerNameLP.topMargin = dip16;
+        drawerNameLP.topMargin = dip18;
         drawerName.setLayoutParams(drawerNameLP);
         blueHeader.addView(drawerName);
 

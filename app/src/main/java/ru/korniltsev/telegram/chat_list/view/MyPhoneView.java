@@ -35,9 +35,8 @@ public class MyPhoneView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        final float lineWidth = staticLayout.getLineWidth(0);
         final int height = staticLayout.getHeight();
-        setMeasuredDimension((int) (lineWidth + 1), height);
+        setMeasuredDimension(width, height);
     }
 
     @Override
