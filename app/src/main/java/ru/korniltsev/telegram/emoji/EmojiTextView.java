@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.emoji;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
@@ -43,5 +44,11 @@ public class EmojiTextView extends TextView{
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         s.unsubscribe();
+    }
+
+    @SuppressLint("MissingSuperCall")
+    @Override
+    protected void drawableStateChanged() {
+
     }
 }

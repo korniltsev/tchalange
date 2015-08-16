@@ -121,7 +121,7 @@ public class FrameUnderMessagePanelController {
             row.setOrientation(LinearLayout.HORIZONTAL);
             for (int i = 0, rowStrLength = rowStr.length; i < rowStrLength; i++) {
                 final String s = rowStr[i];
-                final Button button = new Button(ctx);
+                final BotReplyButton  button = new BotReplyButton(ctx);
                 button.setText(
                         emoji.replaceEmoji(s));
                 final LinearLayout.LayoutParams lp;
@@ -131,7 +131,7 @@ public class FrameUnderMessagePanelController {
                     lp = new LinearLayout.LayoutParams(0, MATCH_PARENT);
                 }
                 lp.weight = 1;
-                button.setBackgroundResource(R.drawable.btn_bot_reply);
+//                button.setBackgroundResource(R.drawable.btn_bot_reply);
                 int leftPadding;
                 int rightPadding;
                 if (i == 0) {
