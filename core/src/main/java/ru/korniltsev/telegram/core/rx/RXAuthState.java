@@ -165,13 +165,13 @@ public class RXAuthState {
 
     @Nullable
     private TdApi.User getCurrentUser() {
-        long start = System.nanoTime();
+//        long start = System.nanoTime();
         final String serializedMe = prefs.getString(ME_JSON, null);
         if (serializedMe != null) {
             final TdApi.User deserialized = FastUserSerialization.deserialize(serializedMe);
             if (deserialized != null){
-                long end = System.nanoTime();
-                Log.d("Duration", (end - start) + " deserialization");
+//                long end = System.nanoTime();
+//                Log.d("Duration", (end - start) + " deserialization");
                 return deserialized;
             }
         }
@@ -190,11 +190,11 @@ public class RXAuthState {
     }
 
     public void saveToDisk(TdApi.User user) {
-        long start = System.nanoTime();
+//        long start = System.nanoTime();
         final String serializedUser = FastUserSerialization.serialize(user);
         prefs.edit().putString(ME_JSON, serializedUser).apply();
-        long end = System.nanoTime();
-        Log.d("Duration", (end - start) + " serialization");
+//        long end = System.nanoTime();
+//        Log.d("Duration", (end - start) + " serialization");
 
         //        final JSONObject jsonObject = new JSONObject();
 //        jsonObject.put("firstName", user.firstName);
