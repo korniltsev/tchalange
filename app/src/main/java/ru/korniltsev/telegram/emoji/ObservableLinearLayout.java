@@ -35,6 +35,7 @@ public class ObservableLinearLayout extends FrameLayout {
     private ObservableLinearLayout.CallBack cb;
 
     /*@Inject*/ DpCalculator calc;
+    private final Resources res;
 
     public interface CallBack {
         void onLayout(int keyboardHeight);
@@ -47,7 +48,7 @@ public class ObservableLinearLayout extends FrameLayout {
         setWillNotDraw(false);
         prefs = context.getSharedPreferences("EmojiPopup", Context.MODE_PRIVATE);
 
-        final Resources res = getResources();
+        res = getResources();
         statusBarHeight = getResource(res, "status_bar_height");
         navBarHeight = getResource(res, "navigation_bar_height");
 
@@ -102,7 +103,8 @@ public class ObservableLinearLayout extends FrameLayout {
     }
 
     private int getNavBarHeight (){
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ||
+                res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             return 0;
         }
         return navBarHeight;
