@@ -2380,6 +2380,177 @@ public class TdApi {
         }
     }
 
+    public abstract static class SearchMessagesFilter extends TLObject {
+    }
+
+    public static class SearchMessagesFilterEmpty extends SearchMessagesFilter {
+
+        public SearchMessagesFilterEmpty() {
+        }
+
+        public static final int CONSTRUCTOR = -869395657;
+
+        @Override
+        public int getConstructor() {
+            return -869395657;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterEmpty").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterAudio extends SearchMessagesFilter {
+
+        public SearchMessagesFilterAudio() {
+        }
+
+        public static final int CONSTRUCTOR = 867505275;
+
+        @Override
+        public int getConstructor() {
+            return 867505275;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterAudio").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterDocument extends SearchMessagesFilter {
+
+        public SearchMessagesFilterDocument() {
+        }
+
+        public static final int CONSTRUCTOR = 1526331215;
+
+        @Override
+        public int getConstructor() {
+            return 1526331215;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterDocument").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterPhoto extends SearchMessagesFilter {
+
+        public SearchMessagesFilterPhoto() {
+        }
+
+        public static final int CONSTRUCTOR = 925932293;
+
+        @Override
+        public int getConstructor() {
+            return 925932293;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterPhoto").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterVideo extends SearchMessagesFilter {
+
+        public SearchMessagesFilterVideo() {
+        }
+
+        public static final int CONSTRUCTOR = 115538222;
+
+        @Override
+        public int getConstructor() {
+            return 115538222;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterVideo").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterVoice extends SearchMessagesFilter {
+
+        public SearchMessagesFilterVoice() {
+        }
+
+        public static final int CONSTRUCTOR = 1123427595;
+
+        @Override
+        public int getConstructor() {
+            return 1123427595;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterVoice").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterPhotoAndVideo extends SearchMessagesFilter {
+
+        public SearchMessagesFilterPhotoAndVideo() {
+        }
+
+        public static final int CONSTRUCTOR = 1352130963;
+
+        @Override
+        public int getConstructor() {
+            return 1352130963;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterPhotoAndVideo").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessagesFilterUrl extends SearchMessagesFilter {
+
+        public SearchMessagesFilterUrl() {
+        }
+
+        public static final int CONSTRUCTOR = -1828724341;
+
+        @Override
+        public int getConstructor() {
+            return -1828724341;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessagesFilterUrl").append(" {\n");
+            shift += 2;
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
     public abstract static class SendMessageAction extends TLObject {
     }
 
@@ -2622,26 +2793,28 @@ public class TdApi {
         public int width;
         public int height;
         public String emoji;
+        public double rating;
         public PhotoSize thumb;
         public File sticker;
 
         public Sticker() {
         }
 
-        public Sticker(long setId, int width, int height, String emoji, PhotoSize thumb, File sticker) {
+        public Sticker(long setId, int width, int height, String emoji, double rating, PhotoSize thumb, File sticker) {
             this.setId = setId;
             this.width = width;
             this.height = height;
             this.emoji = emoji;
+            this.rating = rating;
             this.thumb = thumb;
             this.sticker = sticker;
         }
 
-        public static final int CONSTRUCTOR = -170884566;
+        public static final int CONSTRUCTOR = -319806232;
 
         @Override
         public int getConstructor() {
-            return -170884566;
+            return -319806232;
         }
 
         @Override
@@ -2652,6 +2825,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("width").append(" = ").append(width).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("height").append(" = ").append(height).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("emoji").append(" = ").append(emoji).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rating").append(" = ").append(rating).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("thumb").append(" = "); thumb.toStringBuilder(shift, s);
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("sticker").append(" = "); sticker.toStringBuilder(shift, s);
             shift -= 2;
@@ -2663,6 +2837,7 @@ public class TdApi {
         public long id;
         public String title;
         public String name;
+        public double rating;
         public boolean isInstalled;
         public boolean isEnabled;
         public boolean isOfficial;
@@ -2671,21 +2846,22 @@ public class TdApi {
         public StickerSet() {
         }
 
-        public StickerSet(long id, String title, String name, boolean isInstalled, boolean isEnabled, boolean isOfficial, Sticker[] stickers) {
+        public StickerSet(long id, String title, String name, double rating, boolean isInstalled, boolean isEnabled, boolean isOfficial, Sticker[] stickers) {
             this.id = id;
             this.title = title;
             this.name = name;
+            this.rating = rating;
             this.isInstalled = isInstalled;
             this.isEnabled = isEnabled;
             this.isOfficial = isOfficial;
             this.stickers = stickers;
         }
 
-        public static final int CONSTRUCTOR = 834766719;
+        public static final int CONSTRUCTOR = 1942998252;
 
         @Override
         public int getConstructor() {
-            return 834766719;
+            return 1942998252;
         }
 
         @Override
@@ -2695,6 +2871,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rating").append(" = ").append(rating).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInstalled").append(" = ").append(isInstalled).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isEnabled").append(" = ").append(isEnabled).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isOfficial").append(" = ").append(isOfficial).append('\n');
@@ -2708,6 +2885,7 @@ public class TdApi {
         public long id;
         public String title;
         public String name;
+        public double rating;
         public boolean isInstalled;
         public boolean isEnabled;
         public boolean isOfficial;
@@ -2716,21 +2894,22 @@ public class TdApi {
         public StickerSetInfo() {
         }
 
-        public StickerSetInfo(long id, String title, String name, boolean isInstalled, boolean isEnabled, boolean isOfficial, int size) {
+        public StickerSetInfo(long id, String title, String name, double rating, boolean isInstalled, boolean isEnabled, boolean isOfficial, int size) {
             this.id = id;
             this.title = title;
             this.name = name;
+            this.rating = rating;
             this.isInstalled = isInstalled;
             this.isEnabled = isEnabled;
             this.isOfficial = isOfficial;
             this.size = size;
         }
 
-        public static final int CONSTRUCTOR = -799900440;
+        public static final int CONSTRUCTOR = -1268445223;
 
         @Override
         public int getConstructor() {
-            return -799900440;
+            return -1268445223;
         }
 
         @Override
@@ -2740,6 +2919,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("id").append(" = ").append(id).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("title").append(" = ").append(title).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("name").append(" = ").append(name).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("rating").append(" = ").append(rating).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isInstalled").append(" = ").append(isInstalled).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isEnabled").append(" = ").append(isEnabled).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("isOfficial").append(" = ").append(isOfficial).append('\n');
@@ -5282,6 +5462,45 @@ public class TdApi {
             s.append("ResetAuth").append(" {\n");
             shift += 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("force").append(" = ").append(force).append('\n');
+            shift -= 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
+        }
+    }
+
+    public static class SearchMessages extends TLFunction {
+        public long chatId;
+        public String query;
+        public int fromId;
+        public int limit;
+        public SearchMessagesFilter filter;
+
+        public SearchMessages() {
+        }
+
+        public SearchMessages(long chatId, String query, int fromId, int limit, SearchMessagesFilter filter) {
+            this.chatId = chatId;
+            this.query = query;
+            this.fromId = fromId;
+            this.limit = limit;
+            this.filter = filter;
+        }
+
+        public static final int CONSTRUCTOR = 65456226;
+
+        @Override
+        public int getConstructor() {
+            return 65456226;
+        }
+
+        @Override
+        protected void toStringBuilder(int shift, StringBuilder s) {
+            s.append("SearchMessages").append(" {\n");
+            shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("chatId").append(" = ").append(chatId).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("query").append(" = ").append(query).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("fromId").append(" = ").append(fromId).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("limit").append(" = ").append(limit).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("filter").append(" = "); filter.toStringBuilder(shift, s);
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
