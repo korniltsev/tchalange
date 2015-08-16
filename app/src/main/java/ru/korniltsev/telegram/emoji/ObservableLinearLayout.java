@@ -11,11 +11,11 @@ package ru.korniltsev.telegram.emoji;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -24,13 +24,12 @@ import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 
-import java.lang.reflect.Field;
-
 public class ObservableLinearLayout extends FrameLayout {
 
     private final int statusBarHeight;
     private final Point displaySize = new Point();
     private final SharedPreferences prefs;
+    private final int navBarHeight;
     private Rect rect = new Rect();
     private int keyboardHeight;
     private ObservableLinearLayout.CallBack cb;
@@ -48,17 +47,26 @@ public class ObservableLinearLayout extends FrameLayout {
         setWillNotDraw(false);
         prefs = context.getSharedPreferences("EmojiPopup", Context.MODE_PRIVATE);
 
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        } else {
-            statusBarHeight = 0;
-        }
+        final Resources res = getResources();
+        statusBarHeight = getResource(res, "status_bar_height");
+        navBarHeight = getResource(res, "navigation_bar_height");
+
+
 
         WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
         if (display != null) {
             display.getSize(displaySize);
+        }
+    }
+
+    private int getResource(Resources res, String status_bar_height) {
+        int resourceId = res.getIdentifier(status_bar_height, "dimen", "android");
+        if (resourceId > 0) {
+            return  res.getDimensionPixelSize(resourceId);
+        } else {
+            return 0;
+
         }
     }
 
@@ -71,10 +79,10 @@ public class ObservableLinearLayout extends FrameLayout {
         super.onLayout(changed, l, t, r, b);
 
         View rootView = this.getRootView();
-        int usableViewHeight = rootView.getHeight() - statusBarHeight - getViewInset(rootView);
+        int spaceLeft = rootView.getHeight() - statusBarHeight - getNavBarHeight();
         this.getWindowVisibleDisplayFrame(rect);
-        keyboardHeight = usableViewHeight - (rect.bottom - rect.top);
-        if (keyboardHeight >0 ){
+        keyboardHeight = spaceLeft - (rect.bottom - rect.top);
+        if (keyboardHeight > 0 ){
             saveKeyboardHeight(keyboardHeight);
         }
         if (cb != null) {
@@ -93,25 +101,14 @@ public class ObservableLinearLayout extends FrameLayout {
         return keyboardHeight;
     }
 
-    public static int getViewInset(View view) {
-        if (view == null || Build.VERSION.SDK_INT < 21) {
+    private int getNavBarHeight (){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
             return 0;
         }
-        try {
-            Field mAttachInfoField = View.class.getDeclaredField("mAttachInfo");
-            mAttachInfoField.setAccessible(true);
-            Object mAttachInfo = mAttachInfoField.get(view);
-            if (mAttachInfo != null) {
-                Field mStableInsetsField = mAttachInfo.getClass().getDeclaredField("mStableInsets");
-                mStableInsetsField.setAccessible(true);
-                Rect insets = (Rect) mStableInsetsField.get(mAttachInfo);
-                return insets.bottom;
-            }
-        } catch (Exception e) {
-            Log.e("libtd", "reflection err", e);
-        }
-        return 0;
+        return navBarHeight;
     }
+
+
 
     private void saveKeyboardHeight(int keyboardHeight) {
         boolean portrait = isPortrait();
