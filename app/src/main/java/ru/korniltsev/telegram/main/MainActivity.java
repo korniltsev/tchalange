@@ -152,7 +152,7 @@ public class MainActivity extends Activity implements ActivityOwner.AnActivity {
 
     @Override
     protected void onPause() {
-        event("onPause " + this);
+//        event("onPause " + this);
         super.onPause();
         flow.onPause();
         //todo здесь ошибка и отписываться надо не в onDestroy
