@@ -20,7 +20,6 @@ import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
@@ -94,7 +93,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
         if (chat.type instanceof TdApi.GroupChatInfo) {
             TdApi.GroupChat groupChat = ((TdApi.GroupChatInfo) chat.type).groupChat;
-            fullChatInfoRequest = client.getGroupChatInfo(groupChat.id)
+            fullChatInfoRequest = client.getGroupChatFull(groupChat.id)
                     .cache()
                     .observeOn(mainThread());
             this.user = null;
@@ -629,25 +628,21 @@ public class Presenter extends ViewPresenter<ChatView>
     }
 
     public void open(TdApi.User user) {
-        subscription.add(
-                userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
-                    @Override
-                    public void onNext(TdApi.UserFull response) {
-                        Flow.get(getView())
-                                .set(new ProfilePath(response, chat, path.me));
-                    }
-                }));
+        Flow.get(getView())
+                .set(new ProfilePath( chat, path.me, user));
+//        subscription.add(
+//                userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
+//                    @Override
+//                    public void onNext(TdApi.UserFull response) {
+//
+//                    }
+//                }));
     }
 
     public void open(final TdApi.Chat groupChat) {
-        subscription.add(
-                fullChatInfoRequest.subscribe(new ObserverAdapter<TdApi.GroupChatFull>() {
-                    @Override
-                    public void onNext(TdApi.GroupChatFull response) {
-                        Flow.get(getView())
-                                .set(new ChatInfo(response, groupChat));
-                    }
-                }));
+        Flow.get(getView())
+                .set(new ChatInfo(groupChat));
+
     }
 
     public void muteFor(int duration) {

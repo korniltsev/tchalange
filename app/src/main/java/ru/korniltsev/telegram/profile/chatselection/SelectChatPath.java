@@ -13,10 +13,10 @@ import java.io.Serializable;
 
 @WithModule(SelectChatPath.Module.class)
 public class SelectChatPath extends BasePath implements Serializable{
-    public final TdApi.UserFull user;
+    public final TdApi.User user;
     public final TdApi.User me;
 
-    public SelectChatPath(TdApi.UserFull user, TdApi.User me) {
+    public SelectChatPath(TdApi.User user, TdApi.User me) {
         this.user = user;
         this.me = me;
     }

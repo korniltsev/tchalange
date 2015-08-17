@@ -18,17 +18,20 @@ import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.chatselection.SelectChatPath;
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static ru.korniltsev.telegram.common.AppUtils.getMedia;
+import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
 public class ProfilePresenter extends ViewPresenter<ProfileView> implements ProfileAdapter.CallBack {
+    public static final TdApi.SearchMessagesFilterPhotoAndVideo FILTER = new TdApi.SearchMessagesFilterPhotoAndVideo();
     final ProfilePath path;
     final ActivityOwner owner;
     @Nullable private ListChoicePopup popup;
@@ -50,31 +53,53 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     protected void onLoad(Bundle savedInstanceState) {
         super.onLoad(savedInstanceState);
         subscriptions = new CompositeSubscription();
-        getView().bindUser(path.user);
-        getView().bindMuteMenu(nm.isMuted(path.chat));
-
-        getView().bindBlockMenu(blocked);
+        //        getView().bindUser(path.user);
+        final ProfileView view = getView();
+        view.bindMuteMenu(nm.isMuted(path.chat));
+        view.bindUserAvatar(path.user);
+        view.bindBlockMenu(blocked);
         subscriptions.add(
                 blockInfo()
                         .subscribe(new ObserverAdapter<Boolean>() {
                             @Override
                             public void onNext(Boolean blocked) {
                                 ProfilePresenter.this.blocked = blocked;
-                                getView().bindBlockMenu(blocked);
+                                view.bindBlockMenu(blocked);
                             }
                         }));
+
+        final Observable<UserInfo> userInfo = zip(
+                getMedia(client, path.chat.id),
+                client.getUserFull(path.user.id),
+                new Func2<TdApi.Messages, TdApi.UserFull, UserInfo>() {
+                    @Override
+                    public UserInfo call(TdApi.Messages messages, TdApi.UserFull userFull) {
+                        return new UserInfo(messages, userFull);
+                    }
+                })
+                .observeOn(mainThread());
+
+        subscriptions.add(
+                userInfo.subscribe(new ObserverAdapter<UserInfo>() {
+                    @Override
+                    public void onNext(UserInfo response) {
+                        view
+                                .bindUser(response.user);
+                    }
+                })
+        );
     }
 
     @NonNull
     private Observable<Boolean> blockInfo() {
-        final Observable<Boolean> getUserFull = client.sendCachedRXUI(new TdApi.GetUserFull(path.user.user.id))
+        final Observable<Boolean> getUserFull = client.sendCachedRXUI(new TdApi.GetUserFull(path.user.id))
                 .map(new Func1<TdApi.TLObject, Boolean>() {
                     @Override
                     public Boolean call(TdApi.TLObject tlObject) {
                         return ((TdApi.UserFull) tlObject).isBlocked;
                     }
                 });
-        final Observable<Boolean> updates = client.updateUserBlocked(path.user.user.id);
+        final Observable<Boolean> updates = client.updateUserBlocked(path.user.id);
         return Observable.concat(getUserFull, updates)
                 .observeOn(mainThread());
     }
@@ -104,14 +129,14 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
 
     public void share() {
         Flow.get(getView())
-                .set(new ContactList(path.user.user));
+                .set(new ContactList(path.user));
     }
 
     public void block() {
         if (blocked) {
-            client.sendSilently(new TdApi.UnblockUser(path.user.user.id));
+            client.sendSilently(new TdApi.UnblockUser(path.user.id));
         } else {
-            client.sendSilently(new TdApi.BlockUser(path.user.user.id));
+            client.sendSilently(new TdApi.BlockUser(path.user.id));
         }
         blocked = !blocked;
         getView().bindBlockMenu(blocked);
@@ -122,7 +147,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void delete() {
-        final int id = path.user.user.id;
+        final int id = path.user.id;
         final int[] ids = new int[]{id};
         subscriptions.add(
                 client.sendRx(new TdApi.DeleteContacts(ids))
@@ -160,5 +185,15 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     public void addBotToGroup() {
         Flow.get(getView())
                 .set(new SelectChatPath(path.user, path.me));
+    }
+
+    class UserInfo {
+        final TdApi.Messages ms;
+        final TdApi.UserFull user;
+
+        public UserInfo(TdApi.Messages ms, TdApi.UserFull user) {
+            this.ms = ms;
+            this.user = user;
+        }
     }
 }

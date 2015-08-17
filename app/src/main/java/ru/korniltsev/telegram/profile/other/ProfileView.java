@@ -146,7 +146,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
 
     public void bindUser(@NonNull TdApi.UserFull userFill) {
         final TdApi.User user = userFill.user;
-        fakeToolbar.bindUser(user);
+
         List<ProfileAdapter.Item> items = new ArrayList<>();
         final boolean hasUserName = !isEmpty(user.username);
         final boolean hasPhoneNumber = !isEmpty(user.phoneNumber);
@@ -216,16 +216,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         }
     }
 
-    private List<ListChoicePopup.Item> crateteAddBotToGroupAction() {
-        final ArrayList<ListChoicePopup.Item> items = new ArrayList<>();
-        items.add(new ListChoicePopup.Item("unused", new Runnable() {
-            @Override
-            public void run() {
-                presenter.addBotToGroup();
-            }
-        }));
-        return items;
-    }
+
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {
 
@@ -265,5 +256,9 @@ public class ProfileView extends FrameLayout implements HandlesBack {
     public void bindBlockMenu(boolean blocked) {
         final MenuItem block = toolbar.toolbar.getMenu().findItem(R.id.menu_block);
         block.setTitle(blocked ? R.string.menu_unblock : R.string.menu_block);
+    }
+
+    public void bindUserAvatar(TdApi.User user) {
+        fakeToolbar.bindUser(user);
     }
 }

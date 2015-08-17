@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import mortar.ViewPresenter;
@@ -25,6 +27,7 @@ import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.edit.chat.title.EditChatTitlePath;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -33,7 +36,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.korniltsev.telegram.common.AppUtils.getMedia;
 import static ru.korniltsev.telegram.common.AppUtils.getTmpFileForCamera;
+import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
@@ -45,6 +50,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     private CompositeSubscription subscriptions;
 
     TdApi.Chat chat;
+    @Nullable private TdApi.GroupChatFull chatFull;
 
     @Inject
     public ChatInfoPresenter(ChatInfo path, ActivityOwner owner, NotificationManager notifications, RXClient client) {
@@ -57,17 +63,50 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     @Override
     protected void onLoad(Bundle savedInstanceState) {
         super.onLoad(savedInstanceState);
+        subscriptions = new CompositeSubscription();
+
         try {
             chat = (TdApi.Chat) client.sendRxBlocking(new TdApi.GetChat(path.chatId));
         } catch (Exception e) {
             CrashlyticsCore.getInstance().logException(e);
             return;
         }
-        subscriptions = new CompositeSubscription();
-        getView().bindUser(path, chat);
-        //todo
-        final boolean muted = chat.notificationSettings.muteFor > 0;//notifications.isMuted(chat.notificationSettings);
-        getView().bindMuteMenu(muted);
+        final boolean muted = chat.notificationSettings.muteFor > 0;
+
+        final ChatInfoView view = getView();
+        view.bindChatAvatar(chat);
+        view.bindMuteMenu(muted);
+
+        final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
+        final Observable<ChatInfoData> chatInfo = zip(
+                client.getGroupChatFull(type.groupChat.id),
+                getMedia(client, chat.id),
+                new Func2<TdApi.GroupChatFull, TdApi.Messages, ChatInfoData>() {
+                    @Override
+                    public ChatInfoData call(TdApi.GroupChatFull groupChatFull, TdApi.Messages messages) {
+                        return new ChatInfoData(groupChatFull, messages);
+                    }
+                }
+        ).observeOn(mainThread());
+        subscriptions.add(chatInfo.subscribe(new ObserverAdapter<ChatInfoData>(){
+            @Override
+            public void onNext(ChatInfoData response) {
+                getView()
+                        .bindUser(response.chatFull, path);
+                chatFull = response.chatFull;
+            }
+        }));
+        //        client.sendRx(new )
+//        subscriptions.add(
+//                groupChatFull
+//                        .observeOn(mainThread())
+//                        .subscribe(new ObserverAdapter<TdApi.GroupChatFull>() {
+//                            @Override
+//                            public void onNext(TdApi.GroupChatFull response) {
+//                                super.onNext(response);
+//                            }
+//                        })
+//        );
 
         subscriptions.add(
                 owner.activityResult().subscribe(new ObserverAdapter<ActivityResult>() {
@@ -83,7 +122,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                             public void onNext(TdApi.UpdateChatPhoto response) {
                                 final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
                                 type.groupChat.photo = response.photo;
-                                getView()
+                                view
                                         .bindChatAvatar(chat);
                             }
                         }));
@@ -92,7 +131,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                         .subscribe(new ObserverAdapter<TdApi.UpdateChatTitle>() {
                             @Override
                             public void onNext(TdApi.UpdateChatTitle response) {
-                                getView()
+                                view
                                         .setChatTitle(response.title);
                             }
                         }));
@@ -129,13 +168,16 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
 
     @Override
     public void btnAddMemberClicked() {
+        if (chatFull == null){
+            return;
+        }
         Flow.get(getView())
-                .set(new ContactList(createFilter(), chat));
+                .set(new ContactList(createFilter(chatFull), chat));
     }
 
-    private List<TdApi.User> createFilter() {
+    private List<TdApi.User> createFilter(@NonNull TdApi.GroupChatFull chatFull) {
         final ArrayList<TdApi.User> res = new ArrayList<>();
-        for (TdApi.ChatParticipant p : path.chatFull.participants) {
+        for (TdApi.ChatParticipant p : chatFull.participants) {
             res.add(p.user);
         }
         return res;
@@ -239,5 +281,15 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
         owner.expose()
                 .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO_CHAT_AVATAR);
+    }
+
+    class ChatInfoData {
+        final TdApi.GroupChatFull chatFull;
+        final TdApi.Messages ms;
+
+        public ChatInfoData(TdApi.GroupChatFull chatFull, TdApi.Messages ms) {
+            this.chatFull = chatFull;
+            this.ms = ms;
+        }
     }
 }

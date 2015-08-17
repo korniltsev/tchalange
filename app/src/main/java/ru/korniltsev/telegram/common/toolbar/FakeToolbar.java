@@ -169,18 +169,18 @@ public class FakeToolbar extends FrameLayout {
         }
     }
 
-    public void bindChat(ChatInfo chat, TdApi.Chat chat1) {
-        bindChatAvatar(chat1);
-        setTitle(chat.chatFull.groupChat.title);
+    public void bindChat(TdApi.GroupChatFull chat) {
+//        bindChatAvatar(chat1);
+        setTitle(chat.groupChat.title);
 
         int online = 0;
-        for (TdApi.ChatParticipant p : chat.chatFull.participants) {
+        for (TdApi.ChatParticipant p : chat.participants) {
             if (p.user.status instanceof TdApi.UserStatusOnline) {
                 online++;
             }
         }
         Resources res = getResources();
-        String totalStr = res.getQuantityString(R.plurals.group_chat_members, chat.chatFull.groupChat.participantsCount, chat.chatFull.groupChat.participantsCount);
+        String totalStr = res.getQuantityString(R.plurals.group_chat_members, chat.groupChat.participantsCount, chat.groupChat.participantsCount);
         String onlineStr = res.getQuantityString(R.plurals.group_chat_members_online, online, online);
         subTitle.setText(
                 totalStr + ", " + onlineStr);

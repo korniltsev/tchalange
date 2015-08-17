@@ -28,6 +28,10 @@ import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.profile.other.ProfilePresenter;
+import rx.Observable;
+import rx.functions.Func1;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -268,5 +272,23 @@ public class AppUtils {
 //        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1){
 //            v.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 //        }
+    }
+
+    @NonNull
+    public static Observable<TdApi.Messages> getMedia(final RXClient client, long chatId) {
+        return client.sendRx(new TdApi.GetChat(chatId))
+                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
+                    @Override
+                    public Observable<TdApi.TLObject> call(TdApi.TLObject tlObject) {
+                        TdApi.Chat chat = (TdApi.Chat) tlObject;
+                        //todo deleted history
+                        return client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, ProfilePresenter.FILTER));
+                    }
+                }).map(new Func1<TdApi.TLObject, TdApi.Messages>() {
+                    @Override
+                    public TdApi.Messages call(TdApi.TLObject tlObject) {
+                        return (TdApi.Messages) tlObject;
+                    }
+                });
     }
 }

@@ -12,15 +12,17 @@ import java.io.Serializable;
 
 @WithModule(ProfilePath.Module.class)
 public class ProfilePath extends BasePath implements Serializable{
-    public final TdApi.UserFull user;
+//    public final TdApi.UserFull user;
     public final TdApi.Chat chat;
     public final TdApi.User me;
+    public final TdApi.User user;
     //    @Nullable public final TdApi.Chat groupChat;
 
-    public ProfilePath(TdApi.UserFull user, TdApi.Chat chat, TdApi.User me) {
-        this.user = user;
+    public ProfilePath(TdApi.Chat chat, TdApi.User me, TdApi.User user) {
+//        this.user = user;
         this.chat = chat;
         this.me = me;
+        this.user = user;
     }
 
 //    public ProfilePath(TdApi.Chat groupChat) {

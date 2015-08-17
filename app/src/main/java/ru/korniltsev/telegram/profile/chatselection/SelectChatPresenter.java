@@ -105,7 +105,7 @@ public class SelectChatPresenter extends ViewPresenter<SelectChatView> {
     Subscription s = Subscriptions.empty();
 
     public void chatSelected(final TdApi.Chat chat) {
-        s = client.sendRx(new TdApi.AddChatParticipant(chat.id, path.user.user.id, 0))
+        s = client.sendRx(new TdApi.AddChatParticipant(chat.id, path.user.id, 0))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new ObserverAdapter<TdApi.TLObject>() {
                     @Override

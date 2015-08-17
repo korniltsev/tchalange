@@ -1,7 +1,6 @@
 package ru.korniltsev.telegram.profile.chat;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,6 +48,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
     private ToolbarUtils toolbar;
     @Nullable private ListChoicePopup mutePopup;
     private AttachPanelPopup selectImage;
+    @Nullable private TdApi.GroupChatFull chatFull;
 
     public ChatInfoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -151,17 +151,18 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
         }
     }
 
-    public void bindUser(@NonNull ChatInfo chat, TdApi.Chat chat1) {
-        fakeToolbar.bindChat(chat, chat1);
+    public void bindUser( TdApi.GroupChatFull chat1, ChatInfo chatInfo) {
+        this.chatFull = chat1;
+        fakeToolbar.bindChat( chat1);
         List<ChatInfoAdapter.Item> data = new ArrayList<>();
         data.add(new ChatInfoAdapter.ButtonItem());
 
-        TdApi.ChatParticipant[] participants = chat.chatFull.participants;
+        TdApi.ChatParticipant[] participants = chat1.participants;
         for (int i = 0, participantsLength = participants.length; i < participantsLength; i++) {
             TdApi.ChatParticipant participant = participants[i];
             data.add(new ChatInfoAdapter.ParticipantItem(i == 0, participant.user));
         }
-        for (TdApi.User it : chat.addedUsers) {
+        for (TdApi.User it : chatInfo.addedUsers) {
             data.add(new ChatInfoAdapter.ParticipantItem(false, it));
         }
         adapter.addAll(data);
@@ -173,9 +174,6 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
         if (participants.length >0){
             list.addItemDecoration(new InsetDecorator(2, calc.dp(6)));
             list.addItemDecoration(new TopShadow(ctx, calc, 2));//todo fix when shared media added
-
-
-
             list.addItemDecoration(new BottomShadow(ctx, calc, adapter.getItemCount() - 1));
         }
 

@@ -188,6 +188,12 @@ public class RXClient {
             return (TdApi.UserFull) tlObject;
         }
     };
+    public static final Func1<TLObject, GroupChatFull> CAST_TO_GROUP_CHAT_FULL = new Func1<TLObject, GroupChatFull>() {
+        @Override
+        public GroupChatFull call(TLObject o) {
+            return (GroupChatFull) o;
+        }
+    };
     private Context ctx;
     private final RXAuthState auth;
 
@@ -392,14 +398,9 @@ public class RXClient {
                 .map(CAST_TO_USER);
     }
 
-    public Observable<TdApi.GroupChatFull> getGroupChatInfo(int id) {
+    public Observable<TdApi.GroupChatFull> getGroupChatFull(int id) {
         return sendRx(new TdApi.GetGroupChatFull(id))
-                .map(new Func1<TLObject, TdApi.GroupChatFull>() {
-                    @Override
-                    public TdApi.GroupChatFull call(TLObject o) {
-                        return (TdApi.GroupChatFull) o;
-                    }
-                });
+                .map(CAST_TO_GROUP_CHAT_FULL);
     }
 
     // ui thread
