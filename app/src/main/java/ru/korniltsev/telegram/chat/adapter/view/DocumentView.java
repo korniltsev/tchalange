@@ -73,18 +73,18 @@ public class DocumentView extends LinearLayout{
     public void set(TdApi.Document d) {
         this.document = d;
         final boolean image = document.mimeType.startsWith("image") && document.thumb.photo.id != 0;
-        boolean shouldClearPlaceHolder = true;
+//        boolean shouldClearPlaceHolder = true;
         if (image) {
             documentThumb.setVisibility(View.VISIBLE);
             //check if downloaded
-            if (!downloader.isDownloaded(document.document)){
+//            if (!downloader.isDownloaded(document.document)){
                 picasso.loadPhoto(document.thumb.photo, false)
                         .transform(blur)
                         .into(documentThumb);
-                shouldClearPlaceHolder = false;
-            } else {
+//                shouldClearPlaceHolder = false;
+//            } else {
                 //we load original image in onFinished
-            }
+//            }
         } else {
             documentThumb.setVisibility(View.GONE);
         }
@@ -96,7 +96,7 @@ public class DocumentView extends LinearLayout{
         } else {
             cfg = new DownloadView.Config(R.drawable.ic_file, FINAL_ICON_EMPTY, true, false, 38);
         }
-        final boolean finalShouldClearPlaceHolder = shouldClearPlaceHolder;
+//        final boolean finalShouldClearPlaceHolder = shouldClearPlaceHolder;
         downloadView.bind(d.document, cfg, new DownloadView.CallBack() {
             @Override
             public void onProgress(TdApi.UpdateFileProgress p) {
@@ -106,16 +106,16 @@ public class DocumentView extends LinearLayout{
             @Override
             public void onFinished(TdApi.File e, boolean b) {
                 documentProgress.setText(getResources().getString(R.string.downloaded_kb, AppUtils.kb(e.size)));
-                if (image) {
-                    if (finalShouldClearPlaceHolder){
-                        picasso.loadPhoto(e, false)
-                                .into(documentThumb);
-                    } else {
-                        picasso.loadPhoto(e, false)
-                                .noPlaceholder()
-                                .into(documentThumb);
-                    }
-                }
+//                if (image) {
+//                    if (finalShouldClearPlaceHolder){
+//                        picasso.loadPhoto(e, false)
+//                                .into(documentThumb);
+//                    } else {
+//                        picasso.loadPhoto(e, false)
+//                                .noPlaceholder()
+//                                .into(documentThumb);
+//                    }
+//                }
             }
 
             @Override
@@ -142,9 +142,14 @@ public class DocumentView extends LinearLayout{
         }
 //        "application/vnd.android.package-archive"
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri data = Uri.fromFile(target);
 
-        intent.setDataAndType(data, type);
+        if (type.startsWith("image")){
+            final Uri uri = Uri.parse("file://" + target.getAbsolutePath());
+            intent.setDataAndType(uri, "image/*");
+        } else {
+            Uri data = Uri.fromFile(target);
+            intent.setDataAndType(data, type);
+        }
 
         try {
             getContext()
