@@ -30,8 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH> {
-    static SimpleDateFormat fuckRuFormatter = new SimpleDateFormat("kk:mm", Locale.US);
-    public static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm a");
+
     public static final ColorStateList COLOR_SYSTEM = ColorStateList.valueOf(0xff6b9cc2);
 
     private final Context ctx;
@@ -78,14 +77,16 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             holder.iconGroupChat.setVisibility(View.VISIBLE);
         }
 
-        long timeInMillis = Utils.dateToMillis(chat.topMessage.date);
-        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
+        holder.time.setText(chat.topMessage.dateFormatted);
+
+//        long timeInMillis = Utils.dateToMillis(chat.topMessage.date);
 //        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
-        if (Locale.getDefault().getCountry().equals("RU")){
-            holder.time.setText(fuckRuFormatter.format(local));
-        } else {
-            holder.time.setText(MESSAGE_TIME_FORMAT.print(local));
-        }
+////        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
+//        if (Locale.getDefault().getCountry().equals("RU")){
+//            holder.time.setText(fuckRuFormatter.format(local));
+//        } else {
+//            holder.time.setText(MESSAGE_TIME_FORMAT.print(local));
+//        }
 
 
         if (message instanceof TdApi.MessageText) {

@@ -21,8 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 abstract class BaseAvatarVH extends RealBaseVH {
-    private static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm aa")
-            .withLocale(Locale.US);
+//    private static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm aa")
+//            .withLocale(Locale.US);
 
     private final int myId = adapter.myId;
     protected final CustomCeilLayout root;
@@ -52,21 +52,19 @@ abstract class BaseAvatarVH extends RealBaseVH {
 
     public void bind(ChatListItem item, long lastReadOutbox){
         TextMessageVH.newBind(root, adapter, item, lastReadOutbox);
-
-
-
     }
 
-    static SimpleDateFormat fuckRuFormatter = new SimpleDateFormat("kk:mm", Locale.US);
+//    static SimpleDateFormat fuckRuFormatter = new SimpleDateFormat("kk:mm", Locale.US);
     public static String format(TdApi.Message msg) {
+        return msg.dateFormatted;
 //        Locale l = Locale.getDefault();
 //        if (l)
-        long timeInMillis = Utils.dateToMillis(msg.date);
-        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
-        if (Locale.getDefault().getCountry().equals("RU")){
-            return fuckRuFormatter.format(local);//todo wtf
-        } else {
-            return MESSAGE_TIME_FORMAT.print(local);
-        }
+//        long timeInMillis = Utils.dateToMillis(msg.date);
+//        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
+//        if (Locale.getDefault().getCountry().equals("RU")){
+//            return fuckRuFormatter.format(local);//todo wtf
+//        } else {
+//            return MESSAGE_TIME_FORMAT.print(local);
+//        }
     }
 }

@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.core.rx;
 
 import android.graphics.BitmapFactory;
+import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextPaint;
@@ -9,14 +10,19 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Patterns;
 import android.view.View;
 import org.drinkless.td.libcore.telegram.TdApi;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import rx.subjects.PublishSubject;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class EmojiParser {
     final Emoji emoji;
@@ -28,20 +34,24 @@ public class EmojiParser {
 
     private PublishSubject<ReferenceSpan> clickedSpans = PublishSubject.create();
 
-
     public EmojiParser(Emoji emoji) {
         this.emoji = emoji;
     }
 
+    //    static SimpleDateFormat fuckRuFormatter = new SimpleDateFormat("kk:mm", Locale.US);
+    //    public static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm a");
     public void parse(TdApi.Message msg) {
+        msg.dateFormatted = formatter.get().formatDate(msg);
         if (msg.message instanceof TdApi.MessageText) {
             parseEmojis(msg);
         } else if (msg.message instanceof TdApi.MessagePhoto) {
             pareImageSizes((TdApi.MessagePhoto) msg.message);
         }
     }
+
     // parses commands of type "/foo_bar"
     private Pattern botCommandsParser = Pattern.compile("(?m)(\\s|^)(/[a-zA-Z@\\d_]{1,255})");
+
     private void pareImageSizes(TdApi.MessagePhoto message) {
         //todo rename the class
         for (TdApi.PhotoSize photo : message.photo.photos) {
@@ -91,11 +101,10 @@ public class EmojiParser {
                         start, end, 0);
             }
 
-            while (urlMatcher.find()){
+            while (urlMatcher.find()) {
                 final String url = urlMatcher.group();
                 s.setSpan(new ReferenceSpan(url, userId, TYPE_URL),
                         urlMatcher.start(), urlMatcher.end(), 0);
-
             }
 
             cache.put(key, s);
@@ -108,8 +117,9 @@ public class EmojiParser {
     }
 
     public static final int TYPE_USER_NAME = 0;
-    public static final int TYPE_BOT_COMMAND= 1;
+    public static final int TYPE_BOT_COMMAND = 1;
     public static final int TYPE_URL = 2;
+
     public class ReferenceSpan extends ForegroundColorSpan {
         public final String reference;
         public final int userId;
@@ -132,15 +142,48 @@ public class EmojiParser {
         }
     }
 
+    final ThreadLocal<MessageDateFormatter> formatter = new ThreadLocal<MessageDateFormatter>() {
+        @Override
+        protected MessageDateFormatter initialValue() {
+            return new MessageDateFormatter();
+        }
+    };
 
+    class MessageDateFormatter {
+        @Nullable final SimpleDateFormat fuckRuFormatter;
+        @Nullable final DateTimeFormatter MESSAGE_TIME_FORMAT;
 
-//    public static class BotCommand {
-//        public final String cmd;
-//        public final int userId;
-//
-//        BotCommand(String cmd, int userId) {
-//            this.cmd = cmd;
-//            this.userId = userId;
-//        }
-//    }
+        public MessageDateFormatter() {
+            if (Locale.getDefault().getCountry().equals("RU")) {
+                fuckRuFormatter = new SimpleDateFormat("kk:mm", Locale.US);
+                MESSAGE_TIME_FORMAT = null;
+            } else {
+                fuckRuFormatter = null;
+                MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm a");
+                ;
+            }
+        }
+
+        public String formatDate(TdApi.Message msg) {
+            long timeInMillis = Utils.dateToMillis(msg.date);
+            long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
+            if (fuckRuFormatter != null) {
+                return fuckRuFormatter.format(local);
+            }
+            if (MESSAGE_TIME_FORMAT != null) {
+                MESSAGE_TIME_FORMAT.print(local);
+            }
+            return "";
+        }
+    }
+
+    //    public static class BotCommand {
+    //        public final String cmd;
+    //        public final int userId;
+    //
+    //        BotCommand(String cmd, int userId) {
+    //            this.cmd = cmd;
+    //            this.userId = userId;
+    //        }
+    //    }
 }

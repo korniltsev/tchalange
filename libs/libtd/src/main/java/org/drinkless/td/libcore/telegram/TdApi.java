@@ -1252,6 +1252,8 @@ public class TdApi {
         public MessageContent message;
         public ReplyMarkup replyMarkup;
 
+        public String dateFormatted;
+
         public Message() {
         }
 
