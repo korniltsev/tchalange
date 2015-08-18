@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ru.korniltsev.telegram.core.views.RobotoMediumTextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:text="@string/shared_media_title"
+        android:paddingRight="8dp"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:drawableRight="@drawable/ic_media_down"
+        android:drawablePadding="8dp"
+        >
+
+</ru.korniltsev.telegram.core.views.RobotoMediumTextView>

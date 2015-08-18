@@ -19,7 +19,7 @@ public class MiniPlayerViewFactory {
 
 
 
-        final MiniPlayerView result = new MiniPlayerView(ctx, null);
+        final MiniPlayerView result = new MiniPlayerView(ctx);
         result.setId(R.id.mini_player);
         result.setLayoutParams(
                 new LinearLayout.LayoutParams(MATCH_PARENT, calc.dp(35f)));

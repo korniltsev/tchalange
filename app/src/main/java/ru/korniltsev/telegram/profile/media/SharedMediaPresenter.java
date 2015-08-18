@@ -29,6 +29,7 @@ public class SharedMediaPresenter extends ViewPresenter<SharedMediaView> {
     @Override
     protected void onLoad(Bundle savedInstanceState) {
         cs = new CompositeSubscription();
+        getView().bind(path);
 //        try {
 //            final TdApi.Chat chat = (TdApi.Chat) client.sendRx(new TdApi.GetChat(path.chatId)).toBlocking().first();
 //            getView()

@@ -162,6 +162,8 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
 
     interface CallBack {
         void clicked(KeyValueItem item);
+
+        void sharedMediaClicked();
     }
 
     public class ButtonAddMemberVH extends RecyclerView.ViewHolder {
@@ -209,6 +211,12 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
 
                         outRect.set(dp8, 0, 0, 0);
                     }
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    cb.sharedMediaClicked();
                 }
             });
         }

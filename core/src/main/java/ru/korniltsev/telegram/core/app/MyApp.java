@@ -130,7 +130,7 @@ public class MyApp extends Application {
 
     @Override
     public Object getSystemService(String name) {
-        if (rootScope.hasService(name)) {
+        if (rootScope !=null && rootScope.hasService(name)) {
             return rootScope.getService(name);
         }
 

@@ -156,6 +156,8 @@
     <string name="enter_your_pass">Please enter your personal password</string>
     <string name="password">Password</string>
     <string name="sms_code">SMS code</string>
+    <string name="shared_media_title">Shared Media</string>
+    <string name="audio_files">Audio Files</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

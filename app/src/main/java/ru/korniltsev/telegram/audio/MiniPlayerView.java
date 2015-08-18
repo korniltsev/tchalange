@@ -61,7 +61,7 @@ public class MiniPlayerView extends ViewGroup {
     private Subscription subscription;
     private SimpleImageButtonView btnPlay;
     private SimpleImageButtonView btnStop;
-//    private TextView title;
+    //    private TextView title;
     @Nullable private LinearLayoutWithShadow shadow;
     private float progress;
     private Paint paint;
@@ -69,15 +69,13 @@ public class MiniPlayerView extends ViewGroup {
     private StaticLayout songNameLayout;
     private int songNameLayoutHeight;
 
-    public MiniPlayerView(Context ctx, AttributeSet attrs) {
-        super(ctx, attrs);
+    public MiniPlayerView(Context ctx) {
+        super(ctx);
         final MyApp from = MyApp.from(ctx);
         audioPLayer = from.audioPLayer;
         calc = from.dpCalculator;
         setWillNotDraw(false);
         dp1point5 = calc.dp(1.5f);
-
-
 
         btnPlay = new SimpleImageButtonView(ctx);
         btnPlay.setBackgroundResource(R.drawable.bg_keyboard_tab);
@@ -94,15 +92,14 @@ public class MiniPlayerView extends ViewGroup {
 
         leftRightButtonWidth = calc.dp(61);
         textpadding = calc.dp(4);
-        spaceForSongName = from.displayWidth - leftRightButtonWidth *2 - textpadding * 2;
-
+        spaceForSongName = from.displayWidth - leftRightButtonWidth * 2 - textpadding * 2;
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         final Resources res = getResources();
-//        title = (TextView) findViewById(R.id.text);
+        //        title = (TextView) findViewById(R.id.text);
         btnPlay.setDs(new Drawable[]{
                 res.getDrawable(R.drawable.ic_pausepl),
                 res.getDrawable(R.drawable.ic_playpl)
@@ -146,22 +143,20 @@ public class MiniPlayerView extends ViewGroup {
 
     final Rect r = new Rect();
 
-
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
         int bottom = getBottom();
-        int top2 = getBottom() - getTop()-dp1point5;
+        int top2 = getBottom() - getTop() - dp1point5;
 
-//        int top = getHeight()/2 + dp;
+        //        int top = getHeight()/2 + dp;
         int left = 0;
         int right = (int) (getWidth() * progress);
         r.set(left, top2, right, bottom);
         canvas.drawRect(r, paint);
         Log.d("MiniPlayerView", "draw " + progress);
 
-        if (songNameLayout!= null) {
+        if (songNameLayout != null) {
             canvas.save();
             int ty = (getHeight() - this.songNameLayoutHeight) / 2;
             final int tx = leftRightButtonWidth + textpadding;
@@ -190,7 +185,6 @@ public class MiniPlayerView extends ViewGroup {
                             @Override
                             public void onNext(Long response) {
                                 updateProgress();
-
                             }
                         });
             } else {
@@ -208,8 +202,6 @@ public class MiniPlayerView extends ViewGroup {
         songNameLayout = new StaticLayout(ellipsized, textPaint, spaceForSongName, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
         songNameLayoutHeight = songNameLayout.getHeight();
     }
-
-
 
     private void updateProgress() {
         progress = audioPLayer.getProgress();
@@ -277,10 +269,10 @@ public class MiniPlayerView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        btnPlay.layout(l, t, leftRightButtonWidth, b);
-        int left = r - leftRightButtonWidth;
-        btnStop.layout(left, t, r, b);
 
+        btnPlay.layout(0, 0, leftRightButtonWidth, getHeight());
+        int left = getWidth() - leftRightButtonWidth;
+        btnStop.layout(left, 0, getWidth(), getHeight());
     }
 
     public void setShadow(LinearLayoutWithShadow toolbarShadow) {
@@ -298,6 +290,4 @@ public class MiniPlayerView extends ViewGroup {
             shadow.setShadowPadding(0);
         }
     }
-
-
 }

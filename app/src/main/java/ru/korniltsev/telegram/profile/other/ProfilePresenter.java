@@ -17,6 +17,7 @@ import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.chatselection.SelectChatPath;
+import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -115,6 +116,12 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
         if (item.bottomSheetActions != null) {
             popup = ListChoicePopup.create(owner.expose(), item.bottomSheetActions);
         }
+    }
+
+    @Override
+    public void sharedMediaClicked() {
+        Flow.get(getView())
+                .set(new SharedMediaPath(path.chat.id, SharedMediaPath.TYPE_MEDIA));
     }
 
     public boolean hidePopup() {

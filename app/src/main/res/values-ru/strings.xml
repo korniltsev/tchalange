@@ -173,4 +173,6 @@
     <string name="enter_your_pass">Пожалуйста, введите Ваш пароль</string>
     <string name="password">Пароль</string>
     <string name="sms_code">SMS код</string>
+    <string name="shared_media_title">Shared media</string>
+    <string name="audio_files">Audio Files</string>
 </resources>

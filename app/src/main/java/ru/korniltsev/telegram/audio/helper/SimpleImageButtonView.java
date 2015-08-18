@@ -28,7 +28,7 @@ public class SimpleImageButtonView extends View {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
+
         final int w = getWidth();
         final int h = getHeight();
         for (Drawable d : ds) {
@@ -38,7 +38,7 @@ public class SimpleImageButtonView extends View {
             int tx = (w - iconW) / 2;
             int iconLeft = tx;
             int iconRight = iconLeft + iconW;
-            int iconTop = top + ty;
+            int iconTop =  ty;
             int iconBottom = iconTop + iconH;
             d.setBounds(iconLeft, iconTop, iconRight, iconBottom);
         }
