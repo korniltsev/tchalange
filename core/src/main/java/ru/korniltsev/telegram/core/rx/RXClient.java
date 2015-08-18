@@ -254,6 +254,10 @@ public class RXClient {
                     }
                 });
 
+
+
+        this.client = TG.getClientInstance();
+
         auth.getMe(this).subscribe(new ObserverAdapter<RXAuthState.StateAuthorized>() {
             @Override
             public void onNext(RXAuthState.StateAuthorized response) {
@@ -261,7 +265,6 @@ public class RXClient {
             }
         });
 
-        this.client = TG.getClientInstance();
         updateOptionMyIdEmpty()
                 .observeOn(mainThread())
                 .subscribe(new Action1<TdApi.UpdateOption>() {

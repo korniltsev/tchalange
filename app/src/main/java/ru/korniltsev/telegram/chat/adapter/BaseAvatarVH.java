@@ -24,7 +24,7 @@ abstract class BaseAvatarVH extends RealBaseVH {
 //    private static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("K:mm aa")
 //            .withLocale(Locale.US);
 
-    private final int myId = adapter.myId;
+//    private final int myId = adapter.myId;
     protected final CustomCeilLayout root;
 
     public BaseAvatarVH(CustomCeilLayout itemView, final Adapter adapter) {
