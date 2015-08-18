@@ -216,11 +216,12 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
         public void bind(SharedMedia i) {
             if (i.ms.isEmpty()) {
                 mediaPreview.setVisibility(View.GONE);
+                mediaCount.setText("0");
             } else {
                 mediaPreview.setVisibility(View.VISIBLE);
                 mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, i.ms));
+                mediaCount.setText("");
             }
-            mediaCount.setText(String.valueOf(i.ms.size()));
         }
     }
 }

@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
@@ -13,6 +14,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
+import ru.korniltsev.telegram.photoview.PhotoView;
 
 import java.util.List;
 
@@ -54,9 +56,22 @@ public class MediaPreviewAdapter extends BaseAdapter<TdApi.Message, MediaPreview
 
     class VH extends RecyclerView.ViewHolder{
         final ImageView img;
-        public VH(View itemView) {
+        public VH(final View itemView) {
             super(itemView);
             this.img = (ImageView) itemView;
+            img.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final TdApi.Message msg = getItem(getAdapterPosition());
+                    if (msg.message instanceof TdApi.MessagePhoto){
+                        final TdApi.Photo photo = ((TdApi.MessagePhoto) msg.message).photo;
+                        Flow.get(itemView.getContext())
+                                .set(new PhotoView(photo));
+                    } else {
+                        //video should be downloaded
+                    }
+                }
+            });
         }
 
     }

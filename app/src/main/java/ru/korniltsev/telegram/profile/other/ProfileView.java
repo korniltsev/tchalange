@@ -19,6 +19,8 @@ import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.flow.pathview.TraversalAware;
+import ru.korniltsev.telegram.core.flow.pathview.TraversalAwareHelper;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
@@ -31,7 +33,6 @@ import ru.korniltsev.telegram.profile.decorators.TopShadow;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,11 +43,14 @@ import static ru.korniltsev.telegram.common.AppUtils.copy;
 import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
 import static ru.korniltsev.telegram.common.AppUtils.uiName;
 
-public class ProfileView extends FrameLayout implements HandlesBack {
+public class ProfileView extends FrameLayout implements HandlesBack, TraversalAware {
     @Inject ProfilePresenter presenter;
     @Inject DpCalculator calc;
     @Inject ActivityOwner activity;
     @Inject PhoneFormat phoneFormat;
+
+    final TraversalAwareHelper traversalHelper = new TraversalAwareHelper();
+
 
     private RecyclerView list;
     private LinearLayoutManager listLayout;
@@ -147,7 +151,19 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         presenter.dropView(this);
     }
 
-    public void bindUser(@NonNull TdApi.UserFull userFill, TdApi.Messages ms) {
+    public void bindUser(@NonNull final TdApi.UserFull userFill, final TdApi.Messages ms) {
+        traversalHelper.runWhenTraversalCompleted(new Runnable() {
+            @Override
+            public void run() {
+                bindUserImpl(userFill, ms);
+            }
+        });
+
+
+
+    }
+
+    private void bindUserImpl(@NonNull TdApi.UserFull userFill, TdApi.Messages ms) {
         final TdApi.User user = userFill.user;
         List<List<ProfileAdapter.Item>> sections = new ArrayList<>();
 
@@ -218,8 +234,6 @@ public class ProfileView extends FrameLayout implements HandlesBack {
             itemNumber += nonEmptySection.size();
             list.addItemDecoration(new BottomShadow(getContext(), calc, itemNumber - 1));
         }
-
-
     }
 
     private List<List<ProfileAdapter.Item>> filterNonEmpty(List<List<ProfileAdapter.Item>> sections) {
@@ -282,5 +296,10 @@ public class ProfileView extends FrameLayout implements HandlesBack {
 
     public void bindUserAvatar(TdApi.User user) {
         fakeToolbar.bindUser(user);
+    }
+
+    @Override
+    public void onTraversalCompleted() {
+        traversalHelper.setTraversalCompleted();
     }
 }
