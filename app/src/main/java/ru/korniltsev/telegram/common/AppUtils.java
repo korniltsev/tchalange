@@ -29,6 +29,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.profile.other.ProfileAdapter;
 import ru.korniltsev.telegram.profile.other.ProfilePresenter;
 import rx.Observable;
 import rx.functions.Func1;
@@ -290,5 +291,23 @@ public class AppUtils {
                         return (TdApi.Messages) tlObject;
                     }
                 });
+    }
+
+    public static <T> List<T> flatten(List<List<T>> sections) {
+        final ArrayList<T> res = new ArrayList<>();
+        for (List<T> section : sections) {
+            res.addAll(section);
+        }
+        return res;
+    }
+
+    public static <T> List<List<T>> filterNonEmpty(List<List<T>> sections) {
+        final ArrayList<List<T>> lists = new ArrayList<>();
+        for (List<T> section : sections) {
+            if (!section.isEmpty()) {
+                lists.add(section);
+            }
+        }
+        return lists;
     }
 }

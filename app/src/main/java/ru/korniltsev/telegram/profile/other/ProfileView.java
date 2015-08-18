@@ -15,6 +15,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import phoneformat.PhoneFormat;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
@@ -40,6 +41,7 @@ import static android.text.TextUtils.isEmpty;
 import static java.util.Arrays.asList;
 import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.copy;
+import static ru.korniltsev.telegram.common.AppUtils.flatten;
 import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
 import static ru.korniltsev.telegram.common.AppUtils.uiName;
 
@@ -215,43 +217,28 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
 
         adapter.addAll(flatten(sections));
 
-        List<List<ProfileAdapter.Item>> nonEmptySections = filterNonEmpty(sections);
+        decorate(getContext(), list, calc, sections);
+    }
 
+    public static <T> void decorate(Context ctx, RecyclerView list, DpCalculator calc, List<List<T>> sections) {
+        List<List<T>> nonEmptySections = AppUtils.filterNonEmpty(sections);
         int itemNumber = 1;
         for (int i = 0, nonEmptySectionsSize = nonEmptySections.size(); i < nonEmptySectionsSize; i++) {
-            List<ProfileAdapter.Item> nonEmptySection = nonEmptySections.get(i);
+            List<T> nonEmptySection = nonEmptySections.get(i);
             if (i == 0) {
                 list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(itemNumber, calc.dp(15)));
             } else {
                 list.addItemDecoration(new InsetDecorator(itemNumber, calc.dp(6)));
-                list.addItemDecoration(new TopShadow(getContext(), calc, itemNumber));
+                list.addItemDecoration(new TopShadow(ctx, calc, itemNumber));
             }
             if (nonEmptySection.size() > 1){
-                for (int j = 0; j < nonEmptySectionsSize - 1; j++){
+                for (int j = 0; j < nonEmptySection.size() - 1; j++){
                     list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, itemNumber + j));
                 }
             }
             itemNumber += nonEmptySection.size();
-            list.addItemDecoration(new BottomShadow(getContext(), calc, itemNumber - 1));
+            list.addItemDecoration(new BottomShadow(ctx, calc, itemNumber - 1));
         }
-    }
-
-    private List<List<ProfileAdapter.Item>> filterNonEmpty(List<List<ProfileAdapter.Item>> sections) {
-        final ArrayList<List<ProfileAdapter.Item>> lists = new ArrayList<>();
-        for (List<ProfileAdapter.Item> section : sections) {
-            if (!section.isEmpty()) {
-                lists.add(section);
-            }
-        }
-        return lists;
-    }
-
-    private List<ProfileAdapter.Item> flatten(List<List<ProfileAdapter.Item>> sections) {
-        final ArrayList<ProfileAdapter.Item> res = new ArrayList<>();
-        for (List<ProfileAdapter.Item> section : sections) {
-            res.addAll(section);
-        }
-        return res;
     }
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {

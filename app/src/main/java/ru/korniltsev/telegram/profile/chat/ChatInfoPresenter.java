@@ -92,7 +92,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
             @Override
             public void onNext(ChatInfoData response) {
                 getView()
-                        .bindUser(response.chatFull, path);
+                        .bindChat(response.chatFull, path, response.ms);
                 chatFull = response.chatFull;
             }
         }));

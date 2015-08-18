@@ -17,10 +17,13 @@ import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.flow.pathview.TraversalAware;
+import ru.korniltsev.telegram.core.flow.pathview.TraversalAwareHelper;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
@@ -28,18 +31,22 @@ import ru.korniltsev.telegram.profile.decorators.BottomShadow;
 import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
 import ru.korniltsev.telegram.profile.decorators.MyWhiteRectTopPaddingDecorator;
 import ru.korniltsev.telegram.profile.decorators.TopShadow;
+import ru.korniltsev.telegram.profile.other.ProfileView;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.drinkless.td.libcore.telegram.TdApi.File.NO_FILE_ID;
+import static ru.korniltsev.telegram.common.AppUtils.flatten;
 
-public class ChatInfoView extends FrameLayout implements HandlesBack {
+public class ChatInfoView extends FrameLayout implements HandlesBack , TraversalAware{
     @Inject ChatInfoPresenter presenter;
     @Inject DpCalculator calc;
     @Inject PhoneFormat phoneFormat;
     @Inject ActivityOwner owner;
+    final TraversalAwareHelper traversalHelper = new TraversalAwareHelper();
 
     private RecyclerView list;
     private LinearLayoutManager listLayout;
@@ -151,32 +158,37 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
         }
     }
 
-    public void bindUser( TdApi.GroupChatFull chat1, ChatInfo chatInfo) {
-        this.chatFull = chat1;
-        fakeToolbar.bindChat( chat1);
-        List<ChatInfoAdapter.Item> data = new ArrayList<>();
-        data.add(new ChatInfoAdapter.ButtonItem());
+    public void bindChat(final TdApi.GroupChatFull chat1, final ChatInfo chatInfo, final TdApi.Messages ms) {
+        traversalHelper.runWhenTraversalCompleted(new Runnable() {
+            @Override
+            public void run() {
+                bindChatImpl(chat1, chatInfo, ms);
+            }
+        });
+    }
 
+    private void bindChatImpl(TdApi.GroupChatFull chat1, ChatInfo chatInfo, TdApi.Messages ms) {
+        this.chatFull = chat1;
+        fakeToolbar.bindChat(chat1);
+//        List<ChatInfoAdapter.Item> data = new ArrayList<>();
+        List<List<ChatInfoAdapter.Item>> sections = new ArrayList<>();
+        final ChatInfoAdapter.ButtonItem buttonItem = new ChatInfoAdapter.ButtonItem();
+        sections.add(Collections.<ChatInfoAdapter.Item>singletonList(buttonItem));
+
+        final ArrayList<ChatInfoAdapter.Item> participantsItems = new ArrayList<>();
+        sections.add(participantsItems);
         TdApi.ChatParticipant[] participants = chat1.participants;
+
         for (int i = 0, participantsLength = participants.length; i < participantsLength; i++) {
             TdApi.ChatParticipant participant = participants[i];
-            data.add(new ChatInfoAdapter.ParticipantItem(i == 0, participant.user));
+            participantsItems.add(new ChatInfoAdapter.ParticipantItem(i == 0, participant.user));
         }
         for (TdApi.User it : chatInfo.addedUsers) {
-            data.add(new ChatInfoAdapter.ParticipantItem(false, it));
+            participantsItems.add(new ChatInfoAdapter.ParticipantItem(false, it));
         }
-        adapter.addAll(data);
+        adapter.addAll(flatten(sections));
 
-        final Context ctx = getContext();
-        list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(15)));
-        list.addItemDecoration(new BottomShadow(ctx, calc, 1));
-
-        if (participants.length >0){
-            list.addItemDecoration(new InsetDecorator(2, calc.dp(6)));
-            list.addItemDecoration(new TopShadow(ctx, calc, 2));//todo fix when shared media added
-            list.addItemDecoration(new BottomShadow(ctx, calc, adapter.getItemCount() - 1));
-        }
-
+        ProfileView.decorate(getContext(), list, calc, sections);
     }
 
     public void bindMuteMenu(boolean muted) {
@@ -216,5 +228,10 @@ public class ChatInfoView extends FrameLayout implements HandlesBack {
 
     public void setChatTitle(String title) {
         fakeToolbar.setTitle(title);
+    }
+
+    @Override
+    public void onTraversalCompleted() {
+        traversalHelper.setTraversalCompleted();
     }
 }
