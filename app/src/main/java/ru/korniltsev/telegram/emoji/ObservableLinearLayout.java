@@ -17,7 +17,10 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Display;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import mortar.dagger1support.ObjectGraphService;
@@ -50,9 +53,20 @@ public class ObservableLinearLayout extends FrameLayout {
 
         res = getResources();
         statusBarHeight = getResource(res, "status_bar_height");
-        navBarHeight = getResource(res, "navigation_bar_height");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ||
+                res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            navBarHeight = 0;
+        } else {
+            boolean hasMenuKey = ViewConfiguration.get(context).hasPermanentMenuKey();
+            boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
 
-
+            if (!hasMenuKey && !hasBackKey) {
+                // Do whatever you need to do, this device has a navigation bar
+                navBarHeight = getResource(res, "navigation_bar_height");
+            } else {
+                navBarHeight = 0;
+            }
+        }
 
         WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
@@ -64,10 +78,9 @@ public class ObservableLinearLayout extends FrameLayout {
     private int getResource(Resources res, String status_bar_height) {
         int resourceId = res.getIdentifier(status_bar_height, "dimen", "android");
         if (resourceId > 0) {
-            return  res.getDimensionPixelSize(resourceId);
+            return res.getDimensionPixelSize(resourceId);
         } else {
             return 0;
-
         }
     }
 
@@ -80,10 +93,10 @@ public class ObservableLinearLayout extends FrameLayout {
         super.onLayout(changed, l, t, r, b);
 
         View rootView = this.getRootView();
-        int spaceLeft = rootView.getHeight() - statusBarHeight - getNavBarHeight();
+        int spaceLeft = rootView.getHeight() - statusBarHeight - navBarHeight;
         this.getWindowVisibleDisplayFrame(rect);
         keyboardHeight = spaceLeft - (rect.bottom - rect.top);
-        if (keyboardHeight > 0 ){
+        if (keyboardHeight > 0) {
             saveKeyboardHeight(keyboardHeight);
         }
         if (cb != null) {
@@ -102,16 +115,6 @@ public class ObservableLinearLayout extends FrameLayout {
         return keyboardHeight;
     }
 
-    private int getNavBarHeight (){
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ||
-                res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            return 0;
-        }
-        return navBarHeight;
-    }
-
-
-
     private void saveKeyboardHeight(int keyboardHeight) {
         boolean portrait = isPortrait();
         prefs.edit()
@@ -125,13 +128,13 @@ public class ObservableLinearLayout extends FrameLayout {
         return prefs.getInt(prefKey, calc.dp(portrait ? 240 : 150));
     }
 
-    private String getKeyForConfiguration(boolean portrait){
+    private String getKeyForConfiguration(boolean portrait) {
         String prefKey;
         prefKey = "keyboard_height_" + portrait;
         return prefKey;
     }
 
-    private boolean isPortrait(){
+    private boolean isPortrait() {
         int orientation = getContext().getResources().getConfiguration().orientation;
         boolean portrait = orientation == Configuration.ORIENTATION_PORTRAIT;
         return portrait;
