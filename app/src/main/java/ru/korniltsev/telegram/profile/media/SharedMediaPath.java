@@ -16,8 +16,10 @@ public class SharedMediaPath extends BasePath implements Serializable, NamedPath
     public static final int TYPE_MEDIA = 0;
     public static final int TYPE_AUDIO = 1;
 
-    final long chatId;
-    final int type;
+    public final long chatId;
+    public final int type;
+
+//    transient int loadCount = 0;
 
     public SharedMediaPath(long chatId, int type) {
         this.chatId = chatId;

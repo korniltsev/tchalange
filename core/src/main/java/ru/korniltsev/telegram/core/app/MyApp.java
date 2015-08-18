@@ -25,6 +25,7 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.rx.UserHolder;
 
@@ -54,6 +55,7 @@ public class MyApp extends Application {
     private RXAuthState rxAuthState;
     private RXClient rxClient;
     private UserHolder userHolder;
+    public SharedMediaHelper sharedMediaHelper;
 
     @Override
     public void onCreate() {
@@ -85,6 +87,8 @@ public class MyApp extends Application {
         rxAuthState = new RXAuthState(this);
         userHolder = new UserHolder(rxAuthState, this);
         rxClient = new RXClient(this, rxAuthState, userHolder);
+
+        sharedMediaHelper = new SharedMediaHelper(rxClient);
 
         ObjectGraph graph = ObjectGraph.create(
                 new RootModule(this,  dpCalculator, rxClient, rxAuthState, userHolder));

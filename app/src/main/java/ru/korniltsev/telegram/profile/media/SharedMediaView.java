@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
@@ -22,6 +21,7 @@ import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
+import ru.korniltsev.telegram.profile.media.controllers.SharedMediaController;
 
 import javax.inject.Inject;
 
@@ -36,6 +36,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
     private DpCalculator dpCalculator;
     private DropdownPopup popup;
     private TextView customView;
+    private SharedMediaController mediaController;
 
     public SharedMediaView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -54,7 +55,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         toolbarUtils.toolbar.setNavigationIcon(d);
 
         list = ((RecyclerView) findViewById(R.id.list));
-        list.setLayoutManager(new LinearLayoutManager(getContext()));
+
         final int dp56 = dpCalculator.dp(56f);
         setShadowOffset(dp56);
         customView = (TextView) toolbarUtils.getCustomView();
@@ -123,6 +124,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         super.onDetachedFromWindow();
         presenter.dropView(this);
         dismisPopup();
+        mediaController.drop();
     }
 
     @Override
@@ -138,10 +140,10 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
     }
 
     public void bind(SharedMediaPath path) {
-        if (path.type == SharedMediaPath.TYPE_MEDIA){
-            customView.setText(R.string.shared_media_title);
+        if (path.type == SharedMediaPath.TYPE_MEDIA) {
+            mediaController = new SharedMediaController(list, customView, presenter.path);
         } else {
-            customView.setText(R.string.audio_files);
+            mediaController = new SharedMediaController(list, customView, presenter.path);
         }
     }
 }

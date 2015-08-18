@@ -15,6 +15,7 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
+import ru.korniltsev.telegram.profile.media.controllers.SquareImageView;
 
 import java.util.List;
 
@@ -55,10 +56,11 @@ public class MediaPreviewAdapter extends BaseAdapter<TdApi.Message, MediaPreview
     }
 
     class VH extends RecyclerView.ViewHolder{
-        final ImageView img;
+        final SquareImageView img;
         public VH(final View itemView) {
             super(itemView);
-            this.img = (ImageView) itemView;
+            this.img = (SquareImageView) itemView;
+            this.img.setHorizontal(false);
             img.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
