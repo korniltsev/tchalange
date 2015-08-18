@@ -26,6 +26,7 @@ import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +53,7 @@ public class MyApp extends Application {
     public EmojiParser emojiParser;
     private RXAuthState rxAuthState;
     private RXClient rxClient;
+    private UserHolder userHolder;
 
     @Override
     public void onCreate() {
@@ -81,10 +83,11 @@ public class MyApp extends Application {
         emojiParser = new EmojiParser(emoji);
 
         rxAuthState = new RXAuthState(this);
-        rxClient = new RXClient(this, rxAuthState);
+        userHolder = new UserHolder(rxAuthState, this);
+        rxClient = new RXClient(this, rxAuthState, userHolder);
 
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this,  dpCalculator, rxClient, rxAuthState));
+                new RootModule(this,  dpCalculator, rxClient, rxAuthState, userHolder));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");
