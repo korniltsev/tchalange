@@ -207,7 +207,7 @@ public class RXClient {
     BehaviorSubject<TdApi.AuthState> authStateLogut;
 
     @Inject
-    public RXClient(Context ctx, RXAuthState auth) {
+    public RXClient(Context ctx, RXAuthState auth, final UserHolder userHolder) {
         TdApi.AuthState state = new TdApi.AuthStateWaitPhoneNumber();
         authStateLogut = BehaviorSubject.<TdApi.AuthState>create(state);
         this.ctx = ctx;
@@ -244,24 +244,23 @@ public class RXClient {
                 .subscribe(connectedState)
         ;
 
-        //        globalSubject
-        //                .subscribe(new Action1<TLObject>() {
-        //                    @Override
-        //                    public void call(TLObject tlObject) {
-        //                        Log.e("Update", "probably unhandled update\n" + tlObject);
-        //                    }
-        //                });
-        //        globalSubject2.filter(new Func1<TLObject, Boolean>() {
-        //            @Override
-        //            public Boolean call(TLObject tlObject) {
-        //                return tlObject instanceof TdApi.UpdateStickers;
-        //            }
-        //        }).subscribe(new Action1<TLObject>() {
-        //            @Override
-        //            public void call(TLObject tlObject) {
-        //                throw new IllegalStateException();
-        //            }
-        //        });
+
+        getGlobalObservableWithBackPressure()
+                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateUser.class))
+                .subscribe(new ObserverAdapter<TdApi.UpdateUser>() {
+                    @Override
+                    public void onNext(TdApi.UpdateUser response) {
+                        userHolder.save(response.user);
+                    }
+                });
+
+        auth.getMe(this).subscribe(new ObserverAdapter<RXAuthState.StateAuthorized>() {
+            @Override
+            public void onNext(RXAuthState.StateAuthorized response) {
+                userHolder.save(response.user);
+            }
+        });
+
         this.client = TG.getClientInstance();
         updateOptionMyIdEmpty()
                 .observeOn(mainThread())

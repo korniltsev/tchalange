@@ -11,22 +11,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Singleton
 public class UserHolder {
-    final RXClient client;
     final ConcurrentHashMap<Integer, User> users = new ConcurrentHashMap<>();
     final Context ctx;
 
     @Inject
-    public UserHolder(RXClient client, RXAuthState auth, Context ctx) {
-        this.client = client;
+    public UserHolder(RXAuthState auth, Context ctx) {
         this.ctx = ctx;
-        client.getGlobalObservableWithBackPressure()
-                .compose(new RXClient.FilterAndCastToClass<>(TdApi.UpdateUser.class))
-                .subscribe(new ObserverAdapter<TdApi.UpdateUser>() {
-                    @Override
-                    public void onNext(TdApi.UpdateUser response) {
-                        save(response.user);
-                    }
-                });
+
 
         auth.listen()
                 .subscribe(new ObserverAdapter<RXAuthState.AuthState>() {
@@ -38,15 +29,10 @@ public class UserHolder {
                     }
                 });
 
-        auth.getMe(client).subscribe(new ObserverAdapter<RXAuthState.StateAuthorized>(){
-            @Override
-            public void onNext(RXAuthState.StateAuthorized response) {
-                save(response.user);
-            }
-        });
+
     }
 
-    private User save(User user) {
+    public User save(User user) {
         return users.put(user.id, user);
     }
 
