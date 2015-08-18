@@ -44,7 +44,9 @@ import java.util.concurrent.Executors;
         injects = {
                 RXClient.class,
                 RXAuthState.class,
+
                 RxGlide.class,
+
                 Emoji.class,
                 RxDownloadManager.class,
                 VoicePlayer.class,
@@ -62,13 +64,27 @@ import java.util.concurrent.Executors;
 public class RootModule {
     private Context ctx;
     private final DpCalculator dpCalculator;
+    private final RXClient rxClient;
+    private final RXAuthState rxAuthState;
 
-    public RootModule(Context ctx, DpCalculator dpCalculator) {
+    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState) {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;
+        this.rxClient = rxClient;
+        this.rxAuthState = rxAuthState;
     }
 
 
+    @Singleton
+    @Provides RXAuthState provideAuthState() {
+        return rxAuthState;
+    }
+
+    @Singleton
+    @Provides
+    RXClient provideRxClient(){
+        return rxClient;
+    }
 
     @Singleton
     @Provides

@@ -30,7 +30,7 @@ import static io.fabric.sdk.android.services.common.CommonUtils.closeQuietly;
 import static rx.Observable.concat;
 import static rx.Observable.just;
 
-@Singleton
+
 public class RXAuthState {
     public static final String PREF_AUTHORIZED = "pref_authorized";
     public static final String RX_CLIENT = "rx_client";
@@ -107,7 +107,7 @@ public class RXAuthState {
     final Context ctx;
     AuthState state;
 
-    @Inject
+
     public RXAuthState(Context ctx) {
         this.ctx = ctx;
         prefs = ctx.getSharedPreferences(RX_CLIENT, Context.MODE_PRIVATE);

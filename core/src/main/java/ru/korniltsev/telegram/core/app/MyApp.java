@@ -23,6 +23,8 @@ import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
+import ru.korniltsev.telegram.core.rx.RXAuthState;
+import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 
 import java.lang.reflect.Constructor;
@@ -48,6 +50,8 @@ public class MyApp extends Application {
     private ExecutorService emojiExecutorService;
     public Emoji emoji;
     public EmojiParser emojiParser;
+    private RXAuthState rxAuthState;
+    private RXClient rxClient;
 
     @Override
     public void onCreate() {
@@ -76,8 +80,11 @@ public class MyApp extends Application {
         emoji = new Emoji(this, dpCalculator, emojiExecutorService);
         emojiParser = new EmojiParser(emoji);
 
+        rxAuthState = new RXAuthState(this);
+        rxClient = new RXClient(this, rxAuthState);
+
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this,  dpCalculator));
+                new RootModule(this,  dpCalculator, rxClient, rxAuthState));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");
