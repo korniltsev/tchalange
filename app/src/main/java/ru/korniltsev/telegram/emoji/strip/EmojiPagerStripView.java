@@ -15,6 +15,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -244,6 +245,10 @@ public class EmojiPagerStripView extends ViewGroup {
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 final GridView view1 = (GridView) view;
+                final ListAdapter adapter = view1.getAdapter();
+                if (adapter == null || adapter.getCount() == 0){
+                    return;
+                }
                 final Object itemAtPosition = view1.getItemAtPosition(firstVisibleItem);
                 if (itemAtPosition instanceof StickerAdapter.Data) {
                     final StickerAdapter.Data d = (StickerAdapter.Data) itemAtPosition;
