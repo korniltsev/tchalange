@@ -84,7 +84,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
                     @Override
                     public void onNext(UserInfo response) {
                         view
-                                .bindUser(response.user);
+                                .bindUser(response.user, response.ms);
                     }
                 })
         );

@@ -31,9 +31,12 @@ import ru.korniltsev.telegram.profile.decorators.TopShadow;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
+import static java.util.Arrays.asList;
 import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.copy;
 import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
@@ -72,7 +75,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 .setMenuClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()){
+                        switch (item.getItemId()) {
                             case R.id.menu_mute_unmute:
                                 mute();
                                 return true;
@@ -106,7 +109,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 final TdApi.TLObject boundObject = fakeToolbar.image.boundObject;
                 if (boundObject instanceof TdApi.User) {
                     final TdApi.User u = (TdApi.User) boundObject;
-                    if (u.profilePhoto.big.id == TdApi.File.NO_FILE_ID){
+                    if (u.profilePhoto.big.id == TdApi.File.NO_FILE_ID) {
                         return;
                     }
                     Flow.get(getContext())
@@ -114,7 +117,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                 }
             }
         });
-//        fakeToolbar.hideFAB();
+        //        fakeToolbar.hideFAB();
         activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));
     }
 
@@ -144,16 +147,17 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         presenter.dropView(this);
     }
 
-    public void bindUser(@NonNull TdApi.UserFull userFill) {
+    public void bindUser(@NonNull TdApi.UserFull userFill, TdApi.Messages ms) {
         final TdApi.User user = userFill.user;
+        List<List<ProfileAdapter.Item>> sections = new ArrayList<>();
 
-        List<ProfileAdapter.Item> items = new ArrayList<>();
         final boolean hasUserName = !isEmpty(user.username);
         final boolean hasPhoneNumber = !isEmpty(user.phoneNumber);
-        int firstSectionCount = 0;
+        List<ProfileAdapter.Item> phoneAndUserName = new ArrayList<>();
+        sections.add(phoneAndUserName);
         if (hasUserName) {
-            firstSectionCount++;
-            items.add(new ProfileAdapter.KeyValueItem(
+
+            phoneAndUserName.add(new ProfileAdapter.KeyValueItem(
                     R.drawable.ic_user,
                     "@" + user.username,
                     getContext().getString(R.string.item_type_username),
@@ -161,27 +165,25 @@ public class ProfileView extends FrameLayout implements HandlesBack {
         }
 
         if (hasPhoneNumber) {
-            firstSectionCount++;
             final String phone = phoneFormat.format(
                     phoneNumberWithPlus(user));
-            items.add(new ProfileAdapter.KeyValueItem(
+            phoneAndUserName.add(new ProfileAdapter.KeyValueItem(
                     R.drawable.phone_grey,
                     phone,
                     getContext().getString(R.string.item_type_mobile),
                     createPhoneActions(phone)));
         }
-        List<Integer> singleSections = new ArrayList<>();
-        if (userFill.botInfo instanceof TdApi.BotInfoGeneral){
-            firstSectionCount++;
+        //        List<Integer> singleSections = new ArrayList<>();
+        if (userFill.botInfo instanceof TdApi.BotInfoGeneral) {
             final TdApi.BotInfoGeneral botInfo = (TdApi.BotInfoGeneral) userFill.botInfo;
-            items.add(new ProfileAdapter.KeyValueItem(
+            phoneAndUserName.add(new ProfileAdapter.KeyValueItem(
                     R.drawable.ic_about,
                     botInfo.shareText,
                     getContext().getString(R.string.bot_about),
                     null
             ));
 
-            items.add(new ProfileAdapter.ButtonItem(
+            sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.ButtonItem(
                     R.drawable.ic_add,
                     getContext().getString(R.string.bot_add_to_group),
                     new Runnable() {
@@ -190,33 +192,53 @@ public class ProfileView extends FrameLayout implements HandlesBack {
                             presenter.addBotToGroup();
                         }
                     }
-            ));
-            singleSections.add(items.size());
+            )));
         }
 
+        sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.SharedMedia(asList(ms.messages))));
 
-        adapter.addAll(items);
-        int itemsBeforeFirstSection = 1;//blue header
-        if (firstSectionCount >0){
-            list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(1, calc.dp(15)));
-            if (firstSectionCount > 1){
-                for (int i = 0; i < firstSectionCount; i++) {
-                    int pos = i + itemsBeforeFirstSection;
-                    list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, pos));
+        adapter.addAll(flatten(sections));
+
+        List<List<ProfileAdapter.Item>> nonEmptySections = filterNonEmpty(sections);
+
+        int itemNumber = 1;
+        for (int i = 0, nonEmptySectionsSize = nonEmptySections.size(); i < nonEmptySectionsSize; i++) {
+            List<ProfileAdapter.Item> nonEmptySection = nonEmptySections.get(i);
+            if (i == 0) {
+                list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(itemNumber, calc.dp(15)));
+            } else {
+                list.addItemDecoration(new InsetDecorator(itemNumber, calc.dp(6)));
+                list.addItemDecoration(new TopShadow(getContext(), calc, itemNumber));
+            }
+            if (nonEmptySection.size() > 1){
+                for (int j = 0; j < nonEmptySectionsSize - 1; j++){
+                    list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, itemNumber + j));
                 }
             }
-            list.addItemDecoration(new BottomShadow(getContext(), calc, firstSectionCount));
+            itemNumber += nonEmptySection.size();
+            list.addItemDecoration(new BottomShadow(getContext(), calc, itemNumber - 1));
         }
 
-        Context ctx = getContext();
-        for (Integer integer : singleSections) {
-            list.addItemDecoration(new InsetDecorator(integer, calc.dp(6)));
-            list.addItemDecoration(new TopShadow(ctx, calc, integer));
-            list.addItemDecoration(new BottomShadow(ctx, calc, integer));
-        }
+
     }
 
+    private List<List<ProfileAdapter.Item>> filterNonEmpty(List<List<ProfileAdapter.Item>> sections) {
+        final ArrayList<List<ProfileAdapter.Item>> lists = new ArrayList<>();
+        for (List<ProfileAdapter.Item> section : sections) {
+            if (!section.isEmpty()) {
+                lists.add(section);
+            }
+        }
+        return lists;
+    }
 
+    private List<ProfileAdapter.Item> flatten(List<List<ProfileAdapter.Item>> sections) {
+        final ArrayList<ProfileAdapter.Item> res = new ArrayList<>();
+        for (List<ProfileAdapter.Item> section : sections) {
+            res.addAll(section);
+        }
+        return res;
+    }
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {
 
@@ -238,7 +260,7 @@ public class ProfileView extends FrameLayout implements HandlesBack {
 
     @Override
     public boolean onBackPressed() {
-        if (mutePopup != null && mutePopup.isShowing()){
+        if (mutePopup != null && mutePopup.isShowing()) {
             mutePopup.dismiss();
             mutePopup = null;
             return true;

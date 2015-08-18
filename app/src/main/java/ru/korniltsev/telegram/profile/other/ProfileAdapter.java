@@ -1,15 +1,21 @@
 package ru.korniltsev.telegram.profile.other;
 
 import android.content.Context;
+import android.graphics.Rect;
+import android.media.browse.MediaBrowser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.profile.chat.ChatInfoAdapter;
 
@@ -19,40 +25,53 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
     public static final int VIEW_TYPE_HEADER = 0;
     public static final int VIEW_TYPE_KEY_VALUE = 1;
     public static final int VIEW_TYPE_BUTTON = 2;
+    public static final int VIEW_TYPE_SHARED_MEDIA = 3;
     final CallBack cb;
+    private final DpCalculator calc;
 
     public ProfileAdapter(Context ctx, CallBack cb) {
         super(ctx);
+        calc = MyApp.from(ctx).dpCalculator;
         this.cb = cb;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0){
+        if (position == 0) {
             return VIEW_TYPE_HEADER;
         } else {
             final Item itm = getItem(position);
-            if (itm instanceof KeyValueItem){
+            if (itm instanceof SharedMedia) {
+                return VIEW_TYPE_SHARED_MEDIA;
+            }
+            if (itm instanceof KeyValueItem) {
                 return VIEW_TYPE_KEY_VALUE;
             } else {
                 return VIEW_TYPE_BUTTON;
             }
         }
-//        return position == 0 ? VIEW_TYPE_HEADER : VIEW_TYPE_KEY_VALUE;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        if (viewType == VIEW_TYPE_HEADER) {
-            View view = getViewFactory().inflate(R.layout.profile_item_header, parent, false);
-            return new RecyclerView.ViewHolder(view) {
-            };
-        } else if (viewType == VIEW_TYPE_BUTTON) {
-            View view = getViewFactory().inflate(R.layout.profile_item_button, parent, false);
-            return new ButtonAddMemberVH(view);
-        } else {
-            View view = getViewFactory().inflate(R.layout.profile_item_data, parent, false);
-            return new VH(view);
+        switch (viewType) {
+            case VIEW_TYPE_HEADER: {
+                View view = getViewFactory().inflate(R.layout.profile_item_header, parent, false);
+                return new RecyclerView.ViewHolder(view) {
+                };
+            }
+            case VIEW_TYPE_BUTTON: {
+                View view = getViewFactory().inflate(R.layout.profile_item_button, parent, false);
+                return new ButtonAddMemberVH(view);
+            }
+            case VIEW_TYPE_SHARED_MEDIA: {
+                View view = getViewFactory().inflate(R.layout.profile_item_shared_media, parent, false);
+                return new MediaVH(view);
+            }
+            default: {
+                View view = getViewFactory().inflate(R.layout.profile_item_data, parent, false);
+                return new VH(view);
+            }
         }
     }
 
@@ -68,11 +87,14 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
                 h.dataType.setVisibility(View.VISIBLE);
                 h.dataType.setText(k.localizedDataType);
                 h.itemView.setClickable(k.bottomSheetActions != null);
-            } else if (item instanceof ButtonItem){
+            } else if (item instanceof ButtonItem) {
                 final ButtonItem b = (ButtonItem) item;
                 ButtonAddMemberVH h = (ButtonAddMemberVH) holder;
                 h.icon.setImageResource(b.icon);
                 h.text.setText(b.localizedText);
+            } else if (item instanceof SharedMedia) {
+                MediaVH h = (MediaVH) holder;
+                h.bind((SharedMedia) item);
             }
         }
     }
@@ -130,6 +152,14 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
         }
     }
 
+    public static class SharedMedia extends Item {
+        final List<TdApi.Message> ms;
+
+        public SharedMedia(List<TdApi.Message> ms) {
+            this.ms = ms;
+        }
+    }
+
     interface CallBack {
         void clicked(KeyValueItem item);
     }
@@ -153,6 +183,44 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
                     //                    cb.btnAddMemberClicked();
                 }
             });
+        }
+    }
+
+    class MediaVH extends RecyclerView.ViewHolder {
+
+        private final TextView mediaCount;
+        private final RecyclerView mediaPreview;
+        private final Context ctx;
+
+        public MediaVH(View itemView) {
+            super(itemView);
+            mediaCount = ((TextView) itemView.findViewById(R.id.media_count));
+            mediaPreview = ((RecyclerView) itemView.findViewById(R.id.media_preview));
+            ctx = itemView.getContext();
+            mediaPreview.setLayoutManager(new LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false));
+            final int dp8 = calc.dp(8);
+            mediaPreview.addItemDecoration(new RecyclerView.ItemDecoration() {
+                @Override
+                public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                    final int pos = parent.getChildViewHolder(view).getAdapterPosition();
+                    if (pos == 0) {
+                        outRect.set(0, 0, 0, 0);
+                    } else {
+
+                        outRect.set(dp8, 0, 0, 0);
+                    }
+                }
+            });
+        }
+
+        public void bind(SharedMedia i) {
+            if (i.ms.isEmpty()) {
+                mediaPreview.setVisibility(View.GONE);
+            } else {
+                mediaPreview.setVisibility(View.VISIBLE);
+                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, i.ms));
+            }
+            mediaCount.setText(String.valueOf(i.ms.size()));
         }
     }
 }
