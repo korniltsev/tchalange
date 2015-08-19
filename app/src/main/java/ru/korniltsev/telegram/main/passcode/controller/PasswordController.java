@@ -1,6 +1,8 @@
 package ru.korniltsev.telegram.main.passcode.controller;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
@@ -45,6 +47,7 @@ public class PasswordController extends Controller {
         //        Drawable wrappedDrawable = DrawableCompat.wrap(passcodeField.getBackground());
         //        DrawableCompat.setTint(wrappedDrawable, Color.WHITE);
         //        passcodeField.setBackgroundDrawable(wrappedDrawable);
+        passcodeField.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY);
         passcodeField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

@@ -133,7 +133,11 @@ public class PasscodeManager {
         if (passcodeData ==null){
             return false;
         }
-        return passcodeData.equals(data);
+        final boolean res = passcodeData.equals(data);
+        if (res){
+            setLocked(false);
+        }
+        return res;
     }
 
     public int getPasswordType() {
