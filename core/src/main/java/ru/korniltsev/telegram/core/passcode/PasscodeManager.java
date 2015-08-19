@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 import org.joda.time.Duration;
+import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.rx.RXAuthState;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,9 +27,20 @@ public class PasscodeManager {
     private final SharedPreferences prefs;
 
     @Inject
-    public PasscodeManager(Context ctx) {
+    public PasscodeManager(Context ctx, RXAuthState auth) {
         this.ctx = ctx;
         prefs = ctx.getSharedPreferences("PassCodeManager", Context.MODE_PRIVATE);
+        auth.listen()
+                .subscribe(new ObserverAdapter<RXAuthState.AuthState>() {
+                    @Override
+                    public void onNext(RXAuthState.AuthState authState) {
+                        if (authState instanceof RXAuthState.StateLogout) {
+                            prefs.edit()
+                                    .clear()
+                                    .apply();
+                        }
+                    }
+                });
     }
 
     public void onPause(boolean isLocked) {
@@ -51,7 +64,7 @@ public class PasscodeManager {
         if (shouldIgnoreTime()) {
             cb.lockUI();
             setShouldLockOnceAnyway(false);
-        } else if (isLocked()){
+        } else if (isLocked()) {
             cb.lockUI();
         } else {
             final long lastPauseTime = prefs.getLong(LAST_PAUSE, -1);
@@ -99,7 +112,6 @@ public class PasscodeManager {
                 .commit();
     }
 
-
     public void setAutoLockTiming(long timing) {
         prefs
                 .edit()
@@ -122,19 +134,17 @@ public class PasscodeManager {
                 .commit();
     }
 
-
-
-    public boolean unlock(int type, String data){
+    public boolean unlock(int type, String data) {
         final int passcodeType = prefs.getInt(PASSCODE_TYPE, PasscodeManager.TYPE_PASSWORD);
-        if (passcodeType != type){
+        if (passcodeType != type) {
             return false;
         }
         final String passcodeData = prefs.getString(PASSCODE_DATA, null);
-        if (passcodeData ==null){
+        if (passcodeData == null) {
             return false;
         }
         final boolean res = passcodeData.equals(data);
-        if (res){
+        if (res) {
             setLocked(false);
         }
         return res;
@@ -147,7 +157,6 @@ public class PasscodeManager {
     public interface Callback {
         void lockUI();
     }
-
 
     public static final int TYPE_PASSWORD = 0;
     public static final int TYPE_PIN = 1;
