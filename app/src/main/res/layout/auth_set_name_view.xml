@@ -31,7 +31,7 @@
                     android:inputType="textCapWords"
                     android:imeOptions="actionNext"
                     android:hint="@string/hint_first_name"
-
+                    style="@style/MyEditTextCompat"
                     />
 
             <EditText
@@ -43,7 +43,7 @@
 
                     android:imeOptions="actionDone"
                     android:hint="@string/hint_last_name"
-
+                    style="@style/MyEditTextCompat"
                     />
         </LinearLayout>
 

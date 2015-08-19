@@ -38,10 +38,8 @@
                     android:inputType="textCapWords"
                     android:imeOptions="actionNext"
                     android:hint="@string/hint_first_name"
-                    android:paddingBottom="16dp"
                     android:layout_marginTop="4dp"
-                    android:textCursorDrawable="@null"
-
+                    style="@style/MyEditTextCompat"
                     />
 
             <EditText
@@ -50,12 +48,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:inputType="textCapWords"
-
                     android:imeOptions="actionDone"
                     android:hint="@string/hint_last_name"
 
-                    android:paddingBottom="16dp"
-                    android:textCursorDrawable="@null"
+
+                    style="@style/MyEditTextCompat"
 
 
                     />

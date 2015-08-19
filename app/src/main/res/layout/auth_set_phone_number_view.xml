@@ -29,13 +29,12 @@
                         android:layout_height="wrap_content"
                         android:editable="false"
                         android:focusable="false"
-                        style="@style/Widget.AppCompat.EditText"
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="8dp"
-                        android:textCursorDrawable="@null"
-                        />
+
+                        style="@style/MyEditTextCompat"/>
 
                 <EditText
                         android:id="@+id/country_phone_code"
@@ -46,7 +45,8 @@
                         android:layout_marginLeft="16dp"
                         android:inputType="phone"
                         android:imeOptions="actionNext"
-                        android:textCursorDrawable="@null"
+
+                        style="@style/MyEditTextCompat"
                         />
 
                 <EditText
@@ -63,7 +63,8 @@
                         android:singleLine="true"
                         android:digits="0123456789 -()"
                         android:imeOptions="actionDone"
-                        android:textCursorDrawable="@null"
+
+                        style="@style/MyEditTextCompat"
                         />
 
                 <TextView
