@@ -23,7 +23,7 @@ public class MyPhoneView extends View {
     public MyPhoneView(Context context, int textSize, boolean bold) {
         super(context);
         final MyApp from = MyApp.from(context);
-        final DpCalculator calc = from.dpCalculator;
+        final DpCalculator calc = from.calc;
         width = calc.dp(304) - calc.dp(18) * 2;
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(Color.WHITE);

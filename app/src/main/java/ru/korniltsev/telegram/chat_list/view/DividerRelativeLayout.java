@@ -2,17 +2,12 @@ package ru.korniltsev.telegram.chat_list.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
-import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-
-import javax.inject.Inject;
-
 
 public class DividerRelativeLayout extends RelativeLayout {
     private final int from;
@@ -21,7 +16,7 @@ public class DividerRelativeLayout extends RelativeLayout {
 
     public DividerRelativeLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        calc = MyApp.from(context).dpCalculator;
+        calc = MyApp.from(context).calc;
         from = calc.dp(72);
         setWillNotDraw(false);
         p = new Paint(Paint.ANTI_ALIAS_FLAG);

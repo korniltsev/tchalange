@@ -30,7 +30,7 @@ public class PhotoMessageView extends ImageView {
     public PhotoMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        calc = MyApp.from(context).dpCalculator;
+        calc = MyApp.from(context).calc;
         dip207 = calc.dp(207);
         dip154 = calc.dp(154);
     }

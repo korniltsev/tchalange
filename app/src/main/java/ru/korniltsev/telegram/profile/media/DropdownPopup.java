@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -26,7 +25,7 @@ public class DropdownPopup extends PopupWindow {
     public DropdownPopup(Context ctx, List<Item> items) {
         super();
         this.items = items;
-        final DpCalculator dpCalculator = MyApp.from(ctx).dpCalculator;
+        final DpCalculator dpCalculator = MyApp.from(ctx).calc;
         final LinearLayout linearLayout = new LinearLayout(ctx);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         int height = 0;
@@ -62,11 +61,11 @@ public class DropdownPopup extends PopupWindow {
         setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
-    static class Item {
+    public static class Item {
         final String title;
         final Runnable action;
 
-        Item(String title, Runnable action) {
+        public Item(String title, Runnable action) {
             this.title = title;
             this.action = action;
         }

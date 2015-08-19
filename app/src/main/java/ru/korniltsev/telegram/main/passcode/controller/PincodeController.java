@@ -23,10 +23,9 @@ import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import ru.korniltsev.telegram.main.passcode.PasscodeView;
 import ru.korniltsev.telegram.profile.edit.passcode.EditPasscode;
 
-import static junit.framework.Assert.assertNotNull;
 import static ru.korniltsev.telegram.core.Utils.textFrom;
 
-public class PasswordController extends Controller {
+public class PincodeController extends Controller {
     private final EditText passcodeField;
     private final TextView passCodeHint;
     private final View logo;
@@ -36,13 +35,13 @@ public class PasswordController extends Controller {
     private final PasscodeView passcodeView;
     private String firstPassword;
 
-    public PasswordController(PasscodeView passcodeView, PasscodePath lock, PasscodeManager manager) {
+    public PincodeController(PasscodeView passcodeView, PasscodePath lock, PasscodeManager manager) {
         this.passcodeView = passcodeView;
         ctx = passcodeView.getContext();
         this.lock = lock;
         this.passcodeManager = manager;
         LayoutInflater.from(passcodeView.getContext())
-                .inflate(R.layout.passcode_view_password, passcodeView, true);
+                .inflate(R.layout.passcode_view_pincode, passcodeView, true);
 
         passcodeField = ((EditText) passcodeView.findViewById(R.id.passcode_field));
         passCodeHint = ((TextView) passcodeView.findViewById(R.id.passcode_hint));
@@ -64,20 +63,18 @@ public class PasswordController extends Controller {
             }
         });
         passcodeField.setSingleLine(true);
-        passcodeField.requestFocus();
-        passcodeField.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
         switch (lock.actionType) {
             case PasscodePath.TYPE_LOCK:
-                passCodeHint.setText(R.string.enter_your_password);
+                passCodeHint.setText(R.string.enter_your_pincode);
                 break;
             case PasscodePath.TYPE_SET:
                 logo.setVisibility(View.GONE);
-                passCodeHint.setText(R.string.choose_your_password);
+                passCodeHint.setText(R.string.choose_your_pin);
                 break;
             case PasscodePath.TYPE_LOCK_TO_CHANGE:
                 logo.setVisibility(View.GONE);
-                passCodeHint.setText(R.string.enter_your_password);
+                passCodeHint.setText(R.string.enter_your_pincode);
                 break;
         }
     }
@@ -95,26 +92,23 @@ public class PasswordController extends Controller {
                 final boolean unlocked = unlock(textFrom(passcodeField));
                 if (!unlocked) {
                     passcodeField.setError(ctx.getString(R.string.wrong_password));
-                } else {
-                    //                    hideKeyboard();
                 }
                 break;
             case PasscodePath.TYPE_SET:
                 if (firstPassword == null) {
                     final String text = textFrom(passcodeField);
                     if (text.isEmpty()) {
-                        passcodeField.setError(ctx.getString(R.string.password_cannot_be_empty));
+                        passcodeField.setError(ctx.getString(R.string.pin_cannot_be_empty));
                         return;
                     }
                     firstPassword = text;
                     passcodeField.getText().clear();
-                    passCodeHint.setText(R.string.choose_your_password_2);
+                    passCodeHint.setText(R.string.choose_your_PIN_2);
                 } else {
                     if (firstPassword.equals(textFrom(passcodeField))) {
                         setNewPassword(firstPassword);
-                        //                        hideKeyboard();
                     } else {
-                        passcodeField.setError("Passwords does not match");
+                        passcodeField.setError("PIN does not match");
                     }
                 }
                 break;

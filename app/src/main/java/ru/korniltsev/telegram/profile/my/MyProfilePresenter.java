@@ -21,12 +21,6 @@ import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import ru.korniltsev.telegram.profile.edit.name.EditNamePath;
 import ru.korniltsev.telegram.profile.edit.passcode.EditPasscode;
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -35,7 +29,6 @@ import java.io.File;
 import java.util.List;
 
 import static ru.korniltsev.telegram.common.AppUtils.getTmpFileForCamera;
-import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
 public class MyProfilePresenter extends ViewPresenter<MyProfileView> implements AttachPanelPopup.Callback {

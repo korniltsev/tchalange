@@ -1,15 +1,9 @@
 package ru.korniltsev.telegram.main.passcode;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import flow.Flow;
 import mortar.ViewPresenter;
-import ru.korniltsev.telegram.common.AppUtils;
-import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
-import ru.korniltsev.telegram.core.rx.RXClient;
-import ru.korniltsev.telegram.profile.edit.passcode.EditPasscode;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -44,7 +38,7 @@ public class PasscodePresenter extends ViewPresenter<PasscodeView> {
 
 
     public boolean onBackPressed() {
-        if (path.type == PasscodePath.TYPE_LOCK){
+        if (path.actionType == PasscodePath.TYPE_LOCK){
             owner.expose().finish();
             return true;
         }

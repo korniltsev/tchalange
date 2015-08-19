@@ -4,9 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import flow.Flow;
 import mortar.ViewPresenter;
-import org.joda.time.Duration;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
-import ru.korniltsev.telegram.attach_panel.RecentImagesBottomSheet;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -15,10 +13,7 @@ import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class EditPasscodePresenter extends ViewPresenter<EditPasscodeView> {
@@ -56,7 +51,7 @@ public class EditPasscodePresenter extends ViewPresenter<EditPasscodeView> {
 
     private void setPasscode() {
         Flow.get(getView())
-                .set(new PasscodePath(PasscodePath.TYPE_SET));
+                .set(new PasscodePath(PasscodePath.TYPE_SET, PasscodeManager.TYPE_PASSWORD));
     }
 
     public void changePasscodeClicked() {

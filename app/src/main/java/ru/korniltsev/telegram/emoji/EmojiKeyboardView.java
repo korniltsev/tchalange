@@ -56,7 +56,7 @@ public class EmojiKeyboardView extends LinearLayout {
         ObjectGraphService.inject(context, this);
         viewFactory = LayoutInflater.from(context);
         final MyApp from = MyApp.from(context);
-        calc = from.dpCalculator;
+        calc = from.calc;
         displayWidth = from.displayWidth;
         emoji = from.emoji;
     }

@@ -18,7 +18,6 @@ import ru.korniltsev.telegram.profile.other.MediaPreviewAdapter;
 
 import java.util.List;
 
-import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.uiStatusColor;
 import static ru.korniltsev.telegram.common.AppUtils.uiName;
 import static ru.korniltsev.telegram.common.AppUtils.uiUserStatus;
@@ -34,7 +33,7 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
     public ChatInfoAdapter(Context ctx, CallBack cb) {
         super(ctx);
         this.cb = cb;
-        calc = MyApp.from(ctx).dpCalculator;
+        calc = MyApp.from(ctx).calc;
     }
 
     @Override

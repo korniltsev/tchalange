@@ -9,14 +9,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.google.common.primitives.Chars;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -44,7 +42,7 @@ public class TextMessageView extends View {
         super(context);
         final MyApp app = MyApp.from(context);
         final int displayWidth = app.displayWidth;
-        final DpCalculator calc = app.dpCalculator;
+        final DpCalculator calc = app.calc;
 
         width = displayWidth - calc.dp(41 + 9 + 11 + 8);
         paint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);

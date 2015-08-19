@@ -41,7 +41,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
     public SharedMediaView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        dpCalculator = MyApp.from(this).dpCalculator;
+        dpCalculator = MyApp.from(this).calc;
     }
 
     @Override
@@ -90,8 +90,8 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
             }
         }));
         popup = new DropdownPopup(getContext(), items);
-        final int[] location = new int[2];
-        customView.getLocationOnScreen(location);
+//        final int[] location = new int[2];
+//        customView.getLocationOnScreen(location);
 
         popup.showAtLocation(customView, 0, dpCalculator.dp(48), dpCalculator.dp(28));
     }

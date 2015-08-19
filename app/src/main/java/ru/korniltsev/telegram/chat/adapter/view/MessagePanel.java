@@ -97,7 +97,7 @@ public class MessagePanel extends FrameLayout {
 
         final MyApp app = MyApp.from(context);
         emoji = app.emoji;
-        calc = app.dpCalculator;
+        calc = app.calc;
         dip1 = calc.dp(1);
     }
 

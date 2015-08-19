@@ -63,7 +63,7 @@ public class EmojiPagerStripView extends ViewGroup {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         final MyApp app = MyApp.from(context);
-        calc = app.dpCalculator;
+        calc = app.calc;
 
         emoji = new LinearLayoutWithStrip(context);
         for (int icon : icons) {

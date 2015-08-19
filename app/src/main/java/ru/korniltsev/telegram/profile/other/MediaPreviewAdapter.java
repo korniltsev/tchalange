@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -27,7 +26,7 @@ public class MediaPreviewAdapter extends BaseAdapter<TdApi.Message, MediaPreview
 
     public MediaPreviewAdapter(Context ctx, List<TdApi.Message> messages) {
         super(ctx, messages);
-        calc = MyApp.from(ctx).dpCalculator;
+        calc = MyApp.from(ctx).calc;
         rxGlide = ObjectGraphService.getObjectGraph(ctx).get(RxGlide.class);
         dip100 = calc.dp(100);
 

@@ -141,7 +141,7 @@ public class PasscodeManager {
     }
 
     public int getPasswordType() {
-        return 0;
+        return prefs.getInt(PASSCODE_TYPE, TYPE_PASSWORD);
     }
 
     public interface Callback {

@@ -17,7 +17,6 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
-import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
 
@@ -36,7 +35,7 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
     public SharedMediaAdapter(Context ctx) {
         super(ctx);
         rxGlide = ObjectGraphService.getObjectGraph(ctx).get(RxGlide.class);
-        dip100 = MyApp.from(ctx).dpCalculator.dp(100);
+        dip100 = MyApp.from(ctx).calc.dp(100);
 
 
     }

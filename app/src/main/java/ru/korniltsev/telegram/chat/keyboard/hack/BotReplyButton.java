@@ -4,14 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RoundRectShape;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -32,7 +28,7 @@ public class BotReplyButton extends View {
 
     public BotReplyButton(Context context) {
         super(context);
-        calc = MyApp.from(context).dpCalculator;
+        calc = MyApp.from(context).calc;
         padding = calc.dp(16f);
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(calc.dp(16f));

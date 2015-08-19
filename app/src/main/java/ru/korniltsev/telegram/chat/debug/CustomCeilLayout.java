@@ -77,7 +77,7 @@ public class CustomCeilLayout extends ViewGroup {
 
         final MyApp app = MyApp.from(ctx);
         screenWidth = app.displayWidth;
-        calc = app.dpCalculator;
+        calc = app.calc;
         layoutCache = app.staticLayoutCache;
 
         paddingTopBottom = calc.dp(8);

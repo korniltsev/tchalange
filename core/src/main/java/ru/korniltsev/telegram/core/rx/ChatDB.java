@@ -2,9 +2,7 @@ package ru.korniltsev.telegram.core.rx;
 
 import android.content.Context;
 import android.support.v4.util.LongSparseArray;
-import android.support.v4.util.SparseArrayCompat;
 import android.util.DisplayMetrics;
-import android.util.SparseArray;
 import android.view.WindowManager;
 import junit.framework.Assert;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -14,7 +12,6 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.operators.ImmediateBufferOperator;
 import rx.Observable;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
@@ -31,7 +28,6 @@ import java.util.Set;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
-import static ru.korniltsev.telegram.core.utils.Preconditions.checkNotMainThread;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
@@ -71,7 +67,7 @@ public class ChatDB {
         this.client = client;
         final MyApp from = MyApp.from(ctx);
         parser = from.emojiParser;
-        DpCalculator calc = from.dpCalculator;
+        DpCalculator calc = from.calc;
 //        this.parser = parser;
         this.nm = nm;
         this.userHolder = userHolder;

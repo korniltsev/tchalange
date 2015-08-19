@@ -3,18 +3,15 @@ package ru.korniltsev.telegram.chat_list;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import ru.korniltsev.telegram.audio.LinearLayoutWithShadow;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat_list.view.DrawerButtonView;
@@ -30,7 +27,7 @@ public class ChatListViewFactory {
     @NonNull
     static View construct(Context ctx) {
         final MyApp from = MyApp.from(ctx);
-        final DpCalculator calc = from.dpCalculator;
+        final DpCalculator calc = from.calc;
         final ChatListView clv = new ChatListView(ctx, null);
         clv.setLayoutParams(new FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
         clv.setBackgroundColor(Color.WHITE);

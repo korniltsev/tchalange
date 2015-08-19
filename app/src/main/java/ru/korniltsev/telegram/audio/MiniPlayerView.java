@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
@@ -16,15 +15,9 @@ import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.audio.helper.SimpleImageButtonView;
@@ -38,13 +31,11 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.Subscriptions;
 
-import java.text.Normalizer;
 import java.util.concurrent.TimeUnit;
 
 import static android.text.TextUtils.ellipsize;
 import static android.text.TextUtils.isEmpty;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static rx.Observable.timer;
 
 public class MiniPlayerView extends ViewGroup {
@@ -73,7 +64,7 @@ public class MiniPlayerView extends ViewGroup {
         super(ctx);
         final MyApp from = MyApp.from(ctx);
         audioPLayer = from.audioPLayer;
-        calc = from.dpCalculator;
+        calc = from.calc;
         setWillNotDraw(false);
         dp1point5 = calc.dp(1.5f);
 

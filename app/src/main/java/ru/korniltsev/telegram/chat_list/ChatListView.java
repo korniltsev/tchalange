@@ -1,6 +1,5 @@
 package ru.korniltsev.telegram.chat_list;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcelable;
 import android.support.v4.widget.DrawerLayout;
@@ -9,7 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import dagger.ObjectGraph;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -69,7 +67,7 @@ public class ChatListView extends DrawerLayout {
     public ChatListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        calc = MyApp.from(context).dpCalculator;
+        calc = MyApp.from(context).calc;
         AppUtils.rtlPerformanceFix(this);
     }
 

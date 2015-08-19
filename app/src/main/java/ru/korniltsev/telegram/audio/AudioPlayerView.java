@@ -1,11 +1,9 @@
 package ru.korniltsev.telegram.audio;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
@@ -21,7 +19,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Callback;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
-import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -85,7 +82,7 @@ public class AudioPlayerView extends LinearLayout {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         final MyApp app = MyApp.from(context);
-        calc = app.dpCalculator;
+        calc = app.calc;
         audioPLayer = app.audioPLayer;
 
         blur = new BlurTransformation(getContext().getApplicationContext(), calc.dp(2));

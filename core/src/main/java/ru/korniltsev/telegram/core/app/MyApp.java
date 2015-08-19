@@ -3,7 +3,6 @@ package ru.korniltsev.telegram.core.app;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.os.Debug;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -46,7 +45,7 @@ public class MyApp extends Application {
 //    public DpCalculator dpCalculator;
 //    public RxGlide rxGlide;
     public StaticLayoutCache staticLayoutCache;
-    public DpCalculator dpCalculator;
+    public DpCalculator calc;
     public RxGlide rxGlide;
     public AudioPLayer audioPLayer;
     private ExecutorService emojiExecutorService;
@@ -76,12 +75,12 @@ public class MyApp extends Application {
         refreshDisplay();
 
         float density = getResources().getDisplayMetrics().density;
-        dpCalculator = new DpCalculator(density);
+        calc = new DpCalculator(density);
         audioPLayer = new AudioPLayer(this);
         staticLayoutCache = new StaticLayoutCache();
         final AndroidBackgroundPriorityThreadFactory factory = new AndroidBackgroundPriorityThreadFactory("Emoji/AudioPlayer singleton executor");
         emojiExecutorService = Executors.newSingleThreadExecutor(factory);
-        emoji = new Emoji(this, dpCalculator, emojiExecutorService);
+        emoji = new Emoji(this, calc, emojiExecutorService);
         emojiParser = new EmojiParser(emoji);
 
         rxAuthState = new RXAuthState(this);
@@ -91,7 +90,7 @@ public class MyApp extends Application {
         sharedMediaHelper = new SharedMediaHelper(rxClient);
 
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this,  dpCalculator, rxClient, rxAuthState, userHolder));
+                new RootModule(this, calc, rxClient, rxAuthState, userHolder));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");

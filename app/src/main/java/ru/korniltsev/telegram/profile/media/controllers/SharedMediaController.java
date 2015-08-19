@@ -36,7 +36,7 @@ public class SharedMediaController extends MediaController {
         this.path = path;
         final Context ctx = list.getContext();
         final MyApp from = MyApp.from(ctx);
-        calculator = from.dpCalculator;
+        calculator = from.calc;
         helper = from.sharedMediaHelper.getHolder(path.chatId);
         title.setText(R.string.shared_media_title);
 

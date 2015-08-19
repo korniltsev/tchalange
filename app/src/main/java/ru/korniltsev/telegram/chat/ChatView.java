@@ -127,7 +127,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         ObjectGraphService.inject(context, this);
 
         final MyApp from = MyApp.from(context);
-        calc = from.dpCalculator;
+        calc = from.calc;
         emojiParser = from.emojiParser;
         AppUtils.rtlPerformanceFix(this);
     }

@@ -2,7 +2,6 @@ package ru.korniltsev.telegram.profile.other;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.media.browse.MediaBrowser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,7 +16,6 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
-import ru.korniltsev.telegram.profile.chat.ChatInfoAdapter;
 
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
 
     public ProfileAdapter(Context ctx, CallBack cb) {
         super(ctx);
-        calc = MyApp.from(ctx).dpCalculator;
+        calc = MyApp.from(ctx).calc;
         this.cb = cb;
     }
 

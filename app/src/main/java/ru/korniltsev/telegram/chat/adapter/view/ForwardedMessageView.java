@@ -7,13 +7,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
-import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.utils.Colors;
-
-import javax.inject.Inject;
 
 public class ForwardedMessageView extends RelativeLayout {
 
@@ -29,7 +26,7 @@ public class ForwardedMessageView extends RelativeLayout {
 
     public ForwardedMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        calc = MyApp.from(context).dpCalculator;
+        calc = MyApp.from(context).calc;
 
         setWillNotDraw(false);
         lineWidth = calc.dp(BLUE_LINE_WIDTH_DP);
