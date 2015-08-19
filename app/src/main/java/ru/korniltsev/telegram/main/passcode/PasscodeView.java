@@ -20,6 +20,7 @@ import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.main.passcode.controller.Controller;
 import ru.korniltsev.telegram.main.passcode.controller.PasswordController;
+import ru.korniltsev.telegram.main.passcode.controller.PincodeController;
 import ru.korniltsev.telegram.profile.media.DropdownPopup;
 
 import javax.inject.Inject;
@@ -39,6 +40,7 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
     //    private String firstPassword;
     private PasscodePath lock;
     private Controller controller;
+    private TextView title;
     //    private View logo;
 
     public PasscodeView(Context context, AttributeSet attrs) {
@@ -61,14 +63,14 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
                 })
                 .pop();
 
-        final TextView title = (TextView) toolbar.getCustomView();
+        title = (TextView) toolbar.getCustomView();
         assert title != null;
 
         final Drawable d = getResources().getDrawable(R.drawable.ic_arrow_dropdown);
         assert d != null;
         d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
         title.setCompoundDrawables(null, null, d, null);
-        title.setText(R.string.passcode_title_password);
+
         title.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,18 +82,19 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
     private void showDropdown(TextView title) {
         final ArrayList<DropdownPopup.Item> list = new ArrayList<>();
         final Resources res = getResources();
-        list.add(new DropdownPopup.Item(res.getString(R.string.password), new Runnable() {
-            @Override
-            public void run() {
-                toggle(PasscodeManager.TYPE_PASSWORD);
-            }
-        }));
         list.add(new DropdownPopup.Item(res.getString(R.string.pin), new Runnable() {
             @Override
             public void run() {
                 toggle(PasscodeManager.TYPE_PIN);
             }
         }));
+        list.add(new DropdownPopup.Item(res.getString(R.string.password), new Runnable() {
+            @Override
+            public void run() {
+                toggle(PasscodeManager.TYPE_PASSWORD);
+            }
+        }));
+
         final DropdownPopup popup = new DropdownPopup(getContext(), list);
         popup.showAtLocation(title, 0, calc.dp(48), calc.dp(28));
     }
@@ -143,7 +146,7 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
                 toolbar.toolbar.setVisibility(View.GONE);
                 break;
             case PasscodePath.TYPE_SET:
-                type = PasscodeManager.TYPE_PASSWORD;//todo set
+                type = lock.setPasswordType;
                 break;
             default:
                 return;
@@ -154,6 +157,10 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
     private void createControllerFor(int type, PasscodePath lock) {
         if (type == PasscodeManager.TYPE_PASSWORD) {
             controller = new PasswordController(this, lock, passcodeManager);
+            title.setText(R.string.passcode_title_password);
+        } else if (type == PasscodeManager.TYPE_PIN){
+            controller = new PincodeController(this, lock, passcodeManager);
+            title.setText(R.string.pin);
         }
     }
 

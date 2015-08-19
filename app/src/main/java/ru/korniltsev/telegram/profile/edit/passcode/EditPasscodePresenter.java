@@ -51,7 +51,7 @@ public class EditPasscodePresenter extends ViewPresenter<EditPasscodeView> {
 
     private void setPasscode() {
         Flow.get(getView())
-                .set(new PasscodePath(PasscodePath.TYPE_SET, PasscodeManager.TYPE_PASSWORD));
+                .set(new PasscodePath(PasscodePath.TYPE_SET, PasscodeManager.TYPE_PIN));
     }
 
     public void changePasscodeClicked() {

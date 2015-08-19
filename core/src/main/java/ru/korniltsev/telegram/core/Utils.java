@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -45,6 +46,10 @@ public class Utils {
     }
 
     public static String textFrom(EditText e) {
+        return e.getText().toString();
+    }
+
+    public static String textFrom(TextView e) {
         return e.getText().toString();
     }
 

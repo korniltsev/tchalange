@@ -69,6 +69,7 @@ public class PasswordController extends Controller {
 
         switch (lock.actionType) {
             case PasscodePath.TYPE_LOCK:
+                logo.setVisibility(View.VISIBLE);
                 passCodeHint.setText(R.string.enter_your_password);
                 break;
             case PasscodePath.TYPE_SET:
@@ -76,7 +77,7 @@ public class PasswordController extends Controller {
                 passCodeHint.setText(R.string.choose_your_password);
                 break;
             case PasscodePath.TYPE_LOCK_TO_CHANGE:
-                logo.setVisibility(View.GONE);
+                logo.setVisibility(View.VISIBLE);
                 passCodeHint.setText(R.string.enter_your_password);
                 break;
         }
