@@ -15,12 +15,10 @@ public class PasscodePath extends BasePath implements Serializable{
     public static final int TYPE_LOCK = 0;
     public static final int TYPE_SET = 1;
     public static final int TYPE_LOCK_TO_CHANGE = 2;
-    // true если запущен для лока,
-    // false если пытаемся установить новый паскод
+
     public final int type;
 
-    public final boolean finishOnBackPressed = true;
-    public final Runnable runOnSuccess = null;
+
 
     public PasscodePath(int type) {
         this.type = type;

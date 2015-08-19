@@ -15,10 +15,10 @@ public class PasscodeManager {
 
     public static final String LAST_PAUSE = "last_pause";
     public static final String IGNORE_LAST_SAVED_TIME = "ignore_last_saved_time";
-    public static final String AUTO_LOCK_DURATION = "auto_lock_duration";
-    public static final String PASSCODE_ENABLED = "passcode_enabled";
+    public static final String PASSCODE_ENABLED = "passcode_enabled2";
     public static final String AUTO_LOCK_TIME = "auto_lock_time";
-    public static final String PASSCODE_PASSWORD = "passcode_password";
+    public static final String PASSCODE_DATA = "passcode_date";
+    public static final String PASSCODE_TYPE = "passcode_type";
     public static final String LOCKED_EXPLICITLY = "locked_explicitly";
 
     private final Context ctx;
@@ -92,15 +92,13 @@ public class PasscodeManager {
                 .commit();
     }
 
-    public void setPassword(String firstPassword) {
+    public void setPassword(int type, String firstPassword) {
         prefs.edit()
-                .putString(PASSCODE_PASSWORD, firstPassword)
+                .putString(PASSCODE_DATA, firstPassword)
+                .putInt(PASSCODE_TYPE, type)
                 .commit();
     }
 
-    public String getPassword() {
-        return prefs.getString(PASSCODE_PASSWORD, "");
-    }
 
     public void setAutoLockTiming(long timing) {
         prefs
@@ -124,15 +122,29 @@ public class PasscodeManager {
                 .commit();
     }
 
-    public boolean unlock(String s) {
-        if (s.equals(getPassword())){
-            setLocked(false);
-            return true;
+
+
+    public boolean unlock(int type, String data){
+        final int passcodeType = prefs.getInt(PASSCODE_TYPE, PasscodeManager.TYPE_PASSWORD);
+        if (passcodeType != type){
+            return false;
         }
-        return false;
+        final String passcodeData = prefs.getString(PASSCODE_DATA, null);
+        if (passcodeData ==null){
+            return false;
+        }
+        return passcodeData.equals(data);
+    }
+
+    public int getPasswordType() {
+        return 0;
     }
 
     public interface Callback {
         void lockUI();
     }
+
+
+    public static final int TYPE_PASSWORD = 0;
+    public static final int TYPE_PIN = 1;
 }

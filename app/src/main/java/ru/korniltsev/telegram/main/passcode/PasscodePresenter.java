@@ -42,26 +42,6 @@ public class PasscodePresenter extends ViewPresenter<PasscodeView> {
         view.hideKeyboard();
     }
 
-    public boolean unlock(String s) {
-        if (passcodeManager.unlock(s)) {
-            final Flow flow = Flow.get(getView());
-            if (path.type == PasscodePath.TYPE_LOCK){
-                flow.goBack();
-            } else {
-                AppUtils.flowPushAndRemove(getView(), new EditPasscode(), new FlowHistoryStripper() {
-                    @Override
-                    public boolean shouldRemovePath(Object path) {
-                        return path instanceof PasscodePath;
-                    }
-                }, Flow.Direction.FORWARD);
-//                flow.goBack();
-//                flow.set(new EditPasscode());
-            }
-
-            return true;
-        }
-        return false;
-    }
 
     public boolean onBackPressed() {
         if (path.type == PasscodePath.TYPE_LOCK){
@@ -71,10 +51,10 @@ public class PasscodePresenter extends ViewPresenter<PasscodeView> {
         return false;
     }
 
-    public void setNewPassword(@NonNull String firstPassword) {
-        passcodeManager.setPassword(firstPassword);
-        passcodeManager.setPasscodeEnabled(true);
-        Flow.get(getView())
-                .goBack();
-    }
+//    public void setNewPassword(@NonNull String firstPassword) {
+//        passcodeManager.setPassword(firstPassword);
+//        passcodeManager.setPasscodeEnabled(true);
+//        Flow.get(getView())
+//                .goBack();
+//    }
 }
