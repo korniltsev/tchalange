@@ -12,12 +12,12 @@ public class CheckRecyclerViewSpan  {
      * @param callback called if the view span of the target is not filled
      */
     public static void check(final RecyclerView target, final Runnable callback) {
-        Log.d("CheckRecyclerViewSpan", "check");
+//        Log.d("CheckRecyclerViewSpan", "check");
         target.getViewTreeObserver()
                 .addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public boolean onPreDraw() {
-                        Log.d("CheckRecyclerViewSpan", "onPredraw");
+//                        Log.d("CheckRecyclerViewSpan", "onPredraw");
                         ViewTreeObserver v = target.getViewTreeObserver();
                         if (!v.isAlive()) {
                             return true;
@@ -27,7 +27,7 @@ public class CheckRecyclerViewSpan  {
                         LinearLayoutManager lm = (LinearLayoutManager) target.getLayoutManager();
                         if (lm.findFirstCompletelyVisibleItemPosition() == 0
                                 && lm.findLastCompletelyVisibleItemPosition() == a.getItemCount() - 1) {
-                            Log.d("CheckRecyclerViewSpan", "run");
+//                            Log.d("CheckRecyclerViewSpan", "run");
                             callback.run();
                         }
                         return true;

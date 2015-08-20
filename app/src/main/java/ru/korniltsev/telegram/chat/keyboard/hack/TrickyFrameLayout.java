@@ -38,17 +38,17 @@ public class TrickyFrameLayout extends FrameLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        log("h: " + getHeight());
+//        log("h: " + getHeight());
     }
 
-    private int log(String msg) {
-        return Log.d("TrickyLinearyLayout", msg);
+    private void log(String msg) {
+//        return Log.d("TrickyLinearyLayout", msg);
     }
 
     public void setTrickyMargin(int trickyMargin) {
         this.trickyMargin = trickyMargin;
         requestLayout();
-        log("setTrickyMargin " + trickyMargin)
+//        log("setTrickyMargin " + trickyMargin)
         ;
     }
 
@@ -56,13 +56,13 @@ public class TrickyFrameLayout extends FrameLayout {
         this.fixedHeight = getHeight();
         this.fixedMargin = trickyMargin;
         requestLayout();
-        log("fix height ");
+//        log("fix height ");
     }
 
     public void resetFixedheight() {
-        log("reset fixed height ");
+//        log("reset fixed height ");
         if (fixedHeight != -1){
-            log("reset fixed height impl");
+//            log("reset fixed height impl");
             fixedHeight = -1;
             requestLayout();
         }
@@ -76,7 +76,7 @@ public class TrickyFrameLayout extends FrameLayout {
             int diff = fixedMargin - keyboardHeight;
             fixedHeight += diff;
             fixedMargin = keyboardHeight;
-            log("increase fixed height by " + diff );
+//            log("increase fixed height by " + diff );
             requestLayout();
         } else {
             requestLayout();
