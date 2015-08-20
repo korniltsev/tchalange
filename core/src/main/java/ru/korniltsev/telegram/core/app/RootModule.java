@@ -15,6 +15,7 @@
  */
 package ru.korniltsev.telegram.core.app;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import dagger.Module;
 import dagger.Provides;
@@ -67,15 +68,22 @@ public class RootModule {
     private final RXClient rxClient;
     private final RXAuthState rxAuthState;
     private final UserHolder userHolder;
+    private final RxDownloadManager downloadManager;
 
-    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState, UserHolder userHolder) {
+    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState, UserHolder userHolder, RxDownloadManager downloadManager) {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;
         this.rxClient = rxClient;
         this.rxAuthState = rxAuthState;
         this.userHolder = userHolder;
+        this.downloadManager = downloadManager;
     }
 
+    @Provides
+    @Singleton
+    public RxDownloadManager provideDownlaodManger() {
+        return downloadManager;
+    }
     @Provides
     @Singleton
     public UserHolder provideUserHolder() {

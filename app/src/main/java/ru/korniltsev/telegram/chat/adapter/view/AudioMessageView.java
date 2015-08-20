@@ -6,7 +6,9 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
+import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -17,6 +19,8 @@ import rx.Observer;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 
+import javax.inject.Inject;
+
 import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.common.AppUtils.kb;
 import static ru.korniltsev.telegram.common.AppUtils.performerOf;
@@ -26,12 +30,13 @@ public class AudioMessageView extends LinearLayout {
     private TextView songName;
     private TextView songSinger;
     private DownloadView downloadView;
-
+//    @Inject Presenter presenter;
     private TdApi.MessageAudio audio;
     private Subscription subscription = Subscriptions.empty();
 
     public AudioMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
+//        ObjectGraphService.inject(context, this);
         player = MyApp.from(context).audioPLayer;
 
     }
@@ -45,7 +50,7 @@ public class AudioMessageView extends LinearLayout {
         songSinger = ((TextView) findViewById(R.id.song_singer));
     }
 
-    public void bind(final TdApi.MessageAudio audio) {
+    public void bind(final TdApi.MessageAudio audio, final TdApi.Message msg) {
         if (this.audio == audio){
             return;
         }
@@ -83,7 +88,7 @@ public class AudioMessageView extends LinearLayout {
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
                 } else {
                     downloadView.setLevel(DownloadView.LEVEL_PAUSE, true);
-                    player.play(audio.audio, fileLocal);
+                    player.play(audio.audio, fileLocal, msg);
                 }
             }
         }, downloadView);

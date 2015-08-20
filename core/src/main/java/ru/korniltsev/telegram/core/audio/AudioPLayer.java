@@ -6,8 +6,25 @@ import android.media.MediaPlayer;
 import android.support.annotation.Nullable;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.Subscriptions;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+import static rx.Observable.just;
+import static rx.Observable.zip;
 
 public class AudioPLayer {
     public static final String PREF_LOOP = "pref_loop";
@@ -18,20 +35,46 @@ public class AudioPLayer {
     private TdApi.File currentFile;
     private TdApi.Audio currentAudio;
     private boolean paused;
+    final RXClient client;
+    private final RxDownloadManager downloader;
+    private Subscription playlistCreation = Subscriptions.empty();
+    private TdApi.Message currentMessage;
+    private Subscription downloadSubscription = Subscriptions.empty();
 
-    public AudioPLayer(Context ctx) {
+    public AudioPLayer(Context ctx, RXClient client, RxDownloadManager downloader) {
         this.ctx = ctx;
+        this.client = client;
+        this.downloader = downloader;
         prefs = ctx.getSharedPreferences("AudioPlayerPrefernces", Context.MODE_PRIVATE);
     }
 
     @Nullable MediaPlayer current = null;
 
-    public void play(TdApi.Audio audio, TdApi.File fileLocal) {
+    public void play(TdApi.Audio audio, TdApi.File fileLocal, TdApi.Message msg) {
         cleanup();
-        startNewPlayer(audio, fileLocal);
+        currentState.onNext(new StatePrepare(audio));
+        startNewPlayer(audio, fileLocal, msg);
+        createPlaylist(msg);
     }
 
-    private void startNewPlayer(final TdApi.Audio audio, TdApi.File fileLocal) {
+
+    long playlistChatId = 0;
+    @Nullable List<TdApi.Message> playList;//null до тех пор пока
+    private void createPlaylist(TdApi.Message msg) {
+        if (playlistChatId == msg.chatId){
+            return;
+        }
+        playlistCreation.unsubscribe();
+        playlistCreation =  getAllMedia(msg)
+                .subscribe(new ObserverAdapter<List<TdApi.Message>>() {
+                    @Override
+                    public void onNext(List<TdApi.Message> response) {
+                        playList = response;
+                    }
+                });
+    }
+
+    private void startNewPlayer(final TdApi.Audio audio, final TdApi.File fileLocal, final TdApi.Message msg) {
         try {
 
             final MediaPlayer mp = new MediaPlayer();
@@ -40,13 +83,23 @@ public class AudioPLayer {
             mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    cleanup();
+                    if (isLoopEnabled()){
+                        cleanup();
+                        startNewPlayer(audio, fileLocal, msg);
+                    } else if (isShuffleEnabled()){
+                        //shuffle
+                        random();
+                    } else {
+//                        next();
+                        next();
+                    }
                 }
             });
 
             mp.start();
             current = mp;
             currentFile = fileLocal;
+            this.currentMessage = msg;
             currentAudio = audio;
             currentState.onNext(new StatePlaying(audio));
         } catch (Exception e) {
@@ -54,7 +107,19 @@ public class AudioPLayer {
         }
     }
 
+    private void random() {
+        final List<TdApi.Message> playList = this.playList;
+        if (playList == null || playList.isEmpty()){
+            return;
+        }
+        final TdApi.Message message = playList.get(rnd.nextInt(playList.size()));
+        downloadAndPlay(message);
+    }
+
+    Random rnd = new Random();
+
     private void cleanup() {
+        downloadSubscription.unsubscribe();
         if (current != null) {
             current.stop();
             current.release();
@@ -112,6 +177,8 @@ public class AudioPLayer {
 
     public void stop() {
         cleanup();
+        playList = null;
+        playlistChatId = 0;
     }
 
     public TdApi.Audio getCurrentAudio() {
@@ -175,6 +242,67 @@ public class AudioPLayer {
         }
     }
 
+    public void prev() {
+        final List<TdApi.Message> playListCopy = this.playList;
+        if (playListCopy == null){
+            return;
+        }
+        final TdApi.Message currentMessage = this.currentMessage;
+        for (int i = 0, playListCopySize = playListCopy.size(); i < playListCopySize; i++) {
+            TdApi.Message m = playListCopy.get(i);
+            if (m.id == currentMessage.id) {
+                if (i + 1 < playListCopy.size()) {
+                    final TdApi.Message nextMessage = playListCopy.get(i + 1);
+                    downloadAndPlay(nextMessage);
+                } else {
+                    downloadAndPlay(playListCopy.get(0));
+                }
+                break;
+            }
+        }
+    }
+
+    private void downloadAndPlay(final TdApi.Message nextMessage) {
+        cleanup();
+        final TdApi.MessageAudio a = (TdApi.MessageAudio) nextMessage.message;
+        final TdApi.File audio = a.audio.audio;
+        final TdApi.File downloadedFile = downloader.getDownloadedFile(audio);
+        if (downloadedFile != null) {
+            play(a.audio, downloadedFile, nextMessage);
+        } else {
+            downloadSubscription = downloader.downloadWithoutProgress(audio)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new ObserverAdapter<TdApi.File>() {
+                        @Override
+                        public void onNext(TdApi.File response) {
+                            play(a.audio, response, nextMessage);
+                        }
+                    });
+            currentState.onNext(new StatePrepare(a.audio));
+        }
+    }
+
+    public void next() {
+        final List<TdApi.Message> playListCopy = this.playList;
+        if (playListCopy == null){
+            return;
+        }
+
+        final TdApi.Message currentMessage = this.currentMessage;
+        for (int i = 0, playListCopySize = playListCopy.size(); i < playListCopySize; i++) {
+            TdApi.Message m = playListCopy.get(i);
+            if (m.id == currentMessage.id) {
+                if (i - 1 > 0) {
+                    final TdApi.Message nextMessage = playListCopy.get(i - 1);
+                    downloadAndPlay(nextMessage);
+                } else {
+                    downloadAndPlay(playListCopy.get(playListCopy.size() - 1));
+                }
+                break;
+            }
+        }
+    }
+
     public static abstract class State {
         public final TdApi.Audio audio;
 
@@ -189,20 +317,69 @@ public class AudioPLayer {
     }
 
     public static class StatePlaying extends State {
-
         public StatePlaying(TdApi.Audio audio) {
             super(audio);
         }
     }
-    public static class StatePaused extends State {
 
+    public static class StatePaused extends State {
         public StatePaused(TdApi.Audio audio) {
             super(audio);
         }
     }
 
-    @Nullable
-    public MediaPlayer getCurrent() {
-        return current;
+    public static class StatePrepare extends State {
+        //going to play the music
+        public StatePrepare(TdApi.Audio audio) {
+            super(audio);
+        }
+    }
+
+//    @Nullable
+//    public MediaPlayer getCurrent() {
+//        return current;
+//    }
+
+    private Observable<List<TdApi.Message>> getAllMedia(final TdApi.Message msg){//todo this so fucking wrong
+        return client.sendRx(new TdApi.GetChat(msg.chatId))
+                .flatMap(new Func1<TdApi.TLObject, Observable<List<TdApi.Message>>>() {
+                    @Override
+                    public Observable<List<TdApi.Message>> call(TdApi.TLObject tlObject) {
+                        final TdApi.Message topMessage = ((TdApi.Chat) tlObject).topMessage;
+                        return getAllMessagesRecursive(topMessage.id, ((TdApi.Chat) tlObject).id, topMessage);
+                    }
+                });
+
+
+    }
+
+
+
+    private Observable<List<TdApi.Message>> getAllMessagesRecursive(int fromId, final long chatId,@Nullable final TdApi.Message topMessage) {
+        return client.sendRx(new TdApi.SearchMessages(chatId, "", fromId, 100, new TdApi.SearchMessagesFilterAudio()))
+                .flatMap(new Func1<TdApi.TLObject, Observable<List<TdApi.Message>>>() {
+                    @Override
+                    public Observable<List<TdApi.Message>> call(TdApi.TLObject tlObject) {
+                        final TdApi.Messages ms = (TdApi.Messages) tlObject;
+                        if (ms.messages.length == 0) {
+                            return just(Collections.<TdApi.Message>emptyList());
+                        }
+                        final Observable<List<TdApi.Message>> current = just(Arrays.asList(ms.messages));
+                        final TdApi.Message lastMessage = ms.messages[ms.messages.length - 1];
+                        final Observable<List<TdApi.Message>> next = getAllMessagesRecursive(lastMessage.id, chatId, null);
+                        return zip(next, current, new Func2<List<TdApi.Message>, List<TdApi.Message>, List<TdApi.Message>>() {
+                            @Override
+                            public List<TdApi.Message> call(List<TdApi.Message> messages, List<TdApi.Message> messages2) {
+                                final ArrayList<TdApi.Message> res = new ArrayList<>();
+                                if (topMessage != null){
+                                    res.add(topMessage);
+                                }
+                                res.addAll(messages);
+                                res.addAll(messages2);
+                                return res;
+                            }
+                        });
+                    }
+                });
     }
 }

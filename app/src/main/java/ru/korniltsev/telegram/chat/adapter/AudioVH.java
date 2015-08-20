@@ -25,7 +25,8 @@ public class AudioVH extends BaseAvatarVH {
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
         super.bind(item, lastReadOutbox);
-        final TdApi.MessageAudio a = (TdApi.MessageAudio) ((MessageItem) item).msg.message;
-        contentView.bind(a);
+        final TdApi.Message msg = ((MessageItem) item).msg;
+        final TdApi.MessageAudio a = (TdApi.MessageAudio) msg.message;
+        contentView.bind(a, msg);
     }
 }

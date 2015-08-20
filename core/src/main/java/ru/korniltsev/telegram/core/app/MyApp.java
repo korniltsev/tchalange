@@ -24,6 +24,7 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.rx.UserHolder;
@@ -55,6 +56,7 @@ public class MyApp extends Application {
     private RXClient rxClient;
     private UserHolder userHolder;
     public SharedMediaHelper sharedMediaHelper;
+    private RxDownloadManager downloadManager;
 
     @Override
     public void onCreate() {
@@ -76,21 +78,21 @@ public class MyApp extends Application {
 
         float density = getResources().getDisplayMetrics().density;
         calc = new DpCalculator(density);
-        audioPLayer = new AudioPLayer(this);
+
         staticLayoutCache = new StaticLayoutCache();
         final AndroidBackgroundPriorityThreadFactory factory = new AndroidBackgroundPriorityThreadFactory("Emoji/AudioPlayer singleton executor");
         emojiExecutorService = Executors.newSingleThreadExecutor(factory);
         emoji = new Emoji(this, calc, emojiExecutorService);
         emojiParser = new EmojiParser(emoji);
-
         rxAuthState = new RXAuthState(this);
         userHolder = new UserHolder(rxAuthState, this);
         rxClient = new RXClient(this, rxAuthState, userHolder);
-
         sharedMediaHelper = new SharedMediaHelper(rxClient);
+        downloadManager = new RxDownloadManager(this, rxClient, rxAuthState);
+        audioPLayer = new AudioPLayer(this, rxClient, downloadManager);
 
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this, calc, rxClient, rxAuthState, userHolder));
+                new RootModule(this, calc, rxClient, rxAuthState, userHolder, downloadManager));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");

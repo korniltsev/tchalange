@@ -30,7 +30,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
-@Singleton
+
 public class RxDownloadManager {
     public static final OnlyResult ONLY_RESULT = new OnlyResult();
     private Context ctx;
@@ -46,7 +46,7 @@ public class RxDownloadManager {
     //keep in memory names of files which we have copied to the external storage
     final Set<String> exposedFiles = new HashSet<>();
 
-    @Inject
+
     public RxDownloadManager(Context ctx, RXClient client, RXAuthState auth) {
         this.ctx = ctx;
         this.client = client;

@@ -100,7 +100,7 @@
             android:layout_height="132dp"
             android:gravity="center">
         <ImageButton
-                android:id="@+id/btn_next"
+                android:id="@+id/btn_prev"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_keyboard_tab"
@@ -115,7 +115,7 @@
                 android:layout_marginRight="35dp"
                 />
         <ImageButton
-                android:id="@+id/btn_prev"
+                android:id="@+id/btn_next"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@drawable/bg_keyboard_tab"

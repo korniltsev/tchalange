@@ -144,6 +144,19 @@ public class AudioPlayerView extends LinearLayout {
                 updateButtonsColors();
             }
         });
+        next.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                audioPLayer.next();
+            }
+        });
+
+        prev.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                audioPLayer.prev();
+            }
+        });
     }
 
     float progress = 0;
@@ -217,6 +230,8 @@ public class AudioPlayerView extends LinearLayout {
                     play.setLevel(DownloadView.LEVEL_PAUSE, true);
                 } else if (response instanceof AudioPLayer.StatePaused) {
                     play.setLevel(DownloadView.LEVEL_PLAY, true);
+                } else if (response instanceof AudioPLayer.StatePrepare){
+                    bind(response.audio);
                 }
             }
         });
@@ -301,7 +316,8 @@ public class AudioPlayerView extends LinearLayout {
                     audioPLayer.resume();
                     play.setLevel(DownloadView.LEVEL_PAUSE, true);
                 } else {
-                    audioPLayer.play(currentAudio, fileLocal);
+
+//                    audioPLayer.play(currentAudio, fileLocal, msg.chatId);
                     play.setLevel(DownloadView.LEVEL_PAUSE, true);
                 }
             }
