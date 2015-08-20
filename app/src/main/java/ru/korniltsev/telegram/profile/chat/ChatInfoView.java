@@ -176,7 +176,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
         final ChatInfoAdapter.ButtonItem buttonItem = new ChatInfoAdapter.ButtonItem();
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(buttonItem));
 
-        final ChatInfoAdapter.MediaItem mediaItem = new ChatInfoAdapter.MediaItem(asList(ms.messages));
+        final ChatInfoAdapter.MediaItem mediaItem = new ChatInfoAdapter.MediaItem(ms);
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(mediaItem));
 
         final ArrayList<ChatInfoAdapter.Item> participantsItems = new ArrayList<>();

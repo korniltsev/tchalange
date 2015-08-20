@@ -18,6 +18,7 @@ import ru.korniltsev.telegram.profile.other.MediaPreviewAdapter;
 
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static ru.korniltsev.telegram.common.AppUtils.uiStatusColor;
 import static ru.korniltsev.telegram.common.AppUtils.uiName;
 import static ru.korniltsev.telegram.common.AppUtils.uiUserStatus;
@@ -174,9 +175,9 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
 
 
     public static class MediaItem extends Item {
-        final List<TdApi.Message> ms;
+        final TdApi.Messages ms;
 
-        public MediaItem(List<TdApi.Message> ms) {
+        public MediaItem(TdApi.Messages ms) {
             this.ms = ms;
         }
     }
@@ -214,13 +215,13 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
         }
 
         public void bind(MediaItem i) {
-            if (i.ms.isEmpty()) {
+            if (i.ms.messages.length == 0) {
                 mediaPreview.setVisibility(View.GONE);
                 mediaCount.setText("0");
             } else {
                 mediaPreview.setVisibility(View.VISIBLE);
-                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, i.ms));
-                mediaCount.setText("");
+                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, asList(i.ms.messages)));
+                mediaCount.setText(String.valueOf(i.ms.totalCount));
             }
         }
     }

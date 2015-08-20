@@ -213,7 +213,7 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
             )));
         }
 
-        sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.SharedMedia(asList(ms.messages))));
+        sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.SharedMedia(ms)));
 
         adapter.addAll(flatten(sections));
 

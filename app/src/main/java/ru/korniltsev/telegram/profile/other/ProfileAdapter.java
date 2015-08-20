@@ -17,6 +17,7 @@ import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerView.ViewHolder> {
@@ -151,9 +152,9 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
     }
 
     public static class SharedMedia extends Item {
-        final List<TdApi.Message> ms;
+        final TdApi.Messages ms;
 
-        public SharedMedia(List<TdApi.Message> ms) {
+        public SharedMedia(TdApi.Messages ms) {
             this.ms = ms;
         }
     }
@@ -220,12 +221,12 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
         }
 
         public void bind(SharedMedia i) {
-            if (i.ms.isEmpty()) {
+            if (i.ms.messages.length == 0) {
                 mediaPreview.setVisibility(View.GONE);
                 mediaCount.setText("0");
             } else {
                 mediaPreview.setVisibility(View.VISIBLE);
-                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, i.ms));
+                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, Arrays.asList(i.ms.messages)));
                 mediaCount.setText("");
             }
         }
