@@ -227,7 +227,7 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
             } else {
                 mediaPreview.setVisibility(View.VISIBLE);
                 mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, Arrays.asList(i.ms.messages)));
-                mediaCount.setText("");
+                mediaCount.setText(String.valueOf(i.ms.totalCount));
             }
         }
     }

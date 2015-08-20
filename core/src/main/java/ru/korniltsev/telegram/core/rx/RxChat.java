@@ -322,7 +322,7 @@ public class RxChat  {
                                     final ArrayList<TdApi.Message> res = new ArrayList<>(o.messages.length + o2.messages.length);
                                     addAll(res, o.messages);
                                     addAll(res, o2.messages);
-                                    return new TdApi.Messages(res.toArray(new TdApi.Message[res.size()]));
+                                    return new TdApi.Messages(0, res.toArray(new TdApi.Message[res.size()]));
                                 }
                             });
                         }
@@ -360,7 +360,7 @@ public class RxChat  {
     }
 
     public void sendMessage(TdApi.User sharedContact) {
-        TdApi.InputMessageContact content = new TdApi.InputMessageContact(sharedContact.phoneNumber, sharedContact.firstName, sharedContact.lastName);
+        TdApi.InputMessageContact content = new TdApi.InputMessageContact(sharedContact.phoneNumber, sharedContact.firstName, sharedContact.lastName, sharedContact.id);
         sendMessageImpl(content);
     }
 

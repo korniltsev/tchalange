@@ -59,7 +59,7 @@ public class MediaPreviewAdapter extends BaseAdapter<TdApi.Message, MediaPreview
         public VH(final View itemView) {
             super(itemView);
             this.img = (SquareImageView) itemView;
-            this.img.setHorizontal(false);
+            this.img.setHorizontal(true);
             img.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
