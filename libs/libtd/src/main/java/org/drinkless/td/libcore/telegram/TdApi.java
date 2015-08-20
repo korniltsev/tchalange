@@ -1086,21 +1086,23 @@ public class TdApi {
         public String phoneNumber;
         public String firstName;
         public String lastName;
+        public int userId;
 
         public InputMessageContact() {
         }
 
-        public InputMessageContact(String phoneNumber, String firstName, String lastName) {
+        public InputMessageContact(String phoneNumber, String firstName, String lastName, int userId) {
             this.phoneNumber = phoneNumber;
             this.firstName = firstName;
             this.lastName = lastName;
+            this.userId = userId;
         }
 
-        public static final int CONSTRUCTOR = -1144016580;
+        public static final int CONSTRUCTOR = -1261805057;
 
         @Override
         public int getConstructor() {
-            return -1144016580;
+            return -1261805057;
         }
 
         @Override
@@ -1110,6 +1112,7 @@ public class TdApi {
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("phoneNumber").append(" = ").append(phoneNumber).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("firstName").append(" = ").append(firstName).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("lastName").append(" = ").append(lastName).append('\n');
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("userId").append(" = ").append(userId).append('\n');
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
         }
@@ -1854,26 +1857,29 @@ public class TdApi {
     }
 
     public static class Messages extends TLObject {
+        public int totalCount;
         public Message[] messages;
 
         public Messages() {
         }
 
-        public Messages(Message[] messages) {
+        public Messages(int totalCount, Message[] messages) {
+            this.totalCount = totalCount;
             this.messages = messages;
         }
 
-        public static final int CONSTRUCTOR = -1942796183;
+        public static final int CONSTRUCTOR = 1550441659;
 
         @Override
         public int getConstructor() {
-            return -1942796183;
+            return 1550441659;
         }
 
         @Override
         protected void toStringBuilder(int shift, StringBuilder s) {
             s.append("Messages").append(" {\n");
             shift += 2;
+            for (int i = 0; i < shift; i++) { s.append(' '); } s.append("totalCount").append(" = ").append(totalCount).append('\n');
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("messages").append(" = ").append("Message[]").append(" {").append(Arrays.toString(messages)).append("}\n");
             shift -= 2;
             for (int i = 0; i < shift; i++) { s.append(' '); } s.append("}\n");
