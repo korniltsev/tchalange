@@ -45,7 +45,7 @@ public class AudioMessagesController extends MediaController {
         final MyApp from = MyApp.from(ctx);
         calculator = from.calc;
 
-        title.setText(R.string.shared_media_title);
+        title.setText(R.string.audio_files);
         subscription = RXClient.getAllMedia(client, path.chatId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .cache()

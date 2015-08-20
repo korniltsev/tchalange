@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.squareup.picasso.Callback;
+import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.Period;
@@ -33,6 +34,7 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.core.views.DownloadView;
+import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -120,8 +122,15 @@ public class AudioPlayerView extends LinearLayout {
 
         performer = ((TextView) findViewById(R.id.performer));
         title = ((TextView) findViewById(R.id.title));
+        final TdApi.Message msg = audioPLayer.getCurrentMessage();
         toolbar = ToolbarUtils.initToolbar(this)
-                .inflate(R.menu.player)
+                .addMenuItem(R.menu.player, R.id.playlist, new Runnable() {
+                    @Override
+                    public void run() {
+                        Flow.get(getContext())
+                                .set(new SharedMediaPath(msg.chatId, SharedMediaPath.TYPE_AUDIO));
+                    }
+                })
                 .pop();
         toolbar.toolbar.setNavigationIcon(backIcon);
         toolbar.toolbar.getMenu().findItem(R.id.playlist).setIcon(playlistIcon);

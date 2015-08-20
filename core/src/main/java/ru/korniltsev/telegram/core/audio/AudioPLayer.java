@@ -330,7 +330,11 @@ public class AudioPLayer {
         }
     }
 
-//    @Nullable
+    public TdApi.Message getCurrentMessage() {
+        return currentMessage;
+    }
+
+    //    @Nullable
 //    public MediaPlayer getCurrent() {
 //        return current;
 //    }
