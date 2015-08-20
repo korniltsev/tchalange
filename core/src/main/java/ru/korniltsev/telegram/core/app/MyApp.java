@@ -53,7 +53,7 @@ public class MyApp extends Application {
     public Emoji emoji;
     public EmojiParser emojiParser;
     private RXAuthState rxAuthState;
-    private RXClient rxClient;
+    public RXClient rxClient;
     private UserHolder userHolder;
     public SharedMediaHelper sharedMediaHelper;
     private RxDownloadManager downloadManager;

@@ -20,7 +20,10 @@ import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
+import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
+import ru.korniltsev.telegram.profile.media.controllers.AudioMessagesController;
+import ru.korniltsev.telegram.profile.media.controllers.MediaController;
 import ru.korniltsev.telegram.profile.media.controllers.SharedMediaController;
 
 import javax.inject.Inject;
@@ -30,18 +33,21 @@ import java.util.List;
 
 public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBack{
     public static final int IC_BACK = ru.korniltsev.telegram.utils.R.drawable.abc_ic_ab_back_mtrl_am_alpha;
+    private final RXClient rxClient;
     @Inject SharedMediaPresenter presenter;
     private ToolbarUtils toolbarUtils;
     private RecyclerView list;
     private DpCalculator dpCalculator;
     private DropdownPopup popup;
     private TextView customView;
-    private SharedMediaController mediaController;
+    private MediaController mediaController;
 
     public SharedMediaView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        dpCalculator = MyApp.from(this).calc;
+        final MyApp app = MyApp.from(this);
+        dpCalculator = app.calc;
+        rxClient = app.rxClient;
     }
 
     @Override
@@ -51,6 +57,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
                 .customView(R.layout.shared_media_custom_view)
                 .pop();
         final Drawable d = getResources().getDrawable(IC_BACK);
+        Assert.assertNotNull(d);
         d.setColorFilter(0xff818181, PorterDuff.Mode.MULTIPLY);
         toolbarUtils.toolbar.setNavigationIcon(d);
 
@@ -90,8 +97,6 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
             }
         }));
         popup = new DropdownPopup(getContext(), items);
-//        final int[] location = new int[2];
-//        customView.getLocationOnScreen(location);
 
         popup.showAtLocation(customView, 0, dpCalculator.dp(48), dpCalculator.dp(28));
     }
@@ -143,7 +148,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         if (path.type == SharedMediaPath.TYPE_MEDIA) {
             mediaController = new SharedMediaController(list, customView, presenter.path);
         } else {
-            mediaController = new SharedMediaController(list, customView, presenter.path);
+            mediaController = new AudioMessagesController(list, customView, presenter.path, rxClient);
         }
     }
 }

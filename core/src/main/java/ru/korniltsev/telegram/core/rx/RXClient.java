@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.core.rx;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.Client;
@@ -15,6 +16,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.functions.Func2;
 import rx.subjects.BehaviorSubject;
 import rx.subjects.PublishSubject;
 
@@ -22,9 +24,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static rx.Observable.just;
+import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 import static org.drinkless.td.libcore.telegram.TdApi.*;
@@ -271,6 +276,47 @@ public class RXClient {
                     @Override
                     public void call(TdApi.UpdateOption updateOption) {
                         logout();
+                    }
+                });
+    }
+
+    public static Observable<List<Message>> getAllMedia(final RXClient client, final long chatId){//todo this so fucking wrong
+        return client.sendRx(new GetChat(chatId))
+                .flatMap(new Func1<TLObject, Observable<List<Message>>>() {
+                    @Override
+                    public Observable<List<Message>> call(TLObject tlObject) {
+                        final Message topMessage = ((Chat) tlObject).topMessage;
+                        return getAllMessagesRecursive(client, topMessage.id, ((Chat) tlObject).id, topMessage);
+                    }
+                });
+
+
+    }
+
+    private static Observable<List<Message>> getAllMessagesRecursive(final RXClient client, int fromId, final long chatId,@Nullable final Message topMessage) {
+        return client.sendRx(new SearchMessages(chatId, "", fromId, 100, new SearchMessagesFilterAudio()))
+                .flatMap(new Func1<TLObject, Observable<List<Message>>>() {
+                    @Override
+                    public Observable<List<Message>> call(TLObject tlObject) {
+                        final Messages ms = (Messages) tlObject;
+                        if (ms.messages.length == 0) {
+                            return just(Collections.<Message>emptyList());
+                        }
+                        final Observable<List<Message>> current = just(Arrays.asList(ms.messages));
+                        final Message lastMessage = ms.messages[ms.messages.length - 1];
+                        final Observable<List<Message>> next = getAllMessagesRecursive(client, lastMessage.id, chatId, null);
+                        return zip(next, current, new Func2<List<Message>, List<Message>, List<Message>>() {
+                            @Override
+                            public List<Message> call(List<Message> messages, List<Message> messages2) {
+                                final ArrayList<Message> res = new ArrayList<>();
+                                if (topMessage != null){
+                                    res.add(topMessage);
+                                }
+                                res.addAll(messages);
+                                res.addAll(messages2);
+                                return res;
+                            }
+                        });
                     }
                 });
     }

@@ -12,14 +12,9 @@ import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subjects.PublishSubject;
 import rx.subscriptions.Subscriptions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -65,7 +60,7 @@ public class AudioPLayer {
             return;
         }
         playlistCreation.unsubscribe();
-        playlistCreation =  getAllMedia(msg)
+        playlistCreation =  RXClient.getAllMedia(client, msg.chatId)
                 .subscribe(new ObserverAdapter<List<TdApi.Message>>() {
                     @Override
                     public void onNext(List<TdApi.Message> response) {
@@ -339,47 +334,4 @@ public class AudioPLayer {
 //    public MediaPlayer getCurrent() {
 //        return current;
 //    }
-
-    private Observable<List<TdApi.Message>> getAllMedia(final TdApi.Message msg){//todo this so fucking wrong
-        return client.sendRx(new TdApi.GetChat(msg.chatId))
-                .flatMap(new Func1<TdApi.TLObject, Observable<List<TdApi.Message>>>() {
-                    @Override
-                    public Observable<List<TdApi.Message>> call(TdApi.TLObject tlObject) {
-                        final TdApi.Message topMessage = ((TdApi.Chat) tlObject).topMessage;
-                        return getAllMessagesRecursive(topMessage.id, ((TdApi.Chat) tlObject).id, topMessage);
-                    }
-                });
-
-
-    }
-
-
-
-    private Observable<List<TdApi.Message>> getAllMessagesRecursive(int fromId, final long chatId,@Nullable final TdApi.Message topMessage) {
-        return client.sendRx(new TdApi.SearchMessages(chatId, "", fromId, 100, new TdApi.SearchMessagesFilterAudio()))
-                .flatMap(new Func1<TdApi.TLObject, Observable<List<TdApi.Message>>>() {
-                    @Override
-                    public Observable<List<TdApi.Message>> call(TdApi.TLObject tlObject) {
-                        final TdApi.Messages ms = (TdApi.Messages) tlObject;
-                        if (ms.messages.length == 0) {
-                            return just(Collections.<TdApi.Message>emptyList());
-                        }
-                        final Observable<List<TdApi.Message>> current = just(Arrays.asList(ms.messages));
-                        final TdApi.Message lastMessage = ms.messages[ms.messages.length - 1];
-                        final Observable<List<TdApi.Message>> next = getAllMessagesRecursive(lastMessage.id, chatId, null);
-                        return zip(next, current, new Func2<List<TdApi.Message>, List<TdApi.Message>, List<TdApi.Message>>() {
-                            @Override
-                            public List<TdApi.Message> call(List<TdApi.Message> messages, List<TdApi.Message> messages2) {
-                                final ArrayList<TdApi.Message> res = new ArrayList<>();
-                                if (topMessage != null){
-                                    res.add(topMessage);
-                                }
-                                res.addAll(messages);
-                                res.addAll(messages2);
-                                return res;
-                            }
-                        });
-                    }
-                });
-    }
 }
