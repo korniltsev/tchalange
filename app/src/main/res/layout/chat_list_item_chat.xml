@@ -48,10 +48,11 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:textSize="17sp"
-                android:textColor="#222222"
+                android:textColor="#f00"
                 android:gravity="bottom"
                 android:singleLine="true"
                 android:lines="1"
+                android:visibility="invisible"
                 />
 
         <ImageView

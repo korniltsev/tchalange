@@ -64,10 +64,15 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         TdApi.Chat chat = getItem(position);
         TdApi.MessageContent message = chat.topMessage.message;
 
+        holder.time.setText(chat.topMessage.dateFormatted);
+        holder.cell.setTime(chat.topMessage.dateFormatted);
+
         if (chat.type instanceof TdApi.PrivateChatInfo){
             //name
             TdApi.User u = ((TdApi.PrivateChatInfo) chat.type).user;
-            holder.name.setText(AppUtils.uiName(u, ctx));
+            final String uiName = AppUtils.uiName(u, ctx);
+            holder.cell.setTitle(uiName);
+            holder.name.setText(uiName);
             //group_icon
             holder.iconGroupChat.setVisibility(View.GONE);
             holder.cell.setDrawGroupChatIcon(false);
@@ -75,13 +80,13 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             //name
             TdApi.GroupChatInfo group = (TdApi.GroupChatInfo) chat.type;
             holder.name.setText(group.groupChat.title);
+            holder.cell.setTitle(group.groupChat.title);
             //group_icon
             holder.iconGroupChat.setVisibility(View.VISIBLE);
             holder.cell.setDrawGroupChatIcon(true);
         }
 
-        holder.time.setText(chat.topMessage.dateFormatted);
-        holder.cell.setTime(chat.topMessage.dateFormatted);
+
 
 
 

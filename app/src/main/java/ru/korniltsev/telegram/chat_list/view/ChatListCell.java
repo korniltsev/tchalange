@@ -5,10 +5,12 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import ru.korniltsev.telegram.chat.R;
@@ -16,6 +18,7 @@ import ru.korniltsev.telegram.chat.debug.SquareDumbResourceView;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.views.AvatarView;
+import ru.korniltsev.telegram.core.views.RobotoMediumTextView;
 
 import static android.view.View.MeasureSpec.EXACTLY;
 import static android.view.View.MeasureSpec.getSize;
@@ -43,12 +46,15 @@ public class ChatListCell extends ViewGroup {
     private final int iconTopSize;
     private final int iconTopTopPadding;
     private final int iconTopRightPadding;
+    private final int titlePaddingLeftRight;
+    private final int titlePaddingTop;
 
     DpCalculator calc;
     private TextPaint timePaint;
     private StaticLayout timeLayout;
     private float timeLeft;
     private TextPaint titlePaint;
+    private StaticLayout titleLayout;
 
     public ChatListCell(Context context, AttributeSet a) {
         super(context, a);
@@ -91,15 +97,29 @@ public class ChatListCell extends ViewGroup {
         timeTopPadding = calc.dp(18f);
 
         titlePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        titlePaint.setTextSize(calc.dpFloat(17));
+        final Typeface typeface = RobotoMediumTextView.sGetTypeface(getContext());
+        titlePaint.setTypeface(typeface);
+        titlePaddingLeftRight = calc.dp(6f);
+        titlePaddingTop = calc.dp(14f);
 
         setWillNotDraw(false);
     }
 
     String time;
 
+
+    // time
+    // nick
+    // unread
+    // message
+    //
+
     public void setTime(String time) {
         this.time = time;
         timeLayout = new StaticLayout(time, timePaint, displayWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        timeLeft = displayWidth - timeRightPadding - timeLayout.getLineWidth(0);
+        iconTop.layout(iconTopTopPadding, (int) (timeLeft - iconTopSize - iconTopRightPadding));
     }
 
     String title;
@@ -107,9 +127,14 @@ public class ChatListCell extends ViewGroup {
     public void setTitle(String title) {
         this.title = title;
 
-        //        int widthWithoutAvatar = displayWidth - avatarViewSize - avatarViewMargin * 2;
-        //        int titleMaxWidth = widthWithoutAvatar - icGroup.getIntrinsicWidth() - timeLayout.getLineWidth(0);
-        //        titleLayout = new StaticLayout(time, titlePaint, titleMaxWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        
+        int spaceLeftForNick = (int) (displayWidth 
+                        - avatarViewSize - avatarViewMargin * 2 -
+                        titlePaddingLeftRight *2
+                        - (displayWidth - timeLeft)
+                        - icGroup.getIntrinsicWidth());
+        final CharSequence ellipsized = TextUtils.ellipsize(title, titlePaint, spaceLeftForNick, TextUtils.TruncateAt.END);
+        titleLayout = new StaticLayout(ellipsized, titlePaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
     }
 
     private void layoutIconGroup() {
@@ -142,9 +167,9 @@ public class ChatListCell extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         layoutAvatar();
 
-        timeLeft = getWidth() - timeRightPadding - timeLayout.getLineWidth(0);
 
-        iconTop.layout(iconTopTopPadding, (int) (timeLeft - iconTopSize - iconTopRightPadding));
+
+
 
         rect.set(dividerStart, getHeight() - 1, r, getHeight());
     }
@@ -173,5 +198,15 @@ public class ChatListCell extends ViewGroup {
         canvas.restore();
 
         iconTop.draw(canvas);
+
+        canvas.save();
+        int dx = avatarViewSize + avatarViewMargin * 2 ;
+        if (drawGroupChatIcon) {
+            dx += icGroup.getIntrinsicWidth() + titlePaddingLeftRight;
+        }
+
+        canvas.translate(dx, titlePaddingTop);
+        titleLayout.draw(canvas);
+        canvas.restore();
     }
 }
