@@ -9,13 +9,19 @@
 
         >
 
-    <ru.korniltsev.telegram.core.views.AvatarView
+    <View
             android:id="@+id/avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_margin="10dp"
-            app:size="52dp"
             />
+    <!--<ru.korniltsev.telegram.core.views.AvatarView-->
+
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_margin="10dp"-->
+    <!--app:size="52dp"-->
+    <!--/>-->
     <!-- top-->
     <LinearLayout
             android:id="@+id/top"
@@ -89,9 +95,9 @@
                 android:textStyle="normal"
                 />
 
-            <!--<item name="android:fontFamily">sans-serif</item>-->
-            <!--<item name="android:textStyle">normal</item>-->
-            <TextView
+        <!--<item name="android:fontFamily">sans-serif</item>-->
+        <!--<item name="android:textStyle">normal</item>-->
+        <TextView
                 android:id="@+id/icon_bottom"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
@@ -101,4 +107,8 @@
                 />
     </LinearLayout>
 
+    <ru.korniltsev.telegram.chat_list.view.ChatListCell
+            android:id="@+id/new_cell"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 </ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout>

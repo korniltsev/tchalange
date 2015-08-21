@@ -15,6 +15,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.adapter.ChatPhotoChangedVH;
 import ru.korniltsev.telegram.chat.adapter.SingleTextViewVH;
+import ru.korniltsev.telegram.chat_list.view.ChatListCell;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.ChatDB;
@@ -79,14 +80,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
 
         holder.time.setText(chat.topMessage.dateFormatted);
 
-//        long timeInMillis = Utils.dateToMillis(chat.topMessage.date);
-//        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
-////        long local = DateTimeZone.UTC.convertUTCToLocal(timeInMillis);
-//        if (Locale.getDefault().getCountry().equals("RU")){
-//            holder.time.setText(fuckRuFormatter.format(local));
-//        } else {
-//            holder.time.setText(MESSAGE_TIME_FORMAT.print(local));
-//        }
+
 
 
         if (message instanceof TdApi.MessageText) {
@@ -188,7 +182,8 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
     }
 
     private void loadAvatar(VH holder, TdApi.Chat chat) {
-        holder.avatar.loadAvatarFor(chat);
+//        holder.avatar.loadAvatarFor(chat);
+        holder.cell.avatarView.loadAvatarFor(chat);
     }
 
 
@@ -198,17 +193,19 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
     }
 
     class VH extends RecyclerView.ViewHolder {
-        final AvatarView avatar;
+//        final AvatarView avatar;
         final TextView message;
         private final TextView name;
         private final TextView time;
         private final ImageView iconTop;
         private final TextView iconBottom;
         private final ImageView iconGroupChat;
+        private final ChatListCell cell;
 
         public VH(View itemView) {
             super(itemView);
-            avatar = (AvatarView) itemView.findViewById(R.id.avatar);
+            cell = ((ChatListCell) itemView.findViewById(R.id.new_cell));
+//            avatar = (AvatarView) itemView.findViewById(R.id.avatar);
             message = (TextView) itemView.findViewById(R.id.message);
             name = (TextView) itemView.findViewById(R.id.name);
             time = (TextView) itemView.findViewById(R.id.time);
