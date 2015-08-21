@@ -1,7 +1,5 @@
 package ru.korniltsev.telegram.chat.adapter;
 
-import android.graphics.Color;
-import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -12,8 +10,6 @@ import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 import ru.korniltsev.telegram.core.utils.Colors;
-
-import static ru.korniltsev.telegram.chat.debug.CustomCeilLayout.SquareDumbResourceView.*;
 
 public class TextMessageVH extends BaseAvatarVH {
 
@@ -62,13 +58,13 @@ public class TextMessageVH extends BaseAvatarVH {
 
         switch (adapter.chat.getMessageState(msg, lastReadOutbox, adapter.myId)) {
             case RxChat.MESSAGE_STATE_READ:
-                root.iconRight3.setSate(STATE_IC_NULL);
+                root.iconRight3.setSate(CustomCeilLayout.STATE_IC_NULL);
                 break;
             case RxChat.MESSAGE_STATE_SENT:
-                root.iconRight3.setSate(STATE_IC_UNREAD);
+                root.iconRight3.setSate(CustomCeilLayout.STATE_IC_UNREAD);
                 break;
             case RxChat.MESSAGE_STATE_NOT_SENT:
-                root.iconRight3.setSate(STATE_IC_CLOCK);
+                root.iconRight3.setSate(CustomCeilLayout.STATE_IC_CLOCK);
                 break;
         }
     }

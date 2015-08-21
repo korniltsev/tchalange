@@ -70,16 +70,18 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             holder.name.setText(AppUtils.uiName(u, ctx));
             //group_icon
             holder.iconGroupChat.setVisibility(View.GONE);
+            holder.cell.setDrawGroupChatIcon(false);
         } else {
             //name
             TdApi.GroupChatInfo group = (TdApi.GroupChatInfo) chat.type;
             holder.name.setText(group.groupChat.title);
             //group_icon
             holder.iconGroupChat.setVisibility(View.VISIBLE);
+            holder.cell.setDrawGroupChatIcon(true);
         }
 
         holder.time.setText(chat.topMessage.dateFormatted);
-
+        holder.cell.setTime(chat.topMessage.dateFormatted);
 
 
 
@@ -105,49 +107,25 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         switch (msgState){
             case RxChat.MESSAGE_STATE_READ:
                 holder.iconTop.setVisibility(View.GONE);
+                holder.cell.iconTop.setSate(ChatListCell.STATE_IC_NULL);
                 break;
             case RxChat.MESSAGE_STATE_SENT:
                 holder.iconTop.setImageResource(R.drawable.ic_unread);
                 holder.iconTop.setVisibility(View.VISIBLE);
+                holder.cell.iconTop.setSate(ChatListCell.STATE_IC_UNREAD);
                 break;
             case RxChat.MESSAGE_STATE_NOT_SENT:
                 holder.iconTop.setImageResource(R.drawable.ic_clock);
                 holder.iconTop.setVisibility(View.VISIBLE);
+                holder.cell.iconTop.setSate(ChatListCell.STATE_IC_CLOCK);
                 break;
         }
-//        if (chat.topMessage.fromId == myId){
-//            if (chat.lastReadOutboxMessageId == chat.topMessage.id){
-//                holder.iconTop.setVisibility(View.GONE);
-//            } else {
-//                holder.iconTop.setBackgroundResource(R.drawable.ic_unread);
-//                holder.iconTop.setVisibility(View.VISIBLE);
-//            }
-//        } else {
-//            holder.iconTop.setVisibility(View.GONE);
-//        }
+
         loadAvatar(holder, chat);
     }
 
     private CharSequence getSystemText(TdApi.MessageContent m, TdApi.Message topMessage) {
-        /*
-                        MessageText extends MessageContent {
-                        MessageAudio extends MessageContent {
-                        MessageDocument extends MessageContent {
-                        MessageSticker extends MessageContent {
-                        MessagePhoto extends MessageContent {
-                        MessageVideo extends MessageContent {
-                        MessageGeoPoint extends MessageContent {
-                        MessageContact extends MessageContent {
-          MessageChatChangePhoto extends MessageContent {
 
-             MessageGroupChatCreate extends MessageContent {
-             MessageChatChangeTitle extends MessageContent {
-             MessageChatDeletePhoto extends MessageContent {
-             MessageChatAddParticipant extends MessageContent {
-             MessageChatDeleteParticipant extends MessageContent {
-             MessageDeleted extends MessageContent {
-             MessageUnsupported extends MessageContent {
-        * */
         if (m instanceof TdApi.MessageAudio) {
             return ctx.getString(R.string.Аудио);
         } else if (m instanceof TdApi.MessageDocument){
@@ -199,7 +177,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         private final TextView time;
         private final ImageView iconTop;
         private final TextView iconBottom;
-        private final ImageView iconGroupChat;
+        private final View iconGroupChat;
         private final ChatListCell cell;
 
         public VH(View itemView) {
@@ -211,7 +189,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             time = (TextView) itemView.findViewById(R.id.time);
             iconTop = (ImageView) itemView.findViewById(R.id.icon_top);
             iconBottom = (TextView) itemView.findViewById(R.id.icon_bottom);
-            iconGroupChat = (ImageView) itemView.findViewById(R.id.group_chat_icon);
+            iconGroupChat = itemView.findViewById(R.id.group_chat_icon);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -171,7 +171,7 @@ public class EmojiParser {
                 return fuckRuFormatter.format(local);
             }
             if (MESSAGE_TIME_FORMAT != null) {
-                MESSAGE_TIME_FORMAT.print(local);
+                return MESSAGE_TIME_FORMAT.print(local);
             }
             return "";
         }

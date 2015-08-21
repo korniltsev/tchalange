@@ -26,6 +26,10 @@ import static android.view.View.MeasureSpec.EXACTLY;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public class CustomCeilLayout extends ViewGroup {
+    public static final int STATE_IC_UNREAD = 0;
+    public static final int STATE_IC_CLOCK = 1;
+    public static final int STATE_IC_NULL = 2;
+
     //staff
     public/* @Inject */ DpCalculator calc;
     public/* @Inject */ StaticLayoutCache layoutCache;
@@ -95,7 +99,18 @@ public class CustomCeilLayout extends ViewGroup {
         //iconRight
         iconRightSize = calc.dp(12);
         iconRightMarginRight = calc.dp(15);
-        iconRight3 = new SquareDumbResourceView(iconRightSize);
+
+        final Drawable[] ds = new Drawable[3];
+        final Resources res = getContext().getResources();
+        iconRight3 = new SquareDumbResourceView(ds, this);
+        ds[STATE_IC_UNREAD] = res.getDrawable(R.drawable.ic_unread);
+        ds[STATE_IC_CLOCK] = res.getDrawable(R.drawable.ic_clock);
+        ds[STATE_IC_NULL] = null;
+        for (Drawable d : ds) {
+            if (d != null) {
+                d.setBounds(0, 0, iconRightSize, iconRightSize);
+            }
+        }
 
         //time
         timePadding = calc.dp(8);
@@ -228,55 +243,6 @@ public class CustomCeilLayout extends ViewGroup {
         canvas.restore();
 
         iconRight3.draw(canvas);
-    }
-
-    public class SquareDumbResourceView {
-        public static final int STATE_IC_UNREAD = 0;
-        public static final int STATE_IC_CLOCK = 1;
-        public static final int STATE_IC_NULL = 2;
-
-        private final Drawable[] ds;
-        private Drawable current;
-
-        int tx;
-        int ty;
-
-        public SquareDumbResourceView(int sizePx) {
-            final Resources resources = getContext().getResources();
-            ds = new Drawable[3];
-            ds[STATE_IC_UNREAD] = resources.getDrawable(R.drawable.ic_unread);
-
-            ds[STATE_IC_CLOCK] = resources.getDrawable(R.drawable.ic_clock);
-
-            ds[STATE_IC_NULL] = null;
-            for (Drawable d : ds) {
-                if (d != null) {
-                    d.setBounds(0, 0, sizePx, sizePx);
-                }
-            }
-
-        }
-
-        public void setSate(int state) {
-            if (current != ds[state]) {
-                current = ds[state];
-                invalidate();
-            }
-        }
-
-        public void draw(Canvas c) {
-            if (current != null) {
-                c.save();
-                c.translate(tx, ty);
-                current.draw(c);
-                c.restore();
-            }
-        }
-
-        public void layout(int iconRightTop, int iconRightLeft) {
-            tx = iconRightLeft;
-            ty = iconRightTop;
-        }
     }
 
     public void setBottomMarginEnabled(boolean bottomMarginEnabled) {
