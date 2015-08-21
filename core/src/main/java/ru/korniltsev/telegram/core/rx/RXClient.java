@@ -232,7 +232,7 @@ public class RXClient {
                     //                        Log.e("RxClientError", "error: ", e);
                     //                    }
                 } else {
-                    Log.d("RxClient", "global event " + object);
+//                    Log.d("RxClient", "global event " + object);
                     globalSubject2.onNext(object);
                 }
 

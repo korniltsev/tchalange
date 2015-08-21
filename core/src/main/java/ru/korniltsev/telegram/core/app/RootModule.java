@@ -28,6 +28,7 @@ import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.passcode.BootReceiver;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
+import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.ChatDB;
@@ -50,6 +51,7 @@ import java.util.concurrent.Executors;
 
                 Emoji.class,
                 RxDownloadManager.class,
+                NotificationManager.class,
                 VoicePlayer.class,
                 DpCalculator.class,
                 ChatDB.class,

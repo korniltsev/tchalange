@@ -1,17 +1,17 @@
 package ru.korniltsev.telegram.core.rx;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.net.Uri;
+import android.media.SoundPool;
 import android.os.SystemClock;
-import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.utils.Preconditions;
+import ru.korniltsev.telegram.utils.R;
 import rx.Observable;
-import rx.android.internal.Assertions;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -30,21 +30,37 @@ public class NotificationManager {
 //    private final Ringtone ringtone;
     private final Observable<TdApi.UpdateNotificationSettings> settingsUpdate;
 //    private final Uri notification;
-    private final ThreadLocal<Ringtone> ringtone;
+    private final ThreadLocal<Ringtone> notification;
     private RXAuthState.AuthState state;
+    final ThreadLocal<InChatRingtone> inChatRingtone;
 
     @Inject
     public NotificationManager(RXClient client, final Context ctx, RXAuthState auth) {
         this.client = client;
         this.ctx = ctx;
 
-        ringtone = new ThreadLocal<Ringtone>(){
+        notification = new ThreadLocal<Ringtone>(){
             @Override
             protected Ringtone initialValue() {
                 return RingtoneManager.getRingtone(ctx,
                         RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
             }
         };
+        inChatRingtone = new ThreadLocal<InChatRingtone>(){
+            @Override
+            protected InChatRingtone initialValue() {
+                return new InChatRingtone(ctx);
+            }
+        };
+
+//        alarm = new ThreadLocal<Ringtone>(){
+//            @Override
+//            protected Ringtone initialValue() {
+//                return RingtoneManager.getRingtone(ctx,
+//                        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
+//            }
+//        };
+
         state = auth.getState();
         auth.listen().subscribe(new Action1<RXAuthState.AuthState>() {
             @Override
@@ -187,10 +203,65 @@ public class NotificationManager {
     }
 
     private void notifyNewMessageImpl() {
-        try {
-            ringtone.get().play();
-        } catch (Exception e) {
-            CrashlyticsCore.getInstance().logException(e);
+        if (resumed){
+            try {
+                inChatRingtone.get().play();
+            } catch (Exception e) {
+                CrashlyticsCore.getInstance().logException(e);
+            }
+        } else {
+            try {
+                notification.get().play();
+            } catch (Exception e) {
+                CrashlyticsCore.getInstance().logException(e);
+            }
+        }
+    }
+
+    boolean resumed = false;
+
+    public void onResume() {
+        resumed = true;
+    }
+
+    public void onPause() {
+        resumed = false;
+    }
+
+//    final Map<Long, Boolean> chatIdToResumed = new HashMap<>();
+//
+//    private boolean isChat
+//    public void onLoad(long chatId) {
+//        chatIdToResumed.put(chatId, Boolean.TRUE);
+//    }
+//
+//    public void dropView(long chatId) {
+//        chatIdToResumed.put(chatId, Boolean.FALSE);
+//    }
+
+
+    class InChatRingtone {
+        private final SoundPool soundPool;
+        private final int ringtoneId;
+
+        public InChatRingtone(Context ctx) {
+            soundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 0);
+            soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+                @Override
+                public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                    soundPool.play(ringtoneId, 1.0f, 1.0f, 1, 0, 1.0f);
+                }
+            });
+            ringtoneId = soundPool.load(ctx, R.raw.sound_in, 0);
+        }
+
+        boolean first = true;
+        public void play() {
+            if (first){
+                first = false;
+                return;
+            }
+            soundPool.play(ringtoneId, 1.0f, 1.0f, 1, 0, 1.0f);
         }
     }
 }

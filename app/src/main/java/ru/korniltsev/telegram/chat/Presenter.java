@@ -116,6 +116,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {
+//        nm.onLoad(path.chat.id);
         AppUtils.logEvent("EnterCode.onLoad");
         if (!isGroupChat && ((TdApi.PrivateChatInfo) chat.type).user.type instanceof TdApi.UserTypeBot) {
             getView().setBot(true);
@@ -151,8 +152,8 @@ public class Presenter extends ViewPresenter<ChatView>
             showBotKeyboardForMessage(currentMarkup);
         }
         //        if (currentMarkup instanceof TdApi.ReplyMarkupShowKeyboard){
-//
-//        }
+        //
+        //        }
     }
 
     private void shareContact() {
@@ -188,6 +189,7 @@ public class Presenter extends ViewPresenter<ChatView>
     @Override
     public void dropView(ChatView view) {
         super.dropView(view);
+//        nm.dropView(path.chat.id);
         subscription.unsubscribe();
         //        Utils.hideKeyboard(view);
     }

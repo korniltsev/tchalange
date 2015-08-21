@@ -21,6 +21,7 @@ import ru.korniltsev.telegram.core.flow.SerializableParceler;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.mortar.core.MortarScreenSwitcherFrame;
+import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import rx.Observable;
@@ -44,6 +45,7 @@ public class MainActivity extends Activity implements ActivityOwner.AnActivity {
     private BundleServiceRunner bundleServiceRunner;
 //    private View statusBarBg;
     private PasscodeManager passCodeManager;
+    private NotificationManager notificationmanager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class MainActivity extends Activity implements ActivityOwner.AnActivity {
         ObjectGraph objectGraph = ObjectGraphService.getObjectGraph(this);
         passCodeManager = objectGraph.get(PasscodeManager.class);
         authState = objectGraph.get(RXAuthState.class);
+        notificationmanager = objectGraph.get(NotificationManager.class);
         activityOwner = objectGraph.get(ActivityOwner.class);
         activityOwner.takeView(this);
         History history = History.single(getScreenForAuthState(authState.getState()));
@@ -146,6 +149,7 @@ public class MainActivity extends Activity implements ActivityOwner.AnActivity {
                 }
             }
         });
+        notificationmanager.onResume();
     }
 
     @Override
@@ -157,6 +161,7 @@ public class MainActivity extends Activity implements ActivityOwner.AnActivity {
         subscription.unsubscribe();
         boolean locked = Flow.get(this).getHistory().top() instanceof PasscodePath;
         passCodeManager.onPause(locked);
+        notificationmanager.onPause();
     }
 
     @Override
