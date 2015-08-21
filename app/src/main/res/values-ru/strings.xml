@@ -176,4 +176,10 @@
     <string name="shared_media_title">Shared media</string>
     <string name="audio_files">Audio Files</string>
     <string name="passcode_title_password">Password</string>
+    <string name="choose_your_PIN_2">Введите Ваш PIN повторно</string>
+    <string name="choose_your_pin">Выберите Ваш PIN</string>
+    <string name="enter_your_pincode">Введите Ваш PIN</string>
+    <string name="pin">PIN</string>
+    <string name="pin_cannot_be_empty">PIN не может быть пустым</string>
+    <string name="wrong_pin">Неверный PIN</string>
 </resources>
