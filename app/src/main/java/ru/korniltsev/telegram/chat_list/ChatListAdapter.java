@@ -100,12 +100,13 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             holder.message.setTextColor(COLOR_SYSTEM);
         }
         if (chat.unreadCount > 0){
-            holder.iconBottom.setVisibility(View.VISIBLE);
+            holder.iconBottom.setVisibility(View.INVISIBLE);
             holder.iconBottom.setBackgroundResource(R.drawable.ic_badge);
-            holder.iconBottom.setText(String.valueOf(chat.unreadCount));
+//            holder.iconBottom.setText(String.valueOf(chat.unreadCount));
         } else {
             holder.iconBottom.setVisibility(View.GONE);
         }
+        holder.cell.setUnreadCount(chat.unreadCount);
 
         RxChat rxChat = chatDb.getRxChat(chat.id);
         int msgState = rxChat.getMessageState(chat.topMessage, chat.lastReadOutboxMessageId, myId);
@@ -181,7 +182,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         private final TextView name;
         private final TextView time;
         private final ImageView iconTop;
-        private final TextView iconBottom;
+        private final View iconBottom;
         private final View iconGroupChat;
         private final ChatListCell cell;
 
@@ -193,7 +194,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             name = (TextView) itemView.findViewById(R.id.name);
             time = (TextView) itemView.findViewById(R.id.time);
             iconTop = (ImageView) itemView.findViewById(R.id.icon_top);
-            iconBottom = (TextView) itemView.findViewById(R.id.icon_bottom);
+            iconBottom = (View) itemView.findViewById(R.id.icon_bottom);
             iconGroupChat = itemView.findViewById(R.id.group_chat_icon);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

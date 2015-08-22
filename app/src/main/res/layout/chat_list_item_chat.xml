@@ -101,13 +101,14 @@
 
         <!--<item name="android:fontFamily">sans-serif</item>-->
         <!--<item name="android:textStyle">normal</item>-->
-        <TextView
+        <View
                 android:id="@+id/icon_bottom"
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:textColor="#fff"
                 android:gravity="center"
                 android:layout_marginTop="2dp"
+                android:visibility="invisible"
                 />
     </LinearLayout>
 

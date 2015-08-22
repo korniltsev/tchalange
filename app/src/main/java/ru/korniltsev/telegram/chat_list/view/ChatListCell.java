@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.chat_list.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -39,7 +40,7 @@ public class ChatListCell extends ViewGroup {
     private final int avatarViewSize;
     private final Drawable icGroup;
     private final int displayWidth;
-    private final int timeRightPadding;
+    private final int cellPaddingRight;
     private final int timeTopPadding;
 
     public final SquareDumbResourceView iconTop;
@@ -48,6 +49,8 @@ public class ChatListCell extends ViewGroup {
     private final int iconTopRightPadding;
     private final int titlePaddingLeftRight;
     private final int titlePaddingTop;
+    private final TextPaint messagePaint;
+    private final Drawable icUnreadBadge;
 
     DpCalculator calc;
     private TextPaint timePaint;
@@ -55,6 +58,11 @@ public class ChatListCell extends ViewGroup {
     private float timeLeft;
     private TextPaint titlePaint;
     private StaticLayout titleLayout;
+    private int unreadCount;
+    private TextPaint unreadPaint;
+    private StaticLayout unreadLayout;
+    private float unreadTx;
+    private float unreadTy;
 
     public ChatListCell(Context context, AttributeSet a) {
         super(context, a);
@@ -93,7 +101,7 @@ public class ChatListCell extends ViewGroup {
         timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         timePaint.setColor(0xFF999999);
         timePaint.setTextSize(calc.dpFloat(13));
-        timeRightPadding = calc.dp(15);
+        cellPaddingRight = calc.dp(15);
         timeTopPadding = calc.dp(18f);
 
         titlePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -102,6 +110,23 @@ public class ChatListCell extends ViewGroup {
         titlePaint.setTypeface(typeface);
         titlePaddingLeftRight = calc.dp(6f);
         titlePaddingTop = calc.dp(14f);
+
+        messagePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        messagePaint.setColor(0xFF8A8A8A);
+
+        icUnreadBadge = res.getDrawable(R.drawable.ic_badge);
+        assertNotNull(icUnreadBadge);
+        int right = displayWidth - cellPaddingRight;
+        int left = right- icUnreadBadge.getIntrinsicWidth();
+        int top = calc.dp(39);
+        int bottom = top + icUnreadBadge.getIntrinsicHeight();
+        icUnreadBadge.setBounds(left, top, right, bottom);
+
+
+        unreadPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        unreadPaint.setTextSize(calc.dpFloat(14));
+        unreadPaint.setColor(Color.WHITE);
+
 
         setWillNotDraw(false);
     }
@@ -118,7 +143,7 @@ public class ChatListCell extends ViewGroup {
     public void setTime(String time) {
         this.time = time;
         timeLayout = new StaticLayout(time, timePaint, displayWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
-        timeLeft = displayWidth - timeRightPadding - timeLayout.getLineWidth(0);
+        timeLeft = displayWidth - cellPaddingRight - timeLayout.getLineWidth(0);
         iconTop.layout(iconTopTopPadding, (int) (timeLeft - iconTopSize - iconTopRightPadding));
     }
 
@@ -190,7 +215,7 @@ public class ChatListCell extends ViewGroup {
             icGroup.draw(canvas);
         }
 
-        //        float timeLeft = (int) (timeRightPadding - timeLayout.getLineWidth(0));
+
 
         canvas.save();
         canvas.translate(timeLeft, timeTopPadding);
@@ -208,5 +233,27 @@ public class ChatListCell extends ViewGroup {
         canvas.translate(dx, titlePaddingTop);
         titleLayout.draw(canvas);
         canvas.restore();
+
+        if (unreadCount > 0){
+            icUnreadBadge.draw(canvas);
+
+            canvas.save();
+            canvas.translate(unreadTx, unreadTy);
+            unreadLayout.draw(canvas);
+            canvas.restore();
+        }
+
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
+        if (unreadCount > 0){
+            unreadLayout = new StaticLayout(String.valueOf(unreadCount), unreadPaint, icUnreadBadge.getIntrinsicWidth(), Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+            float px = (icUnreadBadge.getIntrinsicWidth() - unreadLayout.getLineWidth(0))/2;
+            float py = (icUnreadBadge.getIntrinsicHeight() - unreadLayout.getHeight())/2;
+            final Rect bounds = icUnreadBadge.getBounds();
+            unreadTx = bounds.left + px;
+            unreadTy = bounds.top + py;
+        }
     }
 }
