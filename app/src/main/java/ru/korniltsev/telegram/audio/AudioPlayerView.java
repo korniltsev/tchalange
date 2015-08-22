@@ -279,6 +279,7 @@ public class AudioPlayerView extends LinearLayout {
         final TdApi.File thumb = currentAudio.albumCoverThumb.photo;
         final boolean hasCover = thumb.id != TdApi.File.NO_FILE_ID;
         grayToolbar = true;
+        cover.setImageBitmap(null);
         if (hasCover) {
             if (!downloader.isDownloaded(currentAudio.audio)) {
                 glide.loadPhoto(thumb, false)

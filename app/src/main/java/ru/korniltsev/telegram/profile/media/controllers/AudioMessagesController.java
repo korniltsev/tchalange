@@ -53,7 +53,8 @@ public class AudioMessagesController extends MediaController {
                     @Override
                     public void onNext(List<TdApi.Message> response) {
                         adapter.addAll(
-                                split(response));
+                                split(
+                                        filter(response)));
                     }
                 });
 
@@ -104,7 +105,17 @@ public class AudioMessagesController extends MediaController {
         //15
     }
 
-//    private void refreshData() {
+    private List<TdApi.Message> filter(List<TdApi.Message> response) {
+        final ArrayList<TdApi.Message> res = new ArrayList<>();
+        for (TdApi.Message message : response) {
+            if (message.message instanceof TdApi.MessageAudio) {
+                res.add(message);
+            }
+        }
+        return res;
+    }
+
+    //    private void refreshData() {
 //        final List<SharedMediaAdapter.Item> split = split(helper.msg);
 //        adapter.setData(split);
 //    }
