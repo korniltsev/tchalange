@@ -69,7 +69,7 @@ public class ChatListCell extends ViewGroup {
     private int textLayoutDY;
     private int textLayoutDX;
 
-    public ChatListCell(Context context, AttributeSet a) {
+    public ChatListCell(Context context) {
         super(context, a);
         final MyApp app = MyApp.from(context);
         calc = app.calc;
@@ -144,6 +144,9 @@ public class ChatListCell extends ViewGroup {
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextSize(calc.dpFloat(15));
 
+
+//        android:layout_height="72dp"
+        setBackgroundResource(R.drawable.bg_keyboard_tab);
         setWillNotDraw(false);
     }
 

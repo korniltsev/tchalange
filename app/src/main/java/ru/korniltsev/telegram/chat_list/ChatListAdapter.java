@@ -15,6 +15,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import ru.korniltsev.telegram.chat.adapter.ChatPhotoChangedVH;
 import ru.korniltsev.telegram.chat.adapter.SingleTextViewVH;
+import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.chat_list.view.ChatListCell;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
@@ -57,8 +58,8 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View v = getViewFactory().inflate(R.layout.chat_list_item_chat, parent, false);
-        return new VH(v);
+
+        return new VH(new ChatListCell(ctx));
     }
 
     @Override
@@ -66,25 +67,16 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         TdApi.Chat chat = getItem(position);
         TdApi.MessageContent message = chat.topMessage.message;
 
-        holder.time.setText(chat.topMessage.dateFormatted);
         holder.cell.setTime(chat.topMessage.dateFormatted);
 
         if (chat.type instanceof TdApi.PrivateChatInfo){
-            //name
             TdApi.User u = ((TdApi.PrivateChatInfo) chat.type).user;
             final String uiName = AppUtils.uiName(u, ctx);
             holder.cell.setTitle(uiName);
-            holder.name.setText(uiName);
-            //group_icon
-            holder.iconGroupChat.setVisibility(View.GONE);
             holder.cell.setDrawGroupChatIcon(false);
         } else {
-            //name
             TdApi.GroupChatInfo group = (TdApi.GroupChatInfo) chat.type;
-            holder.name.setText(group.groupChat.title);
             holder.cell.setTitle(group.groupChat.title);
-            //group_icon
-            holder.iconGroupChat.setVisibility(View.VISIBLE);
             holder.cell.setDrawGroupChatIcon(true);
         }
 
@@ -94,39 +86,24 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
 
         if (message instanceof TdApi.MessageText) {
             TdApi.MessageText text = (TdApi.MessageText) message;
-            holder.message.setText(text.textWithSmilesAndUserRefs);
-            holder.message.setTextColor(COLOR_TEXT);
             holder.cell.setText(text.textWithSmilesAndUserRefs, COLOR_TEXT);
         } else {
             CharSequence t = getSystemText(message, chat.topMessage);
-            holder.message.setText(t.toString());//todo object allocations!
-            holder.message.setTextColor(COLOR_SYSTEM);
             holder.cell.setText(t, COLOR_TEXT);
         }
-        if (chat.unreadCount > 0){
-            holder.iconBottom.setVisibility(View.INVISIBLE);
-            holder.iconBottom.setBackgroundResource(R.drawable.ic_badge);
-//            holder.iconBottom.setText(String.valueOf(chat.unreadCount));
-        } else {
-            holder.iconBottom.setVisibility(View.GONE);
-        }
+
         holder.cell.setUnreadCount(chat.unreadCount);
 
         RxChat rxChat = chatDb.getRxChat(chat.id);
         int msgState = rxChat.getMessageState(chat.topMessage, chat.lastReadOutboxMessageId, myId);
         switch (msgState){
             case RxChat.MESSAGE_STATE_READ:
-                holder.iconTop.setVisibility(View.GONE);
                 holder.cell.iconTop.setSate(ChatListCell.STATE_IC_NULL);
                 break;
             case RxChat.MESSAGE_STATE_SENT:
-                holder.iconTop.setImageResource(R.drawable.ic_unread);
-                holder.iconTop.setVisibility(View.VISIBLE);
                 holder.cell.iconTop.setSate(ChatListCell.STATE_IC_UNREAD);
                 break;
             case RxChat.MESSAGE_STATE_NOT_SENT:
-                holder.iconTop.setImageResource(R.drawable.ic_clock);
-                holder.iconTop.setVisibility(View.VISIBLE);
                 holder.cell.iconTop.setSate(ChatListCell.STATE_IC_CLOCK);
                 break;
         }
@@ -166,11 +143,9 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             return SingleTextViewVH.getTextFor(ctx, topMessage, m, userHolder);
         }
 
-//        return null;
     }
 
     private void loadAvatar(VH holder, TdApi.Chat chat) {
-//        holder.avatar.loadAvatarFor(chat);
         holder.cell.avatarView.loadAvatarFor(chat);
     }
 
@@ -181,33 +156,11 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
     }
 
     class VH extends RecyclerView.ViewHolder {
-//        final AvatarView avatar;
-        final TextView message;
-        private final TextView name;
-        private final TextView time;
-        private final ImageView iconTop;
-        private final View iconBottom;
-        private final View iconGroupChat;
         private final ChatListCell cell;
 
-        public VH(View itemView) {
+        public VH(ChatListCell itemView) {
             super(itemView);
-            cell = ((ChatListCell) itemView.findViewById(R.id.new_cell));
-//            avatar = (AvatarView) itemView.findViewById(R.id.avatar);
-            message = (TextView) itemView.findViewById(R.id.message);
-            name = (TextView) itemView.findViewById(R.id.name);
-            time = (TextView) itemView.findViewById(R.id.time);
-            iconTop = (ImageView) itemView.findViewById(R.id.icon_top);
-            iconBottom = (View) itemView.findViewById(R.id.icon_bottom);
-            iconGroupChat = itemView.findViewById(R.id.group_chat_icon);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    clicker.call(getItem(getPosition()));
-                }
-            });
-            message.setLinkTextColor(Colors.USER_NAME_COLOR);
-
+            cell = itemView;
         }
     }
 
