@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.chat.adapter;
 
+import android.text.SpannableString;
 import android.text.util.Linkify;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -39,7 +40,13 @@ public class TextMessageVH extends BaseAvatarVH {
         //
         TdApi.MessageContent msg = rawMsg.message;
         TdApi.MessageText text = (TdApi.MessageText) msg;
-        message.setText(text.textWithSmilesAndUserRefs);
+        if (text.textWithSmilesAndUserRefs != null){
+            message.setText(text.textWithSmilesAndUserRefs);
+        } else if (text.text != null){
+            message.setText(new SpannableString(text.text));
+        } else {
+            message.setText(new SpannableString(""));
+        }
     }
 
     public static void newBind(CustomCeilLayout root, Adapter adapter, ChatListItem item, long lastReadOutbox) {
