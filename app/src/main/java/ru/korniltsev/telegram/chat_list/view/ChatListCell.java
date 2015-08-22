@@ -63,6 +63,11 @@ public class ChatListCell extends ViewGroup {
     private StaticLayout unreadLayout;
     private float unreadTx;
     private float unreadTy;
+    private int spaceLeftForText;
+    private TextPaint textPaint;
+    private StaticLayout textLayout;
+    private int textLayoutDY;
+    private int textLayoutDX;
 
     public ChatListCell(Context context, AttributeSet a) {
         super(context, a);
@@ -128,6 +133,17 @@ public class ChatListCell extends ViewGroup {
         unreadPaint.setColor(Color.WHITE);
 
 
+
+        spaceLeftForText = displayWidth
+                - avatarViewSize - avatarViewMargin* 2
+                - icUnreadBadge.getIntrinsicWidth()
+                - cellPaddingRight
+                - calc.dp(4f);
+        textLayoutDY = calc.dp(40);
+        textLayoutDX = avatarViewSize + avatarViewMargin * 2;
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setTextSize(calc.dpFloat(15));
+
         setWillNotDraw(false);
     }
 
@@ -165,7 +181,7 @@ public class ChatListCell extends ViewGroup {
     private void layoutIconGroup() {
         int left = avatarViewSize + avatarViewMargin * 2;
         int right = left + icGroup.getIntrinsicWidth();
-        int bottom = calc.dp(31f);//top + icGroup.getIntrinsicHeight();
+        int bottom = calc.dp(29f);//top + icGroup.getIntrinsicHeight();
         int top = bottom - icGroup.getIntrinsicHeight();
         icGroup.setBounds(left, top, right, bottom);
     }
@@ -243,6 +259,11 @@ public class ChatListCell extends ViewGroup {
             canvas.restore();
         }
 
+        canvas.save();
+        canvas.translate(textLayoutDX, textLayoutDY);
+        textLayout.draw(canvas);
+        canvas.restore();
+
     }
 
     public void setUnreadCount(int unreadCount) {
@@ -255,5 +276,13 @@ public class ChatListCell extends ViewGroup {
             unreadTx = bounds.left + px;
             unreadTy = bounds.top + py;
         }
+    }
+
+    public void setText(CharSequence text, int color) {
+
+        textPaint.setColor(color);
+
+        final CharSequence ellipsized = TextUtils.ellipsize(text, textPaint, spaceLeftForText, TextUtils.TruncateAt.END);
+        textLayout = new StaticLayout(ellipsized, textPaint, spaceLeftForText, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
     }
 }

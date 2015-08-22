@@ -32,13 +32,15 @@ import java.util.Locale;
 
 public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH> {
 
-    public static final ColorStateList COLOR_SYSTEM = ColorStateList.valueOf(0xff6b9cc2);
+    public static final int COLOR_SYSTEM = 0xff6b9cc2;
+    private final int  COLOR_TEXT = 0xff8a8a8a;
+
 
     private final Context ctx;
     private final int myId;
     private final Action1<TdApi.Chat> clicker;
     private final Resources res;
-    private ColorStateList COLOR_TEXT = ColorStateList.valueOf(0xff8a8a8a);
+
     final ChatDB chatDb;
     final UserHolder userHolder;
 
@@ -94,10 +96,12 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
             TdApi.MessageText text = (TdApi.MessageText) message;
             holder.message.setText(text.textWithSmilesAndUserRefs);
             holder.message.setTextColor(COLOR_TEXT);
+            holder.cell.setText(text.textWithSmilesAndUserRefs, COLOR_TEXT);
         } else {
             CharSequence t = getSystemText(message, chat.topMessage);
             holder.message.setText(t.toString());//todo object allocations!
             holder.message.setTextColor(COLOR_SYSTEM);
+            holder.cell.setText(t, COLOR_TEXT);
         }
         if (chat.unreadCount > 0){
             holder.iconBottom.setVisibility(View.INVISIBLE);

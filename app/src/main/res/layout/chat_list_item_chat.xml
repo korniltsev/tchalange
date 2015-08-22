@@ -97,6 +97,7 @@
                 android:paddingTop="3dp"
                 android:fontFamily="sans-serif"
                 android:textStyle="normal"
+                android:visibility="invisible"
                 />
 
         <!--<item name="android:fontFamily">sans-serif</item>-->
