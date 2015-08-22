@@ -33,8 +33,8 @@ import java.util.Locale;
 
 public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH> {
 
-    public static final int COLOR_SYSTEM = 0xff6b9cc2;
-    private final int  COLOR_TEXT = 0xff8a8a8a;
+//    public static final int COLOR_SYSTEM = 0xff6b9cc2;
+//    private final int  COLOR_TEXT = 0xff8a8a8a;
 
 
     private final Context ctx;
@@ -83,16 +83,17 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
 
 
 
+        holder.cell.setUnreadCount(chat.unreadCount);
 
         if (message instanceof TdApi.MessageText) {
             TdApi.MessageText text = (TdApi.MessageText) message;
-            holder.cell.setText(text.textWithSmilesAndUserRefs, COLOR_TEXT);
+            holder.cell.setText(text.textWithSmilesAndUserRefs,false);
         } else {
             CharSequence t = getSystemText(message, chat.topMessage);
-            holder.cell.setText(t, COLOR_TEXT);
+            holder.cell.setText(t, true);
         }
 
-        holder.cell.setUnreadCount(chat.unreadCount);
+
 
         RxChat rxChat = chatDb.getRxChat(chat.id);
         int msgState = rxChat.getMessageState(chat.topMessage, chat.lastReadOutboxMessageId, myId);
@@ -161,6 +162,12 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         public VH(ChatListCell itemView) {
             super(itemView);
             cell = itemView;
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clicker.call(getItem(getPosition()));
+                }
+            });
         }
     }
 

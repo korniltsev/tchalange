@@ -51,6 +51,7 @@ public class ChatListCell extends ViewGroup {
     private final int titlePaddingTop;
     private final TextPaint messagePaint;
     private final Drawable icUnreadBadge;
+    private final TextPaint textPaintSystem;
 
     DpCalculator calc;
     private TextPaint timePaint;
@@ -70,7 +71,7 @@ public class ChatListCell extends ViewGroup {
     private int textLayoutDX;
 
     public ChatListCell(Context context) {
-        super(context, a);
+        super(context);
         final MyApp app = MyApp.from(context);
         calc = app.calc;
         dip72 = calc.dp(72);
@@ -136,13 +137,19 @@ public class ChatListCell extends ViewGroup {
 
         spaceLeftForText = displayWidth
                 - avatarViewSize - avatarViewMargin* 2
-                - icUnreadBadge.getIntrinsicWidth()
-                - cellPaddingRight
-                - calc.dp(4f);
+                - cellPaddingRight;
+        final Typeface textTypeFace = Typeface.create("sans-serif", 0);
         textLayoutDY = calc.dp(40);
         textLayoutDX = avatarViewSize + avatarViewMargin * 2;
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextSize(calc.dpFloat(15));
+        textPaint.setColor(0xFF8A8A8A);
+        textPaint.setTypeface(textTypeFace);
+
+        textPaintSystem = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaintSystem.setTextSize(calc.dpFloat(15));
+        textPaintSystem.setColor(0xFF6D9DC0);
+        textPaintSystem.setTypeface(textTypeFace);
 
 
 //        android:layout_height="72dp"
@@ -281,11 +288,20 @@ public class ChatListCell extends ViewGroup {
         }
     }
 
-    public void setText(CharSequence text, int color) {
+    public void setText(CharSequence text, boolean system) {
+        TextPaint p ;
+        if (system ){
+            p = textPaintSystem;
+        } else {
+            p = textPaint;
+        }
 
-        textPaint.setColor(color);
 
-        final CharSequence ellipsized = TextUtils.ellipsize(text, textPaint, spaceLeftForText, TextUtils.TruncateAt.END);
-        textLayout = new StaticLayout(ellipsized, textPaint, spaceLeftForText, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        int spaceLeft = spaceLeftForText;
+        if (unreadCount > 0) {
+            spaceLeft = spaceLeft - icUnreadBadge.getIntrinsicWidth() - calc.dp(4f);
+        }
+        final CharSequence ellipsized = TextUtils.ellipsize(text, p, spaceLeft, TextUtils.TruncateAt.END);
+        textLayout = new StaticLayout(ellipsized, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
     }
 }
