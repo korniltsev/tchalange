@@ -288,6 +288,17 @@ public class RXClient {
                         final Message topMessage = ((Chat) tlObject).topMessage;
                         return getAllMessagesRecursive(client, topMessage.id, ((Chat) tlObject).id, topMessage);
                     }
+                }).map(new Func1<List<Message>, List<Message>>() {
+                    @Override
+                    public List<Message> call(List<Message> messages) {
+                        final ArrayList<Message> res = new ArrayList<>();
+                        for (Message m : messages) {
+                            if (m.message instanceof MessageAudio) {//can be text and voice
+                                res.add(m);
+                            }
+                        }
+                        return res;
+                    }
                 });
 
 
