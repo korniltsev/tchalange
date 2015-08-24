@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -44,14 +45,23 @@ public class MediaPreviewAdapter extends BaseAdapter<TdApi.Message, MediaPreview
         if (message instanceof TdApi.MessagePhoto){
             final TdApi.Photo photo = ((TdApi.MessagePhoto) message).photo;
             final TdApi.File smallestBiggerThan = PhotoUtils.findSmallestBiggerThan(photo, dip100, dip100);
-            rxGlide.loadPhoto(smallestBiggerThan, false)
-                    .into(holder.img);
+            loadImage(holder.img, smallestBiggerThan);
         } else {
             TdApi.MessageVideo v = (TdApi.MessageVideo) message;
-            rxGlide.loadPhoto(v.video.thumb.photo, false)
-                    .into(holder.img);
+            loadImage(holder.img, v.video.thumb.photo);
         }
 
+    }
+
+    private void loadImage(ImageView img, TdApi.File smallestBiggerThan) {
+        if (smallestBiggerThan.id == TdApi.File.NO_FILE_ID){
+            rxGlide.getPicasso()
+                    .cancelRequest(img);
+            img.setImageDrawable(null);
+        } else {
+            rxGlide.loadPhoto(smallestBiggerThan, false)
+                    .into(img);
+        }
     }
 
     class VH extends RecyclerView.ViewHolder{
