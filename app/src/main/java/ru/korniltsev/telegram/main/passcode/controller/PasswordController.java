@@ -131,17 +131,7 @@ public class PasswordController extends Controller {
 
     public boolean unlock(String s) {
         if (passcodeManager.unlock(PasscodeManager.TYPE_PASSWORD, s)) {
-            final Flow flow = Flow.get(ctx);
-            if (lock.actionType == PasscodePath.TYPE_LOCK) {
-                flow.goBack();
-            } else {
-                AppUtils.flowPushAndRemove(passcodeView, new EditPasscode(), new FlowHistoryStripper() {
-                    @Override
-                    public boolean shouldRemovePath(Object path) {
-                        return path instanceof PasscodePath;
-                    }
-                }, Flow.Direction.FORWARD);
-            }
+            passcodeView.unlocked();
             return true;
         }
         return false;

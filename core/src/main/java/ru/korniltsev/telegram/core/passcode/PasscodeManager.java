@@ -160,4 +160,5 @@ public class PasscodeManager {
 
     public static final int TYPE_PASSWORD = 0;
     public static final int TYPE_PIN = 1;
+    public static final int TYPE_PATTERN = 2;
 }

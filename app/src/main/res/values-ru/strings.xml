@@ -182,4 +182,5 @@
     <string name="pin">PIN</string>
     <string name="pin_cannot_be_empty">PIN не может быть пустым</string>
     <string name="wrong_pin">Неверный PIN</string>
+    <string name="pattern">Pattern</string>
 </resources>

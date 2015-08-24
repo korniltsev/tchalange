@@ -20,7 +20,9 @@ import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.main.passcode.controller.Controller;
 import ru.korniltsev.telegram.main.passcode.controller.PasswordController;
+import ru.korniltsev.telegram.main.passcode.controller.PatternController;
 import ru.korniltsev.telegram.main.passcode.controller.PincodeController;
+import ru.korniltsev.telegram.profile.edit.passcode.EditPasscode;
 import ru.korniltsev.telegram.profile.media.DropdownPopup;
 
 import javax.inject.Inject;
@@ -41,6 +43,7 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
     private PasscodePath lock;
     private Controller controller;
     private TextView title;
+    private DropdownPopup popup;
     //    private View logo;
 
     public PasscodeView(Context context, AttributeSet attrs) {
@@ -95,7 +98,14 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
             }
         }));
 
-        final DropdownPopup popup = new DropdownPopup(getContext(), list);
+        list.add(new DropdownPopup.Item(res.getString(R.string.pattern), new Runnable() {
+            @Override
+            public void run() {
+                toggle(PasscodeManager.TYPE_PATTERN);
+            }
+        }));
+
+        popup = new DropdownPopup(getContext(), list);
         popup.showAtLocation(title, 0, calc.dp(48), calc.dp(28));
     }
 
@@ -132,6 +142,12 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
 
     @Override
     public boolean onBackPressed() {
+        if (popup != null && popup.isShowing()){
+            popup.dismiss();
+            popup = null;
+            return true;
+        }
+        popup = null;
         return presenter.onBackPressed();
     }
 
@@ -161,6 +177,9 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
         } else if (type == PasscodeManager.TYPE_PIN){
             controller = new PincodeController(this, lock, passcodeManager);
             title.setText(R.string.pin);
+        } else if (type == PasscodeManager.TYPE_PATTERN) {
+            controller = new PatternController(this, lock, passcodeManager);
+            title.setText(R.string.pattern);
         }
     }
 
@@ -168,8 +187,24 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
         //        Utils.hideKeyboard(passcodeField);
     }
 
+
+
     @Override
     public boolean shouldSkipAnimation() {
         return presenter.path.actionType == PasscodePath.TYPE_LOCK;
+    }
+
+    public void unlocked() {
+        final Flow flow = Flow.get(getContext());
+        if (lock.actionType == PasscodePath.TYPE_LOCK) {
+            flow.goBack();
+        } else {
+            AppUtils.flowPushAndRemove(this, new EditPasscode(), new FlowHistoryStripper() {
+                @Override
+                public boolean shouldRemovePath(Object path) {
+                    return path instanceof PasscodePath;
+                }
+            }, Flow.Direction.FORWARD);
+        }
     }
 }

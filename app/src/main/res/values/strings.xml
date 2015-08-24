@@ -110,10 +110,13 @@
 
     <string name="enter_your_password">Enter your password to unlock</string>
     <string name="enter_your_pincode">Enter your PIN to unlock</string>
+    <string name="enter_your_pattern">Enter your pattern to unlock</string>
     <string name="choose_your_password">Choose your password</string>
     <string name="choose_your_pin">Choose your PIN</string>
+    <string name="choose_your_pattern">Choose your pattern</string>
     <string name="choose_your_password_2">Re-enter your new password</string>
     <string name="choose_your_PIN_2">Re-enter your new PIN</string>
+    <string name="choose_your_pattern_2">Re-enter your new pattern</string>
 
     <string name="menu_save_to_gallery">Save to gallery</string>
     <string name="menu_delete">Delete</string>
@@ -133,7 +136,9 @@
     <string name="enter_passcode_menu">Enter passcode</string>
     <string name="password_cannot_be_empty">Password cannot be empty</string>
     <string name="pin_cannot_be_empty">PIN cannot be empty</string>
+    <string name="pattern_cannot_be_empty">Pattern is too short</string>
     <string name="wrong_password">Wrong password</string>
+    <string name="wrong_pattern">Wrong pattern</string>
     <string name="wrong_pin">Wrong PIN</string>
     <string name="autolock_disabled">Disabled</string>
     <string name="add_member">Add member</string>
@@ -165,6 +170,7 @@
     <string name="shared_media_title">Shared Media</string>
     <string name="audio_files">Audio Files</string>
     <string name="passcode_title_password">Password</string>
+    <string name="pattern">Pattern</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>

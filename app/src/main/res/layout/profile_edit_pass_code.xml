@@ -28,7 +28,7 @@
                         android:id="@+id/btn_passcode_switcher"
                         android:layout_width="match_parent"
                         android:layout_height="55dp"
-                        android:background="@drawable/bg_keyboard_tab_white"
+                        android:background="@drawable/bg_keyboard_tab"
                         android:orientation="horizontal"
                         >
                     <TextView
@@ -55,7 +55,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="55dp"
                         android:text="@string/change_pass"
-                        android:background="@drawable/bg_keyboard_tab_white"
+                        android:background="@drawable/bg_keyboard_tab"
                         style="@style/EditPassCodeMainLabel"
                         />
                 <View android:layout_width="match_parent"
@@ -82,7 +82,7 @@
                         android:id="@+id/btn_passcode_timing"
                         android:layout_width="match_parent"
                         android:layout_height="55dp"
-                        android:background="@drawable/bg_keyboard_tab_white"
+                        android:background="@drawable/bg_keyboard_tab"
                         android:orientation="horizontal"
                         >
                     <TextView

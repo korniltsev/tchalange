@@ -226,7 +226,7 @@ public class PincodeController extends Controller {
             case PasscodePath.TYPE_LOCK_TO_CHANGE:
                 final boolean unlocked = unlock(textFrom(passcodeField));
                 if (!unlocked) {
-                    passcodeField.setError(ctx.getString(R.string.wrong_password));
+                    passcodeField.setError(ctx.getString(R.string.wrong_pin));
                 }
                 break;
             case PasscodePath.TYPE_SET:
@@ -259,17 +259,7 @@ public class PincodeController extends Controller {
 
     public boolean unlock(String s) {
         if (passcodeManager.unlock(PasscodeManager.TYPE_PIN, s)) {
-            final Flow flow = Flow.get(ctx);
-            if (lock.actionType == PasscodePath.TYPE_LOCK) {
-                flow.goBack();
-            } else {
-                AppUtils.flowPushAndRemove(passcodeView, new EditPasscode(), new FlowHistoryStripper() {
-                    @Override
-                    public boolean shouldRemovePath(Object path) {
-                        return path instanceof PasscodePath;
-                    }
-                }, Flow.Direction.FORWARD);
-            }
+            passcodeView.unlocked();
             return true;
         }
         return false;
