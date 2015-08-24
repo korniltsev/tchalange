@@ -42,7 +42,7 @@
     <string name="menu_delete">Удалить</string>
     <string name="menu_save_to_gallery">Сохранить в галерею</string>
 
-    <string name="enter_your_password">Enter your password to unlock</string>
+    <string name="enter_your_password">Введите Ваш пароль дл разблокировки</string>
     <string name="choose_your_password">Выберите Ваш пароль</string>
 
 
@@ -183,4 +183,9 @@
     <string name="pin_cannot_be_empty">PIN не может быть пустым</string>
     <string name="wrong_pin">Неверный PIN</string>
     <string name="pattern">Pattern</string>
+    <string name="choose_your_pattern">Выберите Ваш паттерн</string>
+    <string name="choose_your_pattern_2">Введите Ваш паттерн повторно</string>
+    <string name="enter_your_pattern">Введите Ваш паттерн для разблокировки</string>
+    <string name="pattern_cannot_be_empty">Паттерн слишком короткий</string>
+    <string name="wrong_pattern">Неверный паттерн</string>
 </resources>
