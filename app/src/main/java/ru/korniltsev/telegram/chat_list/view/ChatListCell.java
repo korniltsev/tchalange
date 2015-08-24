@@ -11,6 +11,8 @@ import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.SpannedString;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -20,6 +22,7 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.debug.SquareDumbResourceView;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.core.views.RobotoMediumTextView;
 
@@ -28,7 +31,7 @@ import static android.view.View.MeasureSpec.getSize;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static junit.framework.Assert.assertNotNull;
 
-public class ChatListCell extends ViewGroup {
+public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
     public static final int STATE_IC_UNREAD = 0;
     public static final int STATE_IC_CLOCK = 1;
@@ -54,6 +57,7 @@ public class ChatListCell extends ViewGroup {
     private final TextPaint messagePaint;
     private final Drawable icUnreadBadge;
     private final TextPaint textPaintSystem;
+    private final Emoji emoji;
 
     DpCalculator calc;
     private TextPaint timePaint;
@@ -71,10 +75,12 @@ public class ChatListCell extends ViewGroup {
     private StaticLayout textLayout;
     private int textLayoutDY;
     private int textLayoutDX;
+    private CharSequence ellipsizedText;
 
     public ChatListCell(Context context) {
         super(context);
         final MyApp app = MyApp.from(context);
+        emoji = app.emoji;
         calc = app.calc;
         dip72 = calc.dp(72);
         this.dividerStart = dip72;
@@ -311,7 +317,37 @@ public class ChatListCell extends ViewGroup {
             }
         }
 
-        final CharSequence ellipsized = TextUtils.ellipsize(firstLine, p, spaceLeft, TextUtils.TruncateAt.END);
-        textLayout = new StaticLayout(ellipsized, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        ellipsizedText = TextUtils.ellipsize(firstLine, p, spaceLeft, TextUtils.TruncateAt.END);
+        textLayout = new StaticLayout(ellipsizedText, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        emoji.addListener(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        emoji.removeListener(this);
+    }
+
+    @Override
+    public void pageLoaded(int page) {
+        if (ellipsizedText instanceof Spanned){
+            final Spanned s = (Spanned) this.ellipsizedText;
+            final Emoji.EmojiSpan[] spans = s.getSpans(0, s.length(), Emoji.EmojiSpan.class);
+            if (spans.length != 0){
+                for (Emoji.EmojiSpan span : spans) {
+                    if (span.d.info.page == page){
+                            invalidate();
+                        return;
+                    }
+                }
+            }
+        } else {
+            invalidate();
+        }
     }
 }

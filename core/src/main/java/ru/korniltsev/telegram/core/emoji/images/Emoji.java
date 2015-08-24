@@ -18,6 +18,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.text.Spannable;
 import android.text.style.DynamicDrawableSpan;
@@ -25,37 +26,27 @@ import android.text.style.ImageSpan;
 import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import rx.Observable;
-import rx.subjects.PublishSubject;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-//import org.telegram.messenger.FileLog;
-//import org.telegram.messenger.Utilities;
-//import org.telegram.messenger.ApplicationLoader;
 
 public class Emoji {
+    public static final Handler MAIN_THREAD_HANDLER = new Handler(Looper.getMainLooper());
     private final HashMap<Long, DrawableInfo> rects = new HashMap<>();
     private final DpCalculator dpCalculator;
     private int drawImgSize, bigImgSize;
-    //    private  boolean inited = false;
     private final Paint placeholderPaint;
     private final Bitmap emojiBmp[] = new Bitmap[5];
-//    private final boolean loadingEmoji[] = new boolean[5];
+
+
 
     private static final int[] cols = {
             13, 10, 15, 10, 14
@@ -209,11 +200,9 @@ public class Emoji {
                             0x00000000D83DDD34L, 0x00000000D83DDD35L, 0x00000000D83DDD3BL, 0x00000000D83DDD36L, 0x00000000D83DDD37L, 0x00000000D83DDD38L, 0x00000000D83DDD39L}};
 
     private final Context ctx;
-    private final PublishSubject<Bitmap> pageLoaded = PublishSubject.create();
 
-    public Observable<Bitmap> pageLoaded() {
-        return pageLoaded;
-    }
+
+
     final ExecutorService service;
 
     public Emoji(Context ctx, DpCalculator dpCalculator, ExecutorService service) {
@@ -231,11 +220,7 @@ public class Emoji {
             emojiFullSize = 90;
         }
         drawImgSize = this.dpCalculator.dp(20);
-        //        if (dpCalculator.isTablet()) {//todo tablets
-        //            bigImgSize = AndroidUtilities.dp(40);
-        //        } else {
         bigImgSize = this.dpCalculator.dp(30);
-        //        }
 
         for (int j = 1; j < data.length; j++) {
             for (int i = 0; i < data[j].length; i++) {
@@ -270,12 +255,6 @@ public class Emoji {
                 scale = 3.0f;
             }
 
-//            File imageFile = ctx.getFileStreamPath(imageName);
-            //            if (!imageFile.exists()) {
-
-//                Utilities.copyFile(is, imageFile);
-//                is.close();
-//            }
 
             BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inSampleSize = imageResize;
@@ -293,10 +272,6 @@ public class Emoji {
             Bitmap colors = BitmapFactory.decodeStream(is, null, opts);
 
             final Bitmap bitmap = compositeDrawableWithMask(colors, alpha);
-            System.gc();
-
-
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File("/mnt/sdcard/foo")));
 
             dispatchPageLoaded(page, bitmap);
 
@@ -307,24 +282,21 @@ public class Emoji {
     }
 
     private void dispatchPageLoaded(final int page, final Bitmap bitmap) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+//        SystemClock.sleep(4000);
+        MAIN_THREAD_HANDLER.post(new Runnable() {
             @Override
             public void run() {
                 emojiBmp[page] = bitmap;
-                synchronized (weakness){
-                    for (EmojiDrawable k: weakness.keySet()) {
-                        k.invalidateSelf();
-                    }
+                for (int i = 0, lsSize = ls.size(); i < lsSize; i++) {
+                    Listener l = ls.get(i);
+                    l.pageLoaded(page);
                 }
-                pageLoaded.onNext(bitmap);
             }
         });
     }
 
     private void loadMasked(int page, File maskedFile) {
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inPreferredConfig = Bitmap.Config.RGB_565;
-        Bitmap bmp = BitmapFactory.decodeFile(maskedFile.getAbsolutePath(), opts);
+        Bitmap bmp = BitmapFactory.decodeFile(maskedFile.getAbsolutePath());
         dispatchPageLoaded(page, bmp);
     }
 
@@ -334,28 +306,21 @@ public class Emoji {
     }
 
     private ConcurrentMap<Integer, Runnable> emojiPageNumberTo = new ConcurrentHashMap<>();
+
     private void loadEmojiAsync(final int page) {
         final Runnable task = new Runnable() {
             public void run() {
                 loadEmoji(page);
-//                loadingEmoji[page] = false;
             }
         };
         final Runnable prev = emojiPageNumberTo.putIfAbsent(page, task);
         if (prev == null) {
             service.submit(task);
         }
-//        if (loadingEmoji[page]) {
-//            return;
-//        }
-//        loadingEmoji[page] = true;
-//
-//        new Thread(task).start();
     }
 
 
-    public static Bitmap compositeDrawableWithMask(
-                                                           Bitmap rgbDrawable, Bitmap alphaDrawable) {
+    public static Bitmap compositeDrawableWithMask(Bitmap rgbDrawable, Bitmap alphaDrawable) {
         Bitmap rgbBitmap = rgbDrawable;
         Bitmap alphaBitmap = alphaDrawable;
         int width = rgbBitmap.getWidth();
@@ -381,21 +346,11 @@ public class Emoji {
         }
 
 
-        return destBitmap;//new BitmapDrawable(resources, destBitmap);
+        return destBitmap;
     }
 
-    //    public static void invalidateAll(View view) {
-    //        if (view instanceof ViewGroup) {
-    //            ViewGroup g = (ViewGroup)view;
-    //            for (int i = 0; i < g.getChildCount(); i++) {
-    //                invalidateAll(g.getChildAt(i));
-    //            }
-    //        } else if (view instanceof TextView) {
-    //            view.invalidate();
-    //        }
-    //    }
-    public static final Object DUMB = new Object();
-    private final WeakHashMap<EmojiDrawable, Object> weakness = new WeakHashMap<>();
+
+
 
     @Nullable
     public EmojiDrawable getEmojiDrawable(long code) {
@@ -405,9 +360,7 @@ public class Emoji {
         }
         EmojiDrawable ed = new EmojiDrawable(info);
         ed.setBounds(0, 0, drawImgSize, drawImgSize);
-        synchronized (weakness) {
-            weakness.put(ed, DUMB);
-        }
+
         return ed;
     }
 
@@ -425,19 +378,13 @@ public class Emoji {
     private static Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG | Paint.ANTI_ALIAS_FLAG);
 
     public class EmojiDrawable extends Drawable {
-        private DrawableInfo info;
-        private boolean fullSize = false;
+        public final DrawableInfo info;
+        public boolean fullSize = false;
 
         public EmojiDrawable(DrawableInfo i) {
             info = i;
-            if ( i == null) {
-                throw new NullPointerException();
-            }
         }
 
-//        public DrawableInfo getDrawableInfo() {
-//            return info;
-//        }
 
         public Rect getDrawRect() {
             Rect b = copyBounds();
@@ -484,9 +431,9 @@ public class Emoji {
         }
     }
 
-    private static class DrawableInfo {
-        public Rect rect;
-        public byte page;
+    public static class DrawableInfo {
+        public final Rect rect;
+        public final byte page;
 
         public DrawableInfo(Rect r, byte p) {
             rect = r;
@@ -573,11 +520,13 @@ public class Emoji {
 
 
     public class EmojiSpan extends ImageSpan {
-//        private Paint.FontMetricsInt fontMetrics = null;
+        public final EmojiDrawable d;
+        //        private Paint.FontMetricsInt fontMetrics = null;
 //        private int size = dpCalculator.dp(20);
 
         public EmojiSpan(EmojiDrawable d) {
             super(d, DynamicDrawableSpan.ALIGN_BOTTOM);
+            this.d = d;
 
 //            fontMetrics = original;
 //            if (original != null) {
@@ -634,5 +583,18 @@ public class Emoji {
                 str = str + (char)j;
             }
         }
+    }
+
+    final List<Listener> ls = new ArrayList<>(30);
+    public void addListener(Listener l){
+        ls.add(l);
+    }
+
+    public void removeListener(Listener l) {
+        ls.remove(l);
+    }
+
+    public interface Listener {
+        void pageLoaded(int page);
     }
 }

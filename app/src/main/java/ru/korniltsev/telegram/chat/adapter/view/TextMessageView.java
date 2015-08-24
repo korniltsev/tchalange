@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.Spannable;
+import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.Log;
@@ -28,19 +29,20 @@ import java.util.Arrays;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_UP;
 
-public class TextMessageView extends View {
+public class TextMessageView extends View implements Emoji.Listener {
     private final int width;
     private final Emoji emoji;
     private final EmojiParser emojiParser;
     private StaticLayout staticLayout;
     private TextPaint paint;
-    private Subscription subscription;
+//    private Subscription subscription;
     private Spannable currentText;
     @Nullable private EmojiParser.ReferenceSpan currentTouchSpan;
 
     public TextMessageView(Context context) {
         super(context);
         final MyApp app = MyApp.from(context);
+
         final int displayWidth = app.displayWidth;
         final DpCalculator calc = app.calc;
 
@@ -56,18 +58,13 @@ public class TextMessageView extends View {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        subscription = emoji.pageLoaded().subscribe(new ObserverAdapter<Bitmap>() {
-            @Override
-            public void onNext(Bitmap response) {
-                invalidate();
-            }
-        });
+        emoji.addListener(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        subscription.unsubscribe();
+        emoji.removeListener(this);
     }
 
     @Override
@@ -125,5 +122,23 @@ public class TextMessageView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         staticLayout.draw(canvas);
+    }
+
+
+    @Override
+    public void pageLoaded(int page) {
+        if (currentText != null){
+            final Emoji.EmojiSpan[] spans = currentText.getSpans(0, currentText.length(), Emoji.EmojiSpan.class);
+            if (spans.length != 0){
+                for (Emoji.EmojiSpan span : spans) {
+                    if (span.d.info.page == page){
+                        invalidate();
+                        return;
+                    }
+                }
+            }
+        } else {
+            invalidate();
+        }
     }
 }

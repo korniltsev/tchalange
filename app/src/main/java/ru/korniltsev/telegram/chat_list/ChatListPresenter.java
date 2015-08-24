@@ -154,14 +154,6 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
 
                     }
                 }));
-        subscription.add(emoji.pageLoaded()
-                .subscribe(new ObserverAdapter<Bitmap>() {
-                    @Override
-                    public void onNext(Bitmap response) {
-                        getView()
-                                .invalidate();
-                    }
-                }));
     }
 
     public void openChat(TdApi.Chat chat) {
