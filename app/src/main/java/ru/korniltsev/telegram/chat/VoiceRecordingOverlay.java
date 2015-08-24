@@ -66,6 +66,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private boolean stopCancelled;
     private boolean ignoreUpAndMove;
     private View slideToCanel;
+    private Subscription amplitudeSubscriptions = Subscriptions.empty();
 
     public VoiceRecordingOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -190,12 +191,17 @@ public class VoiceRecordingOverlay extends FrameLayout {
             ignoreUpAndMove = true;
             stopImpl(cancel);
             animating = true;
-            subscription.unsubscribe();
-            redDotAnimation.cancel();
+            release();
             slideOut();
 //            scaleOutRedButton();
             animateRedButtonPadding();
         }
+    }
+
+    private void release() {
+        subscription.unsubscribe();
+        amplitudeSubscriptions.unsubscribe();
+        redDotAnimation.cancel();
     }
 
     private void animateRedButtonPadding() {
@@ -264,7 +270,14 @@ public class VoiceRecordingOverlay extends FrameLayout {
     }
 
     private void startImpl() {
-        recorder.record();
+        amplitudeSubscriptions = recorder.record()
+                .onBackpressureDrop()
+                .subscribe(new ObserverAdapter<Double>() {
+                    @Override
+                    public void onNext(Double response) {
+                        Log.d("VoiceRecordingOverlay", "amplitude" + response);
+                    }
+                });
     }
 
     private void scaleInRedButton() {
@@ -369,7 +382,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        subscription.unsubscribe();
+        release();
     }
 
     public int getRedDotRightPadding() {

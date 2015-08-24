@@ -42,9 +42,9 @@ public class VoiceRecorder {
         vibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
-    public void record() {
+    public Observable<Double> record() {
         if (audioRecord != null){
-            return;
+            return null;
         }
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
         audioRecord.startRecording();
@@ -52,6 +52,7 @@ public class VoiceRecorder {
         new Thread(reader)
                 .start();
         vibrate();
+        return reader.amplitude;
     }
 
     private void vibrate() {
@@ -93,6 +94,7 @@ public class VoiceRecorder {
         final File targetFile;
         final int bufferSize ;
         private final PublishSubject<Record> recordedAndEncodedFile = PublishSubject.create();
+        private final PublishSubject<Double> amplitude = PublishSubject.create();
 //        volatile boolean stopped = false;
         public Reader(AudioRecord record, File targetFile, int bufferSize) {
             this.record = record;
@@ -107,25 +109,30 @@ public class VoiceRecorder {
             try {
                 fos = new FileOutputStream(targetFile);
                 final byte[] bytes = new byte[bufferSize];
+                final int shortBufSize = bufferSize / 2;
+                final short[] shortBuff= new short[shortBufSize];
                 int readTotal = 0;
                 while (true) {
-                    final int read = record.read(bytes, 0, bufferSize);
-                    if (read == 0) {
+                    final int shortsRead = record.read(shortBuff, 0, shortBufSize);
+                    if (shortsRead == 0) {
                         log("breal");
                         break;
-                    } else if (read > 0) {
-                        readTotal += read;
-                        fos.write(bytes, 0, read);
-                        log("write");
-
+                    } else if (shortsRead > 0) {
+                        //write data
+                        readTotal += shortsRead;
+                        shortArrayToByteArray(shortBuff, bytes);
+                        fos.write(bytes, 0, shortsRead*2);
+                        //calc amplitude
+                        final double rms = rms(shortBuff, shortsRead);
+                        this.amplitude.onNext(rms);
                     } else {
-                        log("break because " + read );
+                        log("break because " + shortsRead );
                         break;
                     }
                 }
                 fos.close();
 
-                int samples = readTotal/2;
+                int samples = readTotal;
                 float duration = (float)samples / VoicePlayer.SAMPLE_RATE_IN_HZ;
 
                 final File ogg = new File(targetFile.getParent(), "encoded_" + targetFile.getName() + ".ogg");
@@ -162,6 +169,26 @@ public class VoiceRecorder {
         //        public void stop() {
 //            stopped = true;
 //        }
+    }
+
+    private static double rms(short[] shortBuff, int shortsRead) {
+        double sqrt;
+        double sum = 0f;
+        for (int i =0; i < shortsRead; ++i) {
+            sum += shortBuff[i] * shortBuff[i];
+        }
+        final double amplitude = sum / shortsRead;
+
+        sqrt = Math.sqrt(amplitude);
+        return sqrt;
+    }
+
+    private static byte[] shortArrayToByteArray(short[] sData, byte[] bytes) {
+        for (int i = 0; i < sData.length; i++) {
+            bytes[i * 2] = (byte) (sData[i] & 0x00FF);
+            bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
+        }
+        return bytes;
     }
 
     public static class Record {
