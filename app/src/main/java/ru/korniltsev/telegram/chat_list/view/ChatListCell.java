@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -301,7 +303,15 @@ public class ChatListCell extends ViewGroup {
         if (unreadCount > 0) {
             spaceLeft = spaceLeft - icUnreadBadge.getIntrinsicWidth() - calc.dp(4f);
         }
-        final CharSequence ellipsized = TextUtils.ellipsize(text, p, spaceLeft, TextUtils.TruncateAt.END);
+        CharSequence firstLine = text;
+        for (int i =0; i < text.length();++i){
+            if (text.charAt(i) == '\n') {
+                firstLine = firstLine.subSequence(0, i);
+                break;
+            }
+        }
+
+        final CharSequence ellipsized = TextUtils.ellipsize(firstLine, p, spaceLeft, TextUtils.TruncateAt.END);
         textLayout = new StaticLayout(ellipsized, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
     }
 }
