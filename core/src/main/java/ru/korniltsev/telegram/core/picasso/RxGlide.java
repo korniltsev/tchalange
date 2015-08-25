@@ -274,8 +274,8 @@ public class RxGlide {
     }
 
     private String stableKeyForTdApiFile(TdApi.File f, boolean webp) {
-//        return String.format("id=%d&webp=%b", f.id, webp);
-        return f.persistentId;
+
+        return String.format("tdfile:%d", f.id);
     }
 
     public interface StubAware<T> {
