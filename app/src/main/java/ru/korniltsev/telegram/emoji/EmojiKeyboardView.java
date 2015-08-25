@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import com.crashlytics.android.core.CrashlyticsCore;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class EmojiKeyboardView extends LinearLayout {
+public class EmojiKeyboardView extends LinearLayout implements Emoji.Listener {
 
     public static final String LAST_CLICK_STICKER = "sticker";
     public static final String LAST_CLICK_EMOJI = "emoji";
@@ -75,7 +76,7 @@ public class EmojiKeyboardView extends LinearLayout {
         }, stickers.getStickers(), new Runnable() {
             @Override
             public void run() {
-                if (adapter.recentEmojiIds.isEmpty()){
+                if (adapter.recentEmojiIds.isEmpty()) {
                     pager.setCurrentItem(1, true);
                 } else {
                     pager.setCurrentItem(0, true);
@@ -93,14 +94,33 @@ public class EmojiKeyboardView extends LinearLayout {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        emoji.addListener(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        emoji.removeListener(this);
     }
 
     public CallBack callback;
 
     public void setCallback(CallBack callback) {
         this.callback = callback;
+    }
+
+    @Override
+    public void pageLoaded(int page) {
+        for (int i = 0; i < pager.getChildCount(); ++i) {
+            final View c = pager.getChildAt(i);
+            if (c instanceof GridView){
+                final GridView g = (GridView) c;
+                final BaseAdapter a = (BaseAdapter) g.getAdapter();
+                a.notifyDataSetChanged();
+            }
+        }
     }
 
     public interface CallBack {
@@ -173,8 +193,7 @@ public class EmojiKeyboardView extends LinearLayout {
             }
         }
 
-
-        private GridView createGridPage(ViewGroup container, int position1, BaseAdapter adapter, int columnSizeResId) {
+        private GridView createGridPage(ViewGroup container, final int position1, BaseAdapter adapter, int columnSizeResId) {
             int columnWidth = getContext().getResources().getDimensionPixelSize(columnSizeResId);
             GridView view = (GridView) viewFactory.inflate(R.layout.keyboard_page_emoji, container, false);
             view.setColumnWidth(columnWidth);
