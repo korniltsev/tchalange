@@ -27,10 +27,6 @@ import ru.korniltsev.telegram.core.flow.pathview.TraversalAwareHelper;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
-import ru.korniltsev.telegram.profile.decorators.BottomShadow;
-import ru.korniltsev.telegram.profile.decorators.InsetDecorator;
-import ru.korniltsev.telegram.profile.decorators.MyWhiteRectTopPaddingDecorator;
-import ru.korniltsev.telegram.profile.decorators.TopShadow;
 import ru.korniltsev.telegram.profile.other.ProfileView;
 
 import javax.inject.Inject;
@@ -38,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.drinkless.td.libcore.telegram.TdApi.File.NO_FILE_ID;
 import static ru.korniltsev.telegram.common.AppUtils.flatten;
 
@@ -176,7 +171,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
         final ChatInfoAdapter.ButtonItem buttonItem = new ChatInfoAdapter.ButtonItem();
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(buttonItem));
 
-        final ChatInfoAdapter.MediaItem mediaItem = new ChatInfoAdapter.MediaItem(ms);
+        final ChatInfoAdapter.MediaItem mediaItem = new ChatInfoAdapter.MediaItem(ms.totalCount, AppUtils.filterPhotosAndVideos(ms));
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(mediaItem));
 
         final ArrayList<ChatInfoAdapter.Item> participantsItems = new ArrayList<>();

@@ -152,9 +152,11 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
     }
 
     public static class SharedMedia extends Item {
-        final TdApi.Messages ms;
+        final int totalCount;
+        final List<TdApi.Message> ms;
 
-        public SharedMedia(TdApi.Messages ms) {
+        public SharedMedia(int totalCount, List<TdApi.Message> ms) {
+            this.totalCount = totalCount;
             this.ms = ms;
         }
     }
@@ -221,13 +223,13 @@ public class ProfileAdapter extends BaseAdapter<ProfileAdapter.Item, RecyclerVie
         }
 
         public void bind(SharedMedia i) {
-            if (i.ms.messages.length == 0) {
+            if (i.ms.size()== 0) {
                 mediaPreview.setVisibility(View.GONE);
                 mediaCount.setText("0");
             } else {
                 mediaPreview.setVisibility(View.VISIBLE);
-                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, Arrays.asList(i.ms.messages)));
-                mediaCount.setText(String.valueOf(i.ms.totalCount));
+                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, i.ms));
+                mediaCount.setText(String.valueOf(i.totalCount));
             }
         }
     }

@@ -175,9 +175,11 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
 
 
     public static class MediaItem extends Item {
-        final TdApi.Messages ms;
+        private final int totalCount;
+        final List<TdApi.Message> ms;
 
-        public MediaItem(TdApi.Messages ms) {
+        public MediaItem(int totalCount, List<TdApi.Message> ms) {
+            this.totalCount = totalCount;
             this.ms = ms;
         }
     }
@@ -215,13 +217,13 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
         }
 
         public void bind(MediaItem i) {
-            if (i.ms.messages.length == 0) {
+            if (i.ms.isEmpty()) {
                 mediaPreview.setVisibility(View.GONE);
                 mediaCount.setText("0");
             } else {
                 mediaPreview.setVisibility(View.VISIBLE);
-                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, asList(i.ms.messages)));
-                mediaCount.setText(String.valueOf(i.ms.totalCount));
+                mediaPreview.setAdapter(new MediaPreviewAdapter(ctx, i.ms));
+                mediaCount.setText(String.valueOf(i.totalCount));
             }
         }
     }

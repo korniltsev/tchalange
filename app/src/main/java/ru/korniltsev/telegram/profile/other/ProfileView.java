@@ -38,9 +38,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
-import static java.util.Arrays.asList;
 import static ru.korniltsev.telegram.common.AppUtils.call;
 import static ru.korniltsev.telegram.common.AppUtils.copy;
+import static ru.korniltsev.telegram.common.AppUtils.filterPhotosAndVideos;
 import static ru.korniltsev.telegram.common.AppUtils.flatten;
 import static ru.korniltsev.telegram.common.AppUtils.phoneNumberWithPlus;
 import static ru.korniltsev.telegram.common.AppUtils.uiName;
@@ -213,7 +213,8 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
             )));
         }
 
-        sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.SharedMedia(ms)));
+        sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.SharedMedia(
+                ms.totalCount, filterPhotosAndVideos(ms))));
 
         adapter.addAll(flatten(sections));
 
