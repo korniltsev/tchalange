@@ -12,14 +12,15 @@ import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.flow.utils.Utils;
-import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.functions.Func2;
 import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,9 +38,10 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
     final RXClient client;
     private final Observable<List<Contact>> request;
     private CompositeSubscription subscription;
-    private Observable<MeAndChat> requestOpen;
+    private Observable<MeAndChat> requestOpenChat;
     private final Context appCtx;
     final ContactList path;
+    private Subscription openChatSubscription = Subscriptions.empty();
 
     @Inject
     public ContactsPresenter(RXClient client, final Context appCtx, final ContactList path) {
@@ -101,8 +103,8 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
                                 .showContacts(response);
                     }
                 }));
-        if (requestOpen != null) {
-            subscribe();
+        if (requestOpenChat != null) {
+            subscribeOpenChat();
         }
     }
 
@@ -110,6 +112,7 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
     public void dropView(ContactListView view) {
         super.dropView(view);
         subscription.unsubscribe();
+        openChatSubscription.unsubscribe();
     }
 
     @Override
@@ -170,25 +173,25 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
     private void openConversation(TdApi.User user) {
         final Observable<TdApi.TLObject> me = client.sendRx(new TdApi.GetMe());
         final Observable<TdApi.TLObject> chat = client.sendRx(new TdApi.CreatePrivateChat(user.id));
-        requestOpen = Observable.zip(me, chat, new Func2<TdApi.TLObject, TdApi.TLObject, MeAndChat>() {
+        requestOpenChat = Observable.zip(me, chat, new Func2<TdApi.TLObject, TdApi.TLObject, MeAndChat>() {
             @Override
             public MeAndChat call(TdApi.TLObject tlObject, TdApi.TLObject tlObject2) {
                 return new MeAndChat((TdApi.User) tlObject, (TdApi.Chat) tlObject2);
             }
         }).observeOn(mainThread())
                 .cache();
-        subscribe();
+        subscribeOpenChat();
     }
 
-    private void subscribe() {
-        subscription.add(
-                requestOpen.subscribe(new ObserverAdapter<MeAndChat>() {
-                    @Override
-                    public void onNext(MeAndChat response) {
-                        final Chat newTop = new Chat(response.tlObject2, response.tlObject);
-                        openChat(newTop);
-                    }
-                }));
+    private void subscribeOpenChat() {
+        openChatSubscription.unsubscribe();
+        openChatSubscription = requestOpenChat.subscribe(new ObserverAdapter<MeAndChat>() {
+            @Override
+            public void onNext(MeAndChat response) {
+                final Chat newTop = new Chat(response.tlObject2, response.tlObject);
+                openChat(newTop);
+            }
+        });
     }
 
     private void openChat(Chat newTop) {
