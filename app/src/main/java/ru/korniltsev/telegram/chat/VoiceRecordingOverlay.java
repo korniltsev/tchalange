@@ -31,7 +31,6 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 import rx.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
@@ -39,11 +38,15 @@ import java.util.concurrent.TimeUnit;
 
 import static android.view.MotionEvent.*;
 import static junit.framework.Assert.assertNotNull;
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 public class VoiceRecordingOverlay extends FrameLayout {
 
     public static final Interpolator INTERPOLATOR = new DecelerateInterpolator(1.5f);
     public static final int SLIDE_DURATION = 256;
+    public static final DecelerateInterpolator VALUE = new DecelerateInterpolator(1.5f);
+    public static final int AMPLITUDE_ANIMATION_DURATION = 300;
+    private final int dip2;
     private View anchor;
     private TextView time;
     private View voicePanel;
@@ -61,18 +64,24 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private ObjectAnimator redButtonAnimation;
     private int redButtonFinalRadius;
     private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint paintAmplitude = new Paint(Paint.ANTI_ALIAS_FLAG);
     private int redDotBottomPadding;
     private Drawable microphone;
     private boolean stopCancelled;
     private boolean ignoreUpAndMove;
     private View slideToCanel;
     private Subscription amplitudeSubscriptions = Subscriptions.empty();
+    private ObjectAnimator amplitudeAnimation;
+    private int amplitudeMaxRadiusAddition ;
 
     public VoiceRecordingOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         setWillNotDraw(false);
-//        setLayerType(LAYER_TYPE_SOFTWARE, null);
+        amplitudeMaxRadiusAddition = calc.dp(24f);
+        paintAmplitude.setColor(0x10000000);
+        dip2 = calc.dp(2);
+        //        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     @Override
@@ -88,7 +97,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         dp48 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, getResources().getDisplayMetrics());
         everySecond = Observable.timer(0, 1, TimeUnit.SECONDS)
                 .onBackpressureDrop()
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(mainThread());
 
         redDotAnimation = ObjectAnimator.ofFloat(redDot, ALPHA, 1f, 0.2f);
         redDotAnimation.setRepeatCount(ObjectAnimator.INFINITE);
@@ -271,13 +280,27 @@ public class VoiceRecordingOverlay extends FrameLayout {
 
     private void startImpl() {
         amplitudeSubscriptions = recorder.record()
+                .sample(AMPLITUDE_ANIMATION_DURATION, TimeUnit.MILLISECONDS)
                 .onBackpressureDrop()
+                .observeOn(mainThread())
                 .subscribe(new ObserverAdapter<Double>() {
                     @Override
                     public void onNext(Double response) {
-                        Log.d("VoiceRecordingOverlay", "amplitude" + response);
+                        animateAmplitude(response);
                     }
                 });
+    }
+
+    final float max = 500f;
+    private void animateAmplitude(Double response) {
+        float normalized = (float) (Math.min(response, max) / max);
+        if (amplitudeAnimation != null){
+            amplitudeAnimation.cancel();
+        }
+        amplitudeAnimation = ObjectAnimator.ofFloat(this, AMPLITUDE, amplitude, normalized);
+        amplitudeAnimation.setDuration(AMPLITUDE_ANIMATION_DURATION);
+        amplitudeAnimation.setInterpolator(VALUE);
+        amplitudeAnimation.start();
     }
 
     private void scaleInRedButton() {
@@ -333,10 +356,23 @@ public class VoiceRecordingOverlay extends FrameLayout {
     @Override
     public void draw(@NonNull Canvas canvas) {
         super.draw(canvas);
+        int centerX = getRight() - redDotRightPadding;
+        int centerY = getBottom() - redDotBottomPadding;
+
+        if (amplitude != 0f && !(animating)) {
+            float radius = redButtonFinalRadius + dip2 + amplitude * amplitudeMaxRadiusAddition;
+            float l = centerX - radius;
+            float r = centerX + radius;
+
+            float t = centerY - radius;
+            float b = centerY + radius;
+            rectF.set(l, t, r, b);
+            canvas.drawOval(rectF, paintAmplitude);
+        }
+
         if (redDotRadius != 0f) {
             final float radius = getRedButtonRadius() * redButtonFinalRadius;
-            int centerX = getRight() - redDotRightPadding;
-            int centerY = getBottom() - redDotBottomPadding;
+
 
             float l = centerX - radius;
             float r = centerX + radius;
@@ -353,6 +389,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
             microphone.draw(canvas);
             canvas.restore();
         }
+
     }
 
     public static Property<VoiceRecordingOverlay, Float> RADIUS = new Property<VoiceRecordingOverlay, Float>(Float.class, "RADIUS") {
@@ -394,7 +431,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         invalidate();
     }
 
-    public static Property<VoiceRecordingOverlay, Integer> RED_DOT_RIGHT_PADDING = new Property<VoiceRecordingOverlay, Integer>(Integer.class, "RED_DOT_RIGHT_PADDING") {
+    private static Property<VoiceRecordingOverlay, Integer> RED_DOT_RIGHT_PADDING = new Property<VoiceRecordingOverlay, Integer>(Integer.class, "RED_DOT_RIGHT_PADDING") {
         @Override
         public Integer get(VoiceRecordingOverlay object) {
             return object.getRedDotRightPadding();
@@ -405,4 +442,21 @@ public class VoiceRecordingOverlay extends FrameLayout {
             object.setRedDotRightPadding(value);
         }
     };
+
+    private float amplitude = 0f;
+    private static Property<VoiceRecordingOverlay, Float> AMPLITUDE = new Property<VoiceRecordingOverlay, Float>(Float.class, "VOICE_AMPLITUDE") {
+
+        @Override
+        public Float get(VoiceRecordingOverlay object) {
+            return object.amplitude;
+        }
+
+        @Override
+        public void set(VoiceRecordingOverlay object, Float value) {
+            object.amplitude = value;
+            object.invalidate();
+        }
+    };
+
+
 }
