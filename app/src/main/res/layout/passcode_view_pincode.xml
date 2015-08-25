@@ -25,7 +25,7 @@
             android:textColor="#d3eafb"
             android:paddingBottom="12dp"
             android:text="@string/enter_your_password"/>
-    <TextView
+    <EditText
             android:id="@+id/passcode_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,6 +35,9 @@
             android:gravity="center_horizontal"
             android:textSize="16sp"
             android:textColor="#fff"
+            android:inputType="textPassword"
+            android:editable="false"
+            android:enabled="false"
             style="@style/MyEditTextCompat"
             />
 </FrameLayout>

@@ -66,18 +66,8 @@ public class PincodeController extends Controller {
         passcodeField.setBackgroundDrawable(wrappedDrawable);
         calc = MyApp.from(ctx).calc;
         passcodeField.setPadding(0, calc.dp(4f), 0, calc.dp(8f));
-        passcodeField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    enterPasscode();
-                    return true;
-                }
-                return false;
-            }
-        });
         passcodeField.setTransformationMethod(PasswordTransformationMethod.getInstance());
-        passcodeField.setSingleLine(true);
+
 
         switch (lock.actionType) {
             case PasscodePath.TYPE_LOCK:
@@ -232,7 +222,7 @@ public class PincodeController extends Controller {
             case PasscodePath.TYPE_SET:
                 if (firstPassword == null) {
                     final String text = textFrom(passcodeField);
-                    if (text.isEmpty()) {
+                    if (text.length() < 4) {
                         passcodeField.setError(ctx.getString(R.string.pin_cannot_be_empty));
                         return;
                     }

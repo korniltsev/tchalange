@@ -134,8 +134,8 @@
     <string name="change_pass">Change Passcode</string>
     <string name="auto_lock">Auto-Lock</string>
     <string name="enter_passcode_menu">Enter passcode</string>
-    <string name="password_cannot_be_empty">Password cannot be empty</string>
-    <string name="pin_cannot_be_empty">PIN cannot be empty</string>
+    <string name="password_cannot_be_empty">Password is too short</string>
+    <string name="pin_cannot_be_empty">PIN is too short</string>
     <string name="pattern_cannot_be_empty">Pattern is too short</string>
     <string name="wrong_password">Wrong password</string>
     <string name="wrong_pattern">Wrong pattern</string>

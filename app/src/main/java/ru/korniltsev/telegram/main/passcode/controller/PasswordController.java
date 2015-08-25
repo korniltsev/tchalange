@@ -16,6 +16,7 @@ import flow.Flow;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
+import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
@@ -81,6 +82,7 @@ public class PasswordController extends Controller {
                 passCodeHint.setText(R.string.enter_your_password);
                 break;
         }
+        Utils.toggleKeyboard(passcodeField);
     }
 
     @Override
@@ -103,7 +105,7 @@ public class PasswordController extends Controller {
             case PasscodePath.TYPE_SET:
                 if (firstPassword == null) {
                     final String text = textFrom(passcodeField);
-                    if (text.isEmpty()) {
+                    if (text.length() < 4) {
                         passcodeField.setError(ctx.getString(R.string.password_cannot_be_empty));
                         return;
                     }

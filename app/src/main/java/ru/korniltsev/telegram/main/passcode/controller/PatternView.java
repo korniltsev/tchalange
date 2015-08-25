@@ -44,7 +44,7 @@ public class PatternView extends View {
         for (int i =0; i < DOT_COUNT * DOT_COUNT; ++i) {
             points.add(new Point(i));
         }
-        touchRadius = calc.dp(16f);
+        touchRadius = calc.dp(20f);
     }
 
     boolean pointerDown = false;

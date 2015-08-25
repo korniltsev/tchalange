@@ -12,6 +12,7 @@ import mortar.dagger1support.ObjectGraphService;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
+import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
@@ -109,11 +110,24 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
         popup.showAtLocation(title, 0, calc.dp(48), calc.dp(28));
     }
 
-    private void toggle(int typePassword) {
+    private void toggle(final int typePassword) {
         if (this.lock.setPasswordType == typePassword) {
             return;
         }
+        if (this.lock.setPasswordType == PasscodeManager.TYPE_PASSWORD){
+            hideKeyboard();
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    toggleImpl(typePassword);
+                }
+            }, 32);
+        } else {
+            toggleImpl(typePassword);
+        }
+    }
 
+    private void toggleImpl(int typePassword) {
         AppUtils.flowPushAndRemove(this,
                 new PasscodePath(PasscodePath.TYPE_SET, typePassword),
                 new FlowHistoryStripper() {
@@ -184,7 +198,7 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
     }
 
     public void hideKeyboard() {
-        //        Utils.hideKeyboard(passcodeField);
+        Utils.hideKeyboard(this);
     }
 
 
