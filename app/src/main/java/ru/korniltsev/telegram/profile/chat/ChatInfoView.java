@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.drinkless.td.libcore.telegram.TdApi.File.NO_FILE_ID;
 import static ru.korniltsev.telegram.common.AppUtils.flatten;
 
@@ -171,7 +172,9 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
         final ChatInfoAdapter.ButtonItem buttonItem = new ChatInfoAdapter.ButtonItem();
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(buttonItem));
 
-        final ChatInfoAdapter.MediaItem mediaItem = new ChatInfoAdapter.MediaItem(ms.totalCount, AppUtils.filterPhotosAndVideos(ms));
+        final ChatInfoAdapter.MediaItem mediaItem = new ChatInfoAdapter.MediaItem(ms.totalCount,
+                AppUtils.filterPhotosAndVideos(
+                        asList(ms.messages)));
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(mediaItem));
 
         final ArrayList<ChatInfoAdapter.Item> participantsItems = new ArrayList<>();

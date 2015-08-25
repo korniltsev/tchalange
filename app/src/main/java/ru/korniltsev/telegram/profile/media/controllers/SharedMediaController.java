@@ -10,6 +10,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -83,7 +84,7 @@ public class SharedMediaController extends MediaController {
     }
 
     private void refreshData() {
-        final List<SharedMediaAdapter.Item> split = split(helper.msg);
+        final List<SharedMediaAdapter.Item> split = split(AppUtils.filterPhotosAndVideos(helper.msg));
         adapter.setData(split);
     }
 

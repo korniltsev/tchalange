@@ -311,9 +311,9 @@ public class AppUtils {
         return lists;
     }
 
-    public static List<TdApi.Message> filterPhotosAndVideos(TdApi.Messages ms) {
+    public static List<TdApi.Message> filterPhotosAndVideos(List<TdApi.Message> ms) {
         final ArrayList<TdApi.Message> res = new ArrayList<>();
-        for (TdApi.Message msg : ms.messages) {
+        for (TdApi.Message msg : ms) {
             if (msg.message instanceof TdApi.MessagePhoto
                     || msg.message instanceof TdApi.MessageVideo){
                 res.add(msg);

@@ -34,6 +34,7 @@ import ru.korniltsev.telegram.profile.decorators.TopShadow;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -214,7 +215,8 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
         }
 
         sections.add(Collections.<ProfileAdapter.Item>singletonList(new ProfileAdapter.SharedMedia(
-                ms.totalCount, filterPhotosAndVideos(ms))));
+                ms.totalCount, filterPhotosAndVideos(
+                Arrays.asList(ms.messages)))));
 
         adapter.addAll(flatten(sections));
 
