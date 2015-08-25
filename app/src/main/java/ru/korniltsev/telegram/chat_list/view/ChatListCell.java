@@ -319,6 +319,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
         ellipsizedText = TextUtils.ellipsize(firstLine, p, spaceLeft, TextUtils.TruncateAt.END);
         textLayout = new StaticLayout(ellipsizedText, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+
     }
 
     @Override

@@ -121,7 +121,7 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
                 public void run() {
                     toggleImpl(typePassword);
                 }
-            }, 32);
+            }, 64);//todo wtf!
         } else {
             toggleImpl(typePassword);
         }

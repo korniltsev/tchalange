@@ -26,6 +26,7 @@ public class PatternView extends View {
 //    private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private float lastX;
     private float lastY;
+    private boolean selected;
 
     public PatternView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -59,6 +60,7 @@ public class PatternView extends View {
             for (int i = 0, pointsSize = points.size(); i < pointsSize; i++) {
                 Point point = points.get(i);
                 if (isIntersect(point)) {
+                    selected = false;
                     selectedPoints.clear();
                     selectedPoints.add(point);
                     pointerDown = true;
@@ -75,8 +77,9 @@ public class PatternView extends View {
                     if (isIntersect(point) && !(selectedPoints.contains(point))){
                         selectedPoints.add(point);
                     }
-                    if (selectedPoints.size() == points.size()) {
+                    if (selectedPoints.size() == points.size() && !selected) {
                         pointerDown = false;
+                        selected = true;
                         callback.selected(selectedPoints);
                     }
                 }
@@ -84,7 +87,7 @@ public class PatternView extends View {
             }
         }
         if (actionMasked == MotionEvent.ACTION_UP){
-            if (selectedPoints.size() > 1){
+            if (selectedPoints.size() > 1 && !selected){
                 callback.selected(selectedPoints);
             }
             pointerDown = false;
