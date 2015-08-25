@@ -74,6 +74,7 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
         adapter.addFirst(new ProfileAdapter.KeyValueItem(0, "", "", null));//header
         listLayout = new LinearLayoutManager(getContext());
         list = ((RecyclerView) findViewById(R.id.list));
+        list.setItemAnimator(null);
         list.setLayoutManager(listLayout);
         list.setAdapter(adapter);
 

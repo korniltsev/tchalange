@@ -67,6 +67,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
         listLayout = new LinearLayoutManager(getContext());
         list = ((RecyclerView) findViewById(R.id.list));
         list.setLayoutManager(listLayout);
+        list.setItemAnimator(null);
         list.setAdapter(adapter);
 
         toolbar = ToolbarUtils.initToolbar(this)
