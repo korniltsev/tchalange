@@ -68,13 +68,19 @@ public class BotReplyButton extends View {
         int textWi = width - padding * 2;
         this.layout = new StaticLayout(text, textPaint, textWi, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
 
-        int maxWidth = 0;
+        float maxWidth = 0;
+        float maxLineLeft = 0;
         for (int i = 0; i < layout.getLineCount(); ++i) {
-            maxWidth = (int) Math.max(maxWidth, layout.getLineWidth(i));
+            final float lineWidth = layout.getLineWidth(i);
+            if (lineWidth > maxWidth) {
+                maxWidth = lineWidth;
+                maxLineLeft = layout.getLineLeft(i);
+            }
+//            maxWidth = (int) Math.max(maxWidth, lineWidth);
         }
 
 
-        tx = padding + (width - padding * 2 - maxWidth) / 2 - layout.getLineLeft(0);
+        tx = padding + (width - padding * 2 - maxWidth) / 2 - maxLineLeft;
         ty = (getHeight() - layout.getHeight()) / 2;
 
         r.set(0, 0, getWidth(), getHeight());
