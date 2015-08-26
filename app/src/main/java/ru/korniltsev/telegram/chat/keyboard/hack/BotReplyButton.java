@@ -23,7 +23,7 @@ public class BotReplyButton extends View {
     private CharSequence text;
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private StaticLayout layout;
-    private int tx;
+    private float tx;
     private int ty;
 
     public BotReplyButton(Context context) {
@@ -73,7 +73,8 @@ public class BotReplyButton extends View {
             maxWidth = (int) Math.max(maxWidth, layout.getLineWidth(i));
         }
 
-        tx = padding + (width - padding * 2 - maxWidth) / 2;
+
+        tx = padding + (width - padding * 2 - maxWidth) / 2 - layout.getLineLeft(0);
         ty = (getHeight() - layout.getHeight()) / 2;
 
         r.set(0, 0, getWidth(), getHeight());
