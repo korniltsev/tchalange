@@ -81,12 +81,10 @@ public class ChatDB {
         int width = displaymetrics.widthPixels;
         int maxSize = Math.max(width, height);
 
-        int aproxRowHeight = calc.dp(72);
-        int limit = (int) (1.5 * maxSize / aproxRowHeight);
-        chatLimit = Math.max(15, limit);
+        chatLimit = 50;
 
         int aproxMessageHeight = calc.dp(41);
-        limit = (int) (1.5 * maxSize / aproxMessageHeight);
+        int limit = (int) (1.5 * maxSize / aproxMessageHeight);
         messageLimit = Math.max(limit, 20);
         auth.listen()
                 .subscribe(new ObserverAdapter<RXAuthState.AuthState>() {
