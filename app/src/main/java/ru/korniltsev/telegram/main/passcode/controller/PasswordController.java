@@ -99,7 +99,7 @@ public class PasswordController extends Controller {
                 if (!unlocked) {
                     passcodeField.setError(ctx.getString(R.string.wrong_password));
                 } else {
-                    //                    hideKeyboard();
+                    Utils.hideKeyboard(passcodeField);
                 }
                 break;
             case PasscodePath.TYPE_SET:
@@ -115,7 +115,7 @@ public class PasswordController extends Controller {
                 } else {
                     if (firstPassword.equals(textFrom(passcodeField))) {
                         setNewPassword(firstPassword);
-                        //                        hideKeyboard();
+                        Utils.hideKeyboard(passcodeField);
                     } else {
                         passcodeField.setError("Passwords does not match");
                     }
