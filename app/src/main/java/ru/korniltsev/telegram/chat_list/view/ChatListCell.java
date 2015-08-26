@@ -74,8 +74,9 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     private TextPaint textPaint;
     private StaticLayout textLayout;
     private int textLayoutDY;
-    private int textLayoutDX;
+    private float textLayoutDX;
     private CharSequence ellipsizedText;
+    private float titleLayoutFirstLineLeft;
 
     public ChatListCell(Context context) {
         super(context);
@@ -148,7 +149,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
                 - cellPaddingRight;
         final Typeface textTypeFace = Typeface.create("sans-serif", 0);
         textLayoutDY = calc.dp(40);
-        textLayoutDX = avatarViewSize + avatarViewMargin * 2;
+
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextSize(calc.dpFloat(15));
         textPaint.setColor(0xFF8A8A8A);
@@ -192,8 +193,15 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
                         titlePaddingLeftRight *2
                         - (displayWidth - timeLeft)
                         - icGroup.getIntrinsicWidth());
-        final CharSequence ellipsized = TextUtils.ellipsize(title, titlePaint, spaceLeftForNick - calc.dp(12), TextUtils.TruncateAt.END);
+        final String titleWithoutNewLines;
+        if (title.contains("\n")){
+            titleWithoutNewLines = title.replaceAll("\n", "");
+        } else {
+            titleWithoutNewLines = title;
+        }
+        final CharSequence ellipsized = TextUtils.ellipsize(titleWithoutNewLines, titlePaint, spaceLeftForNick - calc.dp(12), TextUtils.TruncateAt.END);
         titleLayout = new StaticLayout(ellipsized, titlePaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        titleLayoutFirstLineLeft = titleLayout.getLineLeft(0);
     }
 
     private void layoutIconGroup() {
@@ -263,7 +271,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         if (drawGroupChatIcon) {
             dx += icGroup.getIntrinsicWidth() + titlePaddingLeftRight;
         }
-
+        dx -= titleLayoutFirstLineLeft;
         canvas.translate(dx, titlePaddingTop);
         titleLayout.draw(canvas);
         canvas.restore();
@@ -278,7 +286,11 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         }
 
         canvas.save();
+
         canvas.translate(textLayoutDX, textLayoutDY);
+
+        final Layout.Directions lineDirections = textLayout.getLineDirections(0);
+
         textLayout.draw(canvas);
         canvas.restore();
 
@@ -319,6 +331,8 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
         ellipsizedText = TextUtils.ellipsize(firstLine, p, spaceLeft - calc.dp(12), TextUtils.TruncateAt.END);
         textLayout = new StaticLayout(ellipsizedText, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        textLayoutDX = avatarViewSize + avatarViewMargin * 2 - textLayout.getLineLeft(0);
+
 //        if (textLayout.getLineCount() > 1) {
 //            throw new RuntimeException();
 //        }
