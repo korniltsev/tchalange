@@ -88,6 +88,9 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
     public ChatListCell(Context context) {
         super(context);
+        final MyApp app = MyApp.from(context);
+        emoji = app.emoji;
+        calc = app.calc;
 
         if (dividerPaint == null){
 
@@ -126,9 +129,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
 
 
-        final MyApp app = MyApp.from(context);
-        emoji = app.emoji;
-        calc = app.calc;
+
         dip72 = calc.dp(72);
         this.dividerStart = dip72;
         displayWidth = app.displayWidth;
