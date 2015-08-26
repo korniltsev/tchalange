@@ -50,14 +50,12 @@ public class CustomCeilLayout extends ViewGroup {
     public final SquareDumbResourceView iconRight3;
 
     private String time;
-    private TextPaint timePaint;
     private StaticLayout timeLayout;
     private int timeWidth;
     private final int timePadding;
 
     //nick
     private String nick;
-    private TextPaint nickPaint;
     private Layout nickLayout;
     private int nickWidth;
     private int nickHeight;
@@ -66,6 +64,10 @@ public class CustomCeilLayout extends ViewGroup {
     //content
     private View contentView;
     private int marginBetweenNickAndContentView;
+
+
+    private static TextPaint nickPaint;
+    private static TextPaint timePaint;
 
 
     boolean bottomMarginEnabled = true;
@@ -114,15 +116,18 @@ public class CustomCeilLayout extends ViewGroup {
 
         //time
         timePadding = calc.dp(8);
-        timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        timePaint.setTextSize(calc.dpFloat(14));
-        timePaint.setColor(0xff939494);
+        if (timePaint == null){
+            timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            timePaint.setTextSize(calc.dpFloat(14));
+            timePaint.setColor(0xff939494);
 
-        //nick
-        nickPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        nickPaint.setTextSize(calc.dpFloat(14));
-        nickPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        nickPaint.setColor(Colors.USER_NAME_COLOR);
+
+            nickPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            nickPaint.setTextSize(calc.dpFloat(14));
+            nickPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            nickPaint.setColor(Colors.USER_NAME_COLOR);
+        }
+
 
         marginBetweenNickAndContentView = calc.dp(4);
         setWillNotDraw(false);

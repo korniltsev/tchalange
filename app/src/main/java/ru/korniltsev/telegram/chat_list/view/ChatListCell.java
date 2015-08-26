@@ -37,8 +37,16 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     public static final int STATE_IC_CLOCK = 1;
     public static final int STATE_IC_NULL = 2;
 
+    private static Paint dividerPaint;
+    private static TextPaint messagePaint;
+    private static TextPaint textPaintSystem;
+    private static TextPaint timePaint;
+    private static TextPaint titlePaint;
+    private static TextPaint unreadPaint;
+    private static TextPaint textPaint;
+
+
     private final int dividerStart;
-    private final Paint dividerPaint;
     public final AvatarView avatarView;
     private final int dip72;
     private final int avatarViewMargin;
@@ -54,24 +62,24 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     private final int iconTopRightPadding;
     private final int titlePaddingLeftRight;
     private final int titlePaddingTop;
-    private final TextPaint messagePaint;
+
     private final Drawable icUnreadBadge;
-    private final TextPaint textPaintSystem;
+
     private final Emoji emoji;
 
     DpCalculator calc;
-    private TextPaint timePaint;
+
     private StaticLayout timeLayout;
     private float timeLeft;
-    private TextPaint titlePaint;
+
     private StaticLayout titleLayout;
     private int unreadCount;
-    private TextPaint unreadPaint;
+
     private StaticLayout unreadLayout;
     private float unreadTx;
     private float unreadTy;
     private int spaceLeftForText;
-    private TextPaint textPaint;
+
     private StaticLayout textLayout;
     private int textLayoutDY;
     private float textLayoutDX;
@@ -80,14 +88,51 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
     public ChatListCell(Context context) {
         super(context);
+
+        if (dividerPaint == null){
+
+            final Typeface typeface = RobotoMediumTextView.sGetTypeface(getContext());
+            final Typeface textTypeFace = Typeface.create("sans-serif", 0);
+
+
+            dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            dividerPaint.setColor(0xffd4d4d4);
+
+            timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            timePaint.setColor(0xFF999999);
+            timePaint.setTextSize(calc.dpFloat(13));
+
+            titlePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            titlePaint.setTextSize(calc.dpFloat(17));
+            titlePaint.setTypeface(typeface);
+
+            messagePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            messagePaint.setColor(0xFF8A8A8A);
+
+            unreadPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            unreadPaint.setTextSize(calc.dpFloat(14));
+            unreadPaint.setColor(Color.WHITE);
+
+            textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setTextSize(calc.dpFloat(15));
+            textPaint.setColor(0xFF8A8A8A);
+            textPaint.setTypeface(textTypeFace);
+
+            textPaintSystem = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            textPaintSystem.setTextSize(calc.dpFloat(15));
+            textPaintSystem.setColor(0xFF6D9DC0);
+            textPaintSystem.setTypeface(textTypeFace);
+        }
+
+
+
         final MyApp app = MyApp.from(context);
         emoji = app.emoji;
         calc = app.calc;
         dip72 = calc.dp(72);
         this.dividerStart = dip72;
         displayWidth = app.displayWidth;
-        dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        dividerPaint.setColor(0xffd4d4d4);
+
 
         avatarViewMargin = calc.dp(10f);
         avatarViewSize = calc.dp(52f);
@@ -113,21 +158,15 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         iconTopTopPadding = calc.dp(18f);
         iconTopRightPadding = calc.dp(6f);
 
-        timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        timePaint.setColor(0xFF999999);
-        timePaint.setTextSize(calc.dpFloat(13));
+
         cellPaddingRight = calc.dp(15);
         timeTopPadding = calc.dp(18f);
 
-        titlePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        titlePaint.setTextSize(calc.dpFloat(17));
-        final Typeface typeface = RobotoMediumTextView.sGetTypeface(getContext());
-        titlePaint.setTypeface(typeface);
+
         titlePaddingLeftRight = calc.dp(6f);
         titlePaddingTop = calc.dp(14f);
 
-        messagePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        messagePaint.setColor(0xFF8A8A8A);
+
 
         icUnreadBadge = res.getDrawable(R.drawable.ic_badge);
         assertNotNull(icUnreadBadge);
@@ -138,27 +177,18 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         icUnreadBadge.setBounds(left, top, right, bottom);
 
 
-        unreadPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        unreadPaint.setTextSize(calc.dpFloat(14));
-        unreadPaint.setColor(Color.WHITE);
+
 
 
 
         spaceLeftForText = displayWidth
                 - avatarViewSize - avatarViewMargin* 2
                 - cellPaddingRight;
-        final Typeface textTypeFace = Typeface.create("sans-serif", 0);
+
         textLayoutDY = calc.dp(40);
 
-        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTextSize(calc.dpFloat(15));
-        textPaint.setColor(0xFF8A8A8A);
-        textPaint.setTypeface(textTypeFace);
 
-        textPaintSystem = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaintSystem.setTextSize(calc.dpFloat(15));
-        textPaintSystem.setColor(0xFF6D9DC0);
-        textPaintSystem.setTypeface(textTypeFace);
+
 
 
 //        android:layout_height="72dp"
