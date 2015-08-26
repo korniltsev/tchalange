@@ -192,7 +192,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
                         titlePaddingLeftRight *2
                         - (displayWidth - timeLeft)
                         - icGroup.getIntrinsicWidth());
-        final CharSequence ellipsized = TextUtils.ellipsize(title, titlePaint, spaceLeftForNick, TextUtils.TruncateAt.END);
+        final CharSequence ellipsized = TextUtils.ellipsize(title, titlePaint, spaceLeftForNick - calc.dp(12), TextUtils.TruncateAt.END);
         titleLayout = new StaticLayout(ellipsized, titlePaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
     }
 
@@ -317,9 +317,11 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
             }
         }
 
-        ellipsizedText = TextUtils.ellipsize(firstLine, p, spaceLeft, TextUtils.TruncateAt.END);
+        ellipsizedText = TextUtils.ellipsize(firstLine, p, spaceLeft - calc.dp(12), TextUtils.TruncateAt.END);
         textLayout = new StaticLayout(ellipsizedText, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
-
+//        if (textLayout.getLineCount() > 1) {
+//            throw new RuntimeException();
+//        }
     }
 
     @Override
