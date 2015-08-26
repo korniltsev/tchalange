@@ -12,14 +12,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.emoji.images.Emoji;
 
-public class BotReplyButton extends View {
+public class BotReplyButton extends View implements Emoji.Listener {
     public static final int COLOR_UNPRESSED = 0xffE4E7E9;
     public static final int COLOR_PRESSED = 0xff75c1f7;
     private final DpCalculator calc;
     private final int padding;
     private final Paint pressedPaint;
     private final int radius;
+    private final Emoji emoji;
     private CharSequence text;
     private TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private StaticLayout layout;
@@ -28,7 +30,9 @@ public class BotReplyButton extends View {
 
     public BotReplyButton(Context context) {
         super(context);
-        calc = MyApp.from(context).calc;
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        emoji = app.emoji;
         padding = calc.dp(16f);
         textPaint.setColor(Color.BLACK);
         textPaint.setTextSize(calc.dp(16f));
@@ -86,6 +90,18 @@ public class BotReplyButton extends View {
         r.set(0, 0, getWidth(), getHeight());
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        emoji.addListener(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        emoji.removeListener(this);
+    }
+
     final RectF r = new RectF();
 
     @Override
@@ -97,5 +113,10 @@ public class BotReplyButton extends View {
         canvas.translate(tx, ty);
         layout.draw(canvas);
         canvas.restore();
+    }
+
+    @Override
+    public void pageLoaded(int page) {
+        invalidate();
     }
 }
