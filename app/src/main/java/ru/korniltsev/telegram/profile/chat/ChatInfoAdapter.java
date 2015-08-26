@@ -187,6 +187,8 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
         void btnAddMemberClicked();
 
         void participantClicked(ParticipantItem item);
+
+        void sharedMediaClicked();
     }
 
     class MediaVH extends RecyclerView.ViewHolder {
@@ -212,6 +214,12 @@ public class ChatInfoAdapter extends BaseAdapter<ChatInfoAdapter.Item, RecyclerV
 
                         outRect.set(dp8, 0, 0, 0);
                     }
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    cb.sharedMediaClicked();
                 }
             });
         }

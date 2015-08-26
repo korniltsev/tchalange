@@ -25,6 +25,7 @@ import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.edit.chat.title.EditChatTitlePath;
+import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import rx.Observable;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -196,6 +197,12 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                                 AppUtils.flowPushAndRemove(getView(), path, new LeaveOnlyChatList(), Flow.Direction.FORWARD);
                             }
                         }));
+    }
+
+    @Override
+    public void sharedMediaClicked() {
+        Flow.get(getView())
+                .set(new SharedMediaPath(path.chatId, SharedMediaPath.TYPE_MEDIA));
     }
 
     public void deleteAndLeave() {
