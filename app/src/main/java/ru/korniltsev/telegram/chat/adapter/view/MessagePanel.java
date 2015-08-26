@@ -65,7 +65,6 @@ public class MessagePanel extends FrameLayout {
             String strEmoji = emoji.toString(code);
             Editable text = input.getText();
             text.append(emoji.replaceEmoji(strEmoji));
-
         }
 
         @Override
@@ -74,14 +73,11 @@ public class MessagePanel extends FrameLayout {
         }
     };
 
-
-
     private AttachPanelPopup attachPanelPopup;
     private FrameUnderMessagePanelController bottomFrame;
     private View rightButtons;
     @Nullable private ViewPropertyAnimator currentAnimation;
     @Nullable private ViewPropertyAnimator currentAnimation2;
-
 
     @Nullable private List<BotCommandsAdapter.Record> botCommands;
     private ImageView btnBotCommand;
@@ -144,7 +140,6 @@ public class MessagePanel extends FrameLayout {
         });
         rightButtons = findViewById(R.id.right_buttons);
 
-
         findViewById(R.id.btn_attach).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,31 +150,18 @@ public class MessagePanel extends FrameLayout {
         btnBotCommand.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (botCommands != null) {
-                    if (replyMarkup != null){
-                        showOrHideBotCommands();
-                    } else {
+                if (replyMarkup != null) {
+                    showOrHideBotCommands();
+                } else if (botCommands != null) {
+                    final Editable text = input.getText();
+                    text.clear();
+                    text.insert(0, "/");
+                    input.requestFocus();
 
-
-                        final Editable text = input.getText();
-                        text.clear();
-                        text.insert(0, "/");
-                        input.requestFocus();
-
-                        if (bottomFrame.isBotKeyboardShown()
-                                || bottomFrame.isEmojiKeyboardShown()){
-                            doNotHideCommandsOnce = true;//quick dirty hack
-                            bottomFrame.showRegularKeyboard();
-                        }
-
-
-//                        if (bottomFrame.isEmojiKeyboardShown()){
-//
-//                        } else {
-//                            bottomFrame.dismisAnyKeyboard();
-//                        }
-//                        showKeyboard(input);
-
+                    if (bottomFrame.isBotKeyboardShown()
+                            || bottomFrame.isEmojiKeyboardShown()) {
+                        doNotHideCommandsOnce = true;//quick dirty hack
+                        bottomFrame.showRegularKeyboard();
                     }
                 }
                 updateBotButtonState();
@@ -188,7 +170,7 @@ public class MessagePanel extends FrameLayout {
     }
 
     private void showOrHideBotCommands() {
-        if (bottomFrame.isBotKeyboardShown()){
+        if (bottomFrame.isBotKeyboardShown()) {
             input.requestFocus();
             bottomFrame.showRegularKeyboard();
         } else {
@@ -289,11 +271,8 @@ public class MessagePanel extends FrameLayout {
         updateBotButtonState();
     }
 
-
-
-
     public void setCommands(List<BotCommandsAdapter.Record> cs) {
-        if (!cs.isEmpty()){
+        if (!cs.isEmpty()) {
             this.botCommands = cs;
         }
         updateBotButtonState();
@@ -301,34 +280,32 @@ public class MessagePanel extends FrameLayout {
 
     private void updateBotButtonState() {
         int icon = 0;
-        if (replyMarkup != null){
-            if (bottomFrame.isBotKeyboardShown()){
+        if (replyMarkup != null) {
+            if (bottomFrame.isBotKeyboardShown()) {
                 icon = R.drawable.ic_msg_panel_kb;
             } else {
-                icon =  R.drawable.ic_command;
+                icon = R.drawable.ic_command;
             }
-        } else if (botCommands != null ){
+        } else if (botCommands != null) {
             icon = R.drawable.ic_slash;
         }
-        if (icon == 0){
+        if (icon == 0) {
             btnBotCommand.setVisibility(View.GONE);
         } else {
             btnBotCommand.setVisibility(View.VISIBLE);
             btnBotCommand.setImageResource(icon);
         }
 
-        if (bottomFrame.isEmojiKeyboardShown()){
+        if (bottomFrame.isEmojiKeyboardShown()) {
             btnLeft.setImageResource(R.drawable.ic_msg_panel_kb);
         } else {
             btnLeft.setImageResource(R.drawable.ic_smiles);
         }
-
     }
 
     public void setOnAnyKeyboardShownListener(Runnable onAnyKeyboardShownListener) {
         this.onAnyKeyboardShownListener = onAnyKeyboardShownListener;
     }
-
 
     public void setReplyMarkup(TdApi.Message replyMarkup) {
         this.replyMarkup = replyMarkup;
