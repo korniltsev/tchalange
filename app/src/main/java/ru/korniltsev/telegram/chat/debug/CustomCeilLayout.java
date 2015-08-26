@@ -71,6 +71,7 @@ public class CustomCeilLayout extends ViewGroup {
 
 
     boolean bottomMarginEnabled = true;
+    private float nickLayoutFirstLineLeft;
 
     public CustomCeilLayout(Context ctx) {
         this(ctx, null);
@@ -215,6 +216,7 @@ public class CustomCeilLayout extends ViewGroup {
                     - timeWidth - iconRightSize - iconRightMarginRight;
             CharSequence str2 = TextUtils.ellipsize(nick, nickPaint, spaceLeftForNick, TextUtils.TruncateAt.END);
             this.nickLayout = getStaticLayoutForNick(spaceLeftForNick, str2);
+            nickLayoutFirstLineLeft = nickLayout.getLineLeft(0);
             nickWidth = (int) nickLayout.getLineWidth(0);
             nickHeight = nickLayout.getHeight();
         }
@@ -243,7 +245,7 @@ public class CustomCeilLayout extends ViewGroup {
         canvas.restore();
 
         canvas.save();
-        canvas.translate(nickLeft, paddingTopBottom);
+        canvas.translate(nickLeft - nickLayoutFirstLineLeft, paddingTopBottom);
         nickLayout.draw(canvas);
         canvas.restore();
 
