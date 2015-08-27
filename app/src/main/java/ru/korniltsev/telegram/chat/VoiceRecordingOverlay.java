@@ -359,7 +359,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
         int centerX = getRight() - redDotRightPadding;
         int centerY = getBottom() - redDotBottomPadding;
 
-        if (amplitude != 0f && !(animating)) {
+        if (amplitude != 0f && !(animating && started)) {
             float radius = redButtonFinalRadius + dip2 + amplitude * amplitudeMaxRadiusAddition;
             float l = centerX - radius;
             float r = centerX + radius;
