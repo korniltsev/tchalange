@@ -212,14 +212,23 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
 
     @Override
     public boolean onBackPressed() {
-        dismisPopup();
+        if (dismisPopup()){
+            return true;
+        }
+        final int selectedCount = mediaController.getSelectedMessagesIds().size();
+        if (selectedCount > 0){
+            mediaController.dropSelection();
+            return true;
+        }
         return false;
     }
 
-    private void dismisPopup() {
+    private boolean dismisPopup() {
         if (popup != null && popup.isShowing()){
             popup.dismiss();
+            return true;
         }
+        return false;
     }
 
     public void bind(SharedMediaPath path) {
