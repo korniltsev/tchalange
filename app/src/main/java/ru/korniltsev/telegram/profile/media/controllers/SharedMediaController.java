@@ -78,7 +78,7 @@ public class SharedMediaController extends MediaController {
 
 
         final int dip4 = calculator.dp(4);
-        list.setPadding(dip4, 0, dip4, 0);
+        list.setPadding(dip4, dip4, dip4, 0);
         list.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {

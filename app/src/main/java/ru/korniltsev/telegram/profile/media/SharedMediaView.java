@@ -1,5 +1,7 @@
 package ru.korniltsev.telegram.profile.media;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
@@ -39,19 +41,19 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
     @Inject SharedMediaPresenter presenter;
     private ToolbarUtils toolbarUtils;
     private RecyclerView list;
-    private DpCalculator dpCalculator;
+    private DpCalculator calc;
     private DropdownPopup popup;
     private TextView customView;
     private MediaController mediaController;
     private View secondToolbar;
-    private int toolbarVisible = -1;
+    private int toolbarVisible = 0;
     private TextView selectedItemsCount;
 
     public SharedMediaView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         final MyApp app = MyApp.from(this);
-        dpCalculator = app.calc;
+        calc = app.calc;
         rxClient = app.rxClient;
     }
 
@@ -68,7 +70,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
 
         list = ((RecyclerView) findViewById(R.id.list));
 
-        final int dp56 = dpCalculator.dp(56f);
+        final int dp56 = calc.dp(56f);
         setShadowOffset(dp56);
         customView = (TextView) toolbarUtils.getCustomView();
         Assert.assertNotNull(customView);
@@ -79,7 +81,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
             }
         });
 
-        final MiniPlayerView player = MiniPlayerViewFactory.construct(getContext(), dpCalculator);
+        final MiniPlayerView player = MiniPlayerViewFactory.construct(getContext(), calc);
         addView(player, 1);
         player.setShadow(this);
 
@@ -116,6 +118,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         });
 
         selectedItemsCount = (TextView) findViewById(R.id.selected_items_count_title);
+        secondToolbar.setPivotY(calc.dp(28));
     }
 
     private void cancel() {
@@ -123,18 +126,33 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
 
     }
 
-    public void setToolbarVisible(int visible){
-        if (this.toolbarVisible == visible){
+    public void setToolbarVisible(int selected){
+        if (this.toolbarVisible == selected){
             return;
         }
-        if (visible > 0 ){
+        secondToolbar.animate()
+                .cancel();
+        if (this.toolbarVisible == 0 && selected > 0) {
             secondToolbar.setVisibility(View.VISIBLE);
-            selectedItemsCount.setText(String.valueOf(visible));
-        } else {
-            secondToolbar.setVisibility(View.GONE);
+            secondToolbar.setScaleY(0);
 
+            secondToolbar.animate()
+                    .setDuration(128)
+                    .setListener(null)
+                    .scaleY(1f);
+            selectedItemsCount.setText(String.valueOf(selected));
+        } else if (this.toolbarVisible != 0 && selected == 0){
+            secondToolbar.animate()
+                    .scaleY(0f)
+                    .setDuration(128)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            secondToolbar.setVisibility(View.GONE);
+                        }
+                    });
         }
-        this.toolbarVisible = visible;
+        this.toolbarVisible = selected;
     }
 
 
@@ -158,7 +176,7 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         }));
         popup = new DropdownPopup(getContext(), items);
 
-        popup.showAtLocation(customView, 0, dpCalculator.dp(48), dpCalculator.dp(28));
+        popup.showAtLocation(customView, 0, calc.dp(48), calc.dp(28));
     }
 
     private void toggle(int typeMedia) {
