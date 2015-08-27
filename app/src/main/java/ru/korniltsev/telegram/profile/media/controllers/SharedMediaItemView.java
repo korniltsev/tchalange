@@ -6,6 +6,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,7 +29,10 @@ import static ru.korniltsev.telegram.core.views.DownloadView.Config.FINAL_ICON_E
 public class SharedMediaItemView extends FrameLayout {
 
     public static final BlurTransformation BLUR = new BlurTransformation(6);
-    public static final float SCALE_SELECTED = 0.8f;
+    public static final float SCALE_SELECTED = 0.83f;
+    public static final int DURATION = 128;
+    public static final AccelerateInterpolator ACCELERATE_INTERPOLATOR = new AccelerateInterpolator(1.5f);
+    public static final DecelerateInterpolator DECELERATE_INTERPOLATOR = new DecelerateInterpolator(1.5f);
     private final RxGlide picasso;
     private final RxDownloadManager downloader;
     private final int dip100;
@@ -176,10 +181,14 @@ public class SharedMediaItemView extends FrameLayout {
                 .cancel();
         if (in) {
             content.animate()
+                    .setDuration(DURATION)
                     .scaleX(SCALE_SELECTED)
+                    .setInterpolator(DECELERATE_INTERPOLATOR)
                     .scaleY(SCALE_SELECTED);
         } else {
             content.animate()
+                    .setDuration(DURATION)
+                    .setInterpolator(ACCELERATE_INTERPOLATOR)
                     .scaleX(1f)
                     .scaleY(1f);
         }
@@ -194,11 +203,13 @@ public class SharedMediaItemView extends FrameLayout {
             v.setScaleY(0);
             v.animate()
                     .scaleX(1)
+                    .setDuration(DURATION)
                     .scaleY(1)
                     .setListener(null);
         } else {
             v.animate()
                     .scaleX(0)
+                    .setDuration(DURATION)
                     .scaleY(0)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override

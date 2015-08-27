@@ -31,6 +31,7 @@ import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBack{
     public static final int IC_BACK = ru.korniltsev.telegram.utils.R.drawable.abc_ic_ab_back_mtrl_am_alpha;
@@ -102,13 +103,15 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         menuForward.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                final Set<Integer> selected = mediaController.getSelectedMessagesIds();
+                presenter.forwardMessages(selected);
             }
         });
         menuDelete.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                final Set<Integer> selectedMessages = mediaController.getSelectedMessagesIds();
+                presenter.deleteMessages(selectedMessages);
             }
         });
 
@@ -207,5 +210,10 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         } else {
             mediaController = new AudioMessagesController(this, list, customView, presenter.path, rxClient);
         }
+    }
+
+    public void messagesDeleted(int[] msgIds) {
+        mediaController.messagesDeleted(msgIds);
+
     }
 }

@@ -43,6 +43,7 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
             }
         });
         cb.itemsSelected(0);
+
     }
 
     public interface Callback {
@@ -56,8 +57,18 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
         this.list = list;
         rxGlide = ObjectGraphService.getObjectGraph(ctx).get(RxGlide.class);
         dip100 = MyApp.from(ctx).calc.dp(100);
+        setHasStableIds(true);
 
+    }
 
+    @Override
+    public long getItemId(int position) {
+        final Item item = getItem(position);
+        if (item instanceof Section) {
+            return ((Section) item).id;
+        }
+        final Media m = (Media) item;
+        return m.msg.id;
     }
 
     @Override
@@ -217,9 +228,11 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
 
     static class Section extends Item {
         final DateTime time;
+        private final int id;
 
-        Section(DateTime time) {
+        Section(DateTime time, int id) {
             this.time = time;
+            this.id = id;
         }
     }
 

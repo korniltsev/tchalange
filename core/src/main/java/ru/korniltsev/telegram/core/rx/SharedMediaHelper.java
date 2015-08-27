@@ -3,8 +3,10 @@ package ru.korniltsev.telegram.core.rx;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.PublishSubject;
+import rx.subscriptions.Subscriptions;
 
 import javax.security.auth.Subject;
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ public class SharedMediaHelper {
         final long chatId;
         public final List<TdApi.Message> msg;
         final PublishSubject<List<TdApi.Message>> historyListener = PublishSubject.create();
+        private Subscription subscription = Subscriptions.empty();
 
         public PublishSubject<List<TdApi.Message>> getHistoryListener() {
             return historyListener;
@@ -62,7 +65,7 @@ public class SharedMediaHelper {
             if (!msg.isEmpty()) {
                 fromId = msg.get(msg.size() - 1).id;
             }
-            client.sendRx(new TdApi.SearchMessages(chatId, "", fromId, 50, new TdApi.SearchMessagesFilterPhotoAndVideo()))
+            subscription = client.sendRx(new TdApi.SearchMessages(chatId, "", fromId, 50, new TdApi.SearchMessagesFilterPhotoAndVideo()))
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new ObserverAdapter<TdApi.TLObject>() {
                         @Override
@@ -70,7 +73,7 @@ public class SharedMediaHelper {
                             requestInProgress = false;
 
                             TdApi.Messages history = (TdApi.Messages) response;
-                            if (history.messages.length == 0){
+                            if (history.messages.length == 0) {
                                 downloadedAll = true;
                             }
                             Collections.addAll(msg, history.messages);
@@ -86,6 +89,13 @@ public class SharedMediaHelper {
 
         public boolean isDownloadedAll() {
             return downloadedAll;
+        }
+
+        public void clear() {
+            msg.clear();
+            downloadedAll = false;
+            requestInProgress = false;
+            subscription.unsubscribe();
         }
     }
 }

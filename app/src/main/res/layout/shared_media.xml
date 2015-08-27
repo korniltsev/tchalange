@@ -67,6 +67,9 @@
     <android.support.v7.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:paddingTop="48dp"
+            android:clipToPadding="false"
+            />
 
 </ru.korniltsev.telegram.profile.media.SharedMediaView>

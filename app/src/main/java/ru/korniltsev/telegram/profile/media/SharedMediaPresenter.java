@@ -6,11 +6,15 @@ import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import java.util.Set;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -29,35 +33,45 @@ public class SharedMediaPresenter extends ViewPresenter<SharedMediaView> {
     @Override
     protected void onLoad(Bundle savedInstanceState) {
         cs = new CompositeSubscription();
+
+        path.loadCount++;
+        if (path.loadCount == 1){
+            SharedMediaHelper.Holder helper = MyApp.from(getView().getContext()).sharedMediaHelper.getHolder(path.chatId);
+            helper.clear();
+        }
+
         getView().bind(path);
-//        try {
-//            final TdApi.Chat chat = (TdApi.Chat) client.sendRx(new TdApi.GetChat(path.chatId)).toBlocking().first();
-//            getView()
-//                    .bindTitle(chat);
-//        } catch (Exception e) {
-//            CrashlyticsCore.getInstance().logException(e);
-//        }
+
 
     }
-
-//    public void editName(String title) {
-//        cs.add(client.sendRx(new TdApi.ChangeChatTitle(path.chatId, title))
-//                .observeOn(mainThread())
-//                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-//                    @Override
-//                    public void onNext(TdApi.TLObject response) {
-//                        Flow.get(getView())
-//                                .goBack();
-//                    }
-//
-//                }));
-//    }
-
 
 
     @Override
     public void dropView(SharedMediaView view) {
         super.dropView(view);
         cs.unsubscribe();
+    }
+
+    public void deleteMessages(Set<Integer> selectedMessages) {
+        final int[] msgIds = new int[selectedMessages.size()];
+        int i = 0;
+        for (Integer msgId : selectedMessages) {
+            msgIds[i++] = msgId;
+        }
+        cs.add(
+                client.sendRx(new TdApi.DeleteMessages(path.chatId, msgIds))
+                        .observeOn(mainThread())
+                        .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+                            @Override
+                            public void onNext(TdApi.TLObject response) {
+                                TdApi.Ok res = (TdApi.Ok) response;
+                                getView()
+                                        .messagesDeleted(msgIds);
+                            }
+                        }));
+    }
+
+    public void forwardMessages(Set<Integer> selected) {
+
     }
 }

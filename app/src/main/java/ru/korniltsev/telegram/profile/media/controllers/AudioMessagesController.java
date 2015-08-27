@@ -26,6 +26,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class AudioMessagesController extends MediaController {
     private final SharedMediaView sharedMediaView;
@@ -154,6 +155,11 @@ public class AudioMessagesController extends MediaController {
 //    }
 
     @Override
+    public Set<Integer> getSelectedMessagesIds() {
+        throw new RuntimeException("unimplemented");
+    }
+
+    @Override
     public void drop() {
         subscription.unsubscribe();
 //        subscribe.unsubscribe();
@@ -161,6 +167,13 @@ public class AudioMessagesController extends MediaController {
 
     @Override
     public void dropSelection() {
+        throw new RuntimeException("unimplemented");
+
+    }
+
+    @Override
+    public void messagesDeleted(int[] msgIds) {
+        throw new RuntimeException("unimplemented");
 
     }
 }

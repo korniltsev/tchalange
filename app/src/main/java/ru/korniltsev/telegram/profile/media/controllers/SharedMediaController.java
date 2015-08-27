@@ -23,7 +23,9 @@ import rx.Subscription;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class SharedMediaController extends MediaController {
     private final SharedMediaView sharedMediaView;
@@ -96,7 +98,7 @@ public class SharedMediaController extends MediaController {
         final List<SharedMediaAdapter.Item> split = split(AppUtils.filterPhotosAndVideos(helper.msg));
         adapter.setData(split);
     }
-
+    private static int idCounter = -1;
     private List<SharedMediaAdapter.Item> split(List<TdApi.Message> msg) {
         if (msg.isEmpty()) {
             return Collections.emptyList();
@@ -104,7 +106,7 @@ public class SharedMediaController extends MediaController {
         final ArrayList<SharedMediaAdapter.Item> res = new ArrayList<>();
         TdApi.Message first = msg.get(0);
         DateTime prevDate = time(first);
-        res.add(new SharedMediaAdapter.Section(prevDate));
+        res.add(new SharedMediaAdapter.Section(prevDate, idCounter--));
         res.add(new SharedMediaAdapter.Media(first));
         for (int i = 1; i < msg.size(); ++i) {
             final TdApi.Message message = msg.get(i);
@@ -112,7 +114,7 @@ public class SharedMediaController extends MediaController {
             if (time.getMonthOfYear() == prevDate.getMonthOfYear()
                     && time.getYear() == prevDate.getYear()) {
             } else {
-                res.add(new SharedMediaAdapter.Section(time));
+                res.add(new SharedMediaAdapter.Section(time, idCounter--));
             }
             res.add(new SharedMediaAdapter.Media(message));
             prevDate = time;
@@ -137,6 +139,11 @@ public class SharedMediaController extends MediaController {
     }
 
     @Override
+    public Set<Integer> getSelectedMessagesIds() {
+        return adapter.selectedIds;
+    }
+
+    @Override
     public void drop() {
         subscribe.unsubscribe();
     }
@@ -144,5 +151,22 @@ public class SharedMediaController extends MediaController {
     @Override
     public void dropSelection() {
         adapter.dropSelection();
+    }
+
+    @Override
+    public void messagesDeleted(int[] msgIds) {
+        for (Iterator<SharedMediaAdapter.Item> iterator = adapter.getData().iterator(); iterator.hasNext(); ) {
+            SharedMediaAdapter.Item i = iterator.next();
+            if (i instanceof SharedMediaAdapter.Media) {
+                final TdApi.Message msg = ((SharedMediaAdapter.Media) i).msg;
+                for (int msgId : msgIds) {
+                    if (msgId == msg.id) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
+        dropSelection();
     }
 }

@@ -43,16 +43,19 @@
                 android:id="@+id/white_circle"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="#fff"
+                android:src="@drawable/ic_check_white_circle"
+                android:scaleType="centerCrop"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"/>
         <ImageView
                 android:id="@+id/green_circle"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="#0f0"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp"
+                android:src="@drawable/ic_attach_check"
+                android:scaleType="centerCrop"
+                android:elevation="4dp"
                 />
 
 </ru.korniltsev.telegram.profile.media.controllers.SharedMediaItemView>
