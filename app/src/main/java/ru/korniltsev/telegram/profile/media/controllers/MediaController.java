@@ -4,6 +4,8 @@ public abstract class MediaController {
 
 
     public abstract void drop();
+
+    public abstract void dropSelection() ;
 }
 
 

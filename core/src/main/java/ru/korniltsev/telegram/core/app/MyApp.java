@@ -56,7 +56,7 @@ public class MyApp extends Application {
     public RXClient rxClient;
     private UserHolder userHolder;
     public SharedMediaHelper sharedMediaHelper;
-    private RxDownloadManager downloadManager;
+    public RxDownloadManager downloadManager;
 
     @Override
     public void onCreate() {

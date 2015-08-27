@@ -18,6 +18,50 @@
                 app:popupTheme="@style/Theme.AppCompat.Light"
                 android:background="#fff"
                 />
+        <LinearLayout
+                android:id="@+id/second_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:background="#76C87C"
+                android:visibility="gone"
+                >
+            <ru.korniltsev.telegram.profile.media.controllers.SquareImageView
+                    android:id="@+id/menu_cancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"
+                    android:scaleType="center"
+                    android:background="@drawable/bg_keyboard_tab"/>
+            <TextView
+                    android:id="@+id/selected_items_count_title"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:textSize="16sp"
+                    android:textColor="#fff"
+                    android:textStyle="bold"
+                    android:gravity="center_vertical"
+                    />
+            <ru.korniltsev.telegram.profile.media.controllers.SquareImageView
+                    android:id="@+id/menu_forward"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_forward"
+                    android:scaleType="center"
+                    android:background="@drawable/bg_keyboard_tab"
+                    />
+            <ru.korniltsev.telegram.profile.media.controllers.SquareImageView
+                    android:id="@+id/menu_delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_delete"
+                    android:scaleType="center"
+                    android:background="@drawable/bg_keyboard_tab"
+                    />
+        </LinearLayout>
 
     </FrameLayout>
     <android.support.v7.widget.RecyclerView

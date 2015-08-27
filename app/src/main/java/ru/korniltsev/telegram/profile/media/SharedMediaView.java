@@ -25,6 +25,7 @@ import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.profile.media.controllers.AudioMessagesController;
 import ru.korniltsev.telegram.profile.media.controllers.MediaController;
 import ru.korniltsev.telegram.profile.media.controllers.SharedMediaController;
+import ru.korniltsev.telegram.profile.media.controllers.SquareImageView;
 
 import javax.inject.Inject;
 
@@ -41,6 +42,9 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
     private DropdownPopup popup;
     private TextView customView;
     private MediaController mediaController;
+    private View secondToolbar;
+    private int toolbarVisible = -1;
+    private TextView selectedItemsCount;
 
     public SharedMediaView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -77,7 +81,60 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
         final MiniPlayerView player = MiniPlayerViewFactory.construct(getContext(), dpCalculator);
         addView(player, 1);
         player.setShadow(this);
+
+        secondToolbar = findViewById(R.id.second_toolbar);
+
+
+        SquareImageView menuCancel = ((SquareImageView) findViewById(R.id.menu_cancel));
+        SquareImageView menuForward = ((SquareImageView) findViewById(R.id.menu_forward));
+        SquareImageView menuDelete = ((SquareImageView) findViewById(R.id.menu_delete));
+
+        menuCancel.setHorizontal(true);
+        menuForward.setHorizontal(true);
+        menuDelete.setHorizontal(true);
+
+        menuCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel();
+            }
+        });
+        menuForward.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        menuDelete.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        selectedItemsCount = (TextView) findViewById(R.id.selected_items_count_title);
     }
+
+    private void cancel() {
+        mediaController.dropSelection();
+
+    }
+
+    public void setToolbarVisible(int visible){
+        if (this.toolbarVisible == visible){
+            return;
+        }
+        if (visible > 0 ){
+            secondToolbar.setVisibility(View.VISIBLE);
+            selectedItemsCount.setText(String.valueOf(visible));
+        } else {
+            secondToolbar.setVisibility(View.GONE);
+
+        }
+        this.toolbarVisible = visible;
+    }
+
+
 
     private void showDropdown(View customView) {
         List<DropdownPopup.Item> items = new ArrayList<>();
@@ -146,9 +203,9 @@ public class SharedMediaView extends LinearLayoutWithShadow implements HandlesBa
 
     public void bind(SharedMediaPath path) {
         if (path.type == SharedMediaPath.TYPE_MEDIA) {
-            mediaController = new SharedMediaController(list, customView, presenter.path);
+            mediaController = new SharedMediaController(this, list, customView, presenter.path);
         } else {
-            mediaController = new AudioMessagesController(list, customView, presenter.path, rxClient);
+            mediaController = new AudioMessagesController(this, list, customView, presenter.path, rxClient);
         }
     }
 }

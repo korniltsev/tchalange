@@ -18,6 +18,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.profile.media.SharedMediaPath;
+import ru.korniltsev.telegram.profile.media.SharedMediaView;
 import rx.Subscription;
 
 import java.util.ArrayList;
@@ -25,15 +26,19 @@ import java.util.Collections;
 import java.util.List;
 
 public class SharedMediaController extends MediaController {
+    private final SharedMediaView sharedMediaView;
     final RecyclerView list;
     private final SharedMediaHelper.Holder helper;
+    private final TextView title;
     private final SharedMediaPath path;
     private final Subscription subscribe;
     private final SharedMediaAdapter adapter;
     private final DpCalculator calculator;
 
-    public SharedMediaController(RecyclerView list, TextView title, SharedMediaPath path) {
+    public SharedMediaController(final SharedMediaView sharedMediaView, RecyclerView list, TextView title, SharedMediaPath path) {
+        this.sharedMediaView = sharedMediaView;
         this.list = list;
+        this.title = title;
         this.path = path;
         final Context ctx = list.getContext();
         final MyApp from = MyApp.from(ctx);
@@ -41,8 +46,12 @@ public class SharedMediaController extends MediaController {
         helper = from.sharedMediaHelper.getHolder(path.chatId);
         title.setText(R.string.shared_media_title);
 
-        final List<TdApi.Message> msg = helper.msg;
-        adapter = new SharedMediaAdapter(ctx);
+        adapter = new SharedMediaAdapter(ctx, new SharedMediaAdapter.Callback() {
+            @Override
+            public void itemsSelected(int selectedItems) {
+                sharedMediaView.setToolbarVisible(selectedItems);
+            }
+        }, list);
         final GridLayoutManager layout = new GridLayoutManager(ctx, 3);
         list.setLayoutManager(layout);
         list.addOnScrollListener(new EndlessOnScrollListener(layout, adapter, new Runnable() {
@@ -130,5 +139,10 @@ public class SharedMediaController extends MediaController {
     @Override
     public void drop() {
         subscribe.unsubscribe();
+    }
+
+    @Override
+    public void dropSelection() {
+        adapter.dropSelection();
     }
 }

@@ -1,5 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ru.korniltsev.telegram.profile.media.controllers.SquareImageView xmlns:android="http://schemas.android.com/apk/res/android"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:scaleType="centerCrop"/>
+<ru.korniltsev.telegram.profile.media.controllers.SharedMediaItemView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <ImageView
+                android:id="@+id/img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"/>
+
+        <ImageView
+                android:id="@+id/video_play_button"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="#fff"
+                android:layout_gravity="right"
+                android:layout_marginRight="8dp"
+                android:layout_marginTop="8dp"
+                />
+        <TextView
+                android:id="@+id/duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="32dp"
+                android:layout_gravity="right"
+                android:textColor="#fff"/>
+    </FrameLayout>
+
+    <ru.korniltsev.telegram.core.views.DownloadView
+            android:id="@+id/download_view"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            />
+        <ImageView
+                android:id="@+id/white_circle"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#fff"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"/>
+        <ImageView
+                android:id="@+id/green_circle"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="#0f0"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"
+                />
+
+</ru.korniltsev.telegram.profile.media.controllers.SharedMediaItemView>

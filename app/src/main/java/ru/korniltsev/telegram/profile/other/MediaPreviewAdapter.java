@@ -15,6 +15,7 @@ import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
+import ru.korniltsev.telegram.profile.media.controllers.SharedMediaItemView;
 import ru.korniltsev.telegram.profile.media.controllers.SquareImageView;
 
 import java.util.List;
@@ -44,32 +45,25 @@ public class MediaPreviewAdapter extends BaseAdapter<TdApi.Message, MediaPreview
         final TdApi.MessageContent message = item.message;
         if (message instanceof TdApi.MessagePhoto){
             final TdApi.Photo photo = ((TdApi.MessagePhoto) message).photo;
-            final TdApi.File smallestBiggerThan = PhotoUtils.findSmallestBiggerThan(photo, dip100, dip100);
-            loadImage(holder.img, smallestBiggerThan);
+            holder.img.bindPhoto(photo);
+//            final TdApi.File smallestBiggerThan = PhotoUtils.findSmallestBiggerThan(photo, dip100, dip100);
+//            loadImage(holder.img, smallestBiggerThan);
         } else {
             TdApi.MessageVideo v = (TdApi.MessageVideo) message;
-            loadImage(holder.img, v.video.thumb.photo);
+            holder.img.bindVideo(v.video);
+//            loadImage(holder.img, v.video.thumb.photo);
         }
 
     }
 
-    private void loadImage(ImageView img, TdApi.File smallestBiggerThan) {
-        if (smallestBiggerThan.id == TdApi.File.NO_FILE_ID){
-            rxGlide.getPicasso()
-                    .cancelRequest(img);
-            img.setImageDrawable(null);
-        } else {
-            rxGlide.loadPhoto(smallestBiggerThan, false)
-                    .into(img);
-        }
-    }
+
 
     class VH extends RecyclerView.ViewHolder{
-        final SquareImageView img;
+        final SharedMediaItemView img;
         public VH(final View itemView) {
             super(itemView);
-            this.img = (SquareImageView) itemView;
-            this.img.setHorizontal(true);
+            this.img = (SharedMediaItemView) itemView;
+            this.img.setIgnoreWidth(true);
             img.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

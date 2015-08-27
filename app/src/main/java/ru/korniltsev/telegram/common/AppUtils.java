@@ -33,13 +33,16 @@ import ru.korniltsev.telegram.profile.other.ProfileAdapter;
 import ru.korniltsev.telegram.profile.other.ProfilePresenter;
 import rx.Observable;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
+import static rx.Observable.zip;
 
 public class AppUtils {
     public static final int REQUEST_CHOOS_FROM_GALLERY = 1;
@@ -173,7 +176,7 @@ public class AppUtils {
     }
 
     public static void clear(Rect outRect) {
-        outRect.set(0,0,0,0);
+        outRect.set(0, 0, 0, 0);
     }
 
     @Nullable
@@ -278,17 +281,27 @@ public class AppUtils {
     @NonNull
     public static Observable<TdApi.Messages> getMedia(final RXClient client, long chatId) {
         return client.sendRx(new TdApi.GetChat(chatId))
-                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.TLObject>>() {
+                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.Messages>>() {
                     @Override
-                    public Observable<TdApi.TLObject> call(TdApi.TLObject tlObject) {
+                    public Observable<TdApi.Messages> call(TdApi.TLObject tlObject) {
                         TdApi.Chat chat = (TdApi.Chat) tlObject;
                         //todo deleted history
-                        return client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, ProfilePresenter.FILTER));
-                    }
-                }).map(new Func1<TdApi.TLObject, TdApi.Messages>() {
-                    @Override
-                    public TdApi.Messages call(TdApi.TLObject tlObject) {
-                        return (TdApi.Messages) tlObject;
+                        final Observable<TdApi.Chat> justChat = Observable.just(chat);
+                        final Observable<TdApi.TLObject> messages = client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, ProfilePresenter.FILTER));
+                        return zip(justChat, messages, new Func2<TdApi.Chat, TdApi.TLObject, TdApi.Messages>() {
+                            @Override
+                            public TdApi.Messages call(TdApi.Chat chat, TdApi.TLObject tlObject) {
+                                final TdApi.Messages res = (TdApi.Messages) tlObject;
+                                if (isPhotoOrVideo(chat.topMessage)){
+                                    final ArrayList<TdApi.Message> m = new ArrayList<>(Arrays.asList(res.messages));
+                                    m.add(0, chat.topMessage);
+                                    res.messages = m.toArray(new TdApi.Message[m.size()]);
+                                    return res;
+                                } else {
+                                    return res;
+                                }
+                            }
+                        });
                     }
                 });
     }
@@ -314,11 +327,15 @@ public class AppUtils {
     public static List<TdApi.Message> filterPhotosAndVideos(List<TdApi.Message> ms) {
         final ArrayList<TdApi.Message> res = new ArrayList<>();
         for (TdApi.Message msg : ms) {
-            if (msg.message instanceof TdApi.MessagePhoto
-                    || msg.message instanceof TdApi.MessageVideo){
+            if (isPhotoOrVideo(msg)){
                 res.add(msg);
             }
         }
         return res;
+    }
+
+    private static boolean isPhotoOrVideo(TdApi.Message msg) {
+        return msg.message instanceof TdApi.MessagePhoto
+                || msg.message instanceof TdApi.MessageVideo;
     }
 }

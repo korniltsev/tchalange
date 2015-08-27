@@ -7,12 +7,10 @@ import com.squareup.picasso.Transformation;
 import ru.korniltsev.telegram.common.FastBlur;
 
 public class BlurTransformation implements Transformation {
-    final Context appCtx;
-//    private float radius;
+
     final int radius;
 
-    public BlurTransformation(Context appCtx, int radius) {
-        this.appCtx = appCtx;
+    public BlurTransformation(int radius) {
         this.radius = radius;
     }
 

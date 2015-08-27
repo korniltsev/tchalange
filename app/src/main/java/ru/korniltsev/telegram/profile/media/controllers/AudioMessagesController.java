@@ -19,6 +19,7 @@ import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.profile.media.SharedMediaPath;
+import ru.korniltsev.telegram.profile.media.SharedMediaView;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class AudioMessagesController extends MediaController {
+    private final SharedMediaView sharedMediaView;
     final RecyclerView list;
 //    private final SharedMediaHelper.Holder helper;
     private final SharedMediaPath path;
@@ -37,7 +39,8 @@ public class AudioMessagesController extends MediaController {
     private final Subscription subscription;
     private final AudioMessagesAdapter adapter;
 
-    public AudioMessagesController(RecyclerView list, TextView title, SharedMediaPath path, RXClient client) {
+    public AudioMessagesController(SharedMediaView sharedMediaView, RecyclerView list, TextView title, SharedMediaPath path, RXClient client) {
+        this.sharedMediaView = sharedMediaView;
         this.list = list;
         this.path = path;
         this.client = client;
@@ -154,5 +157,10 @@ public class AudioMessagesController extends MediaController {
     public void drop() {
         subscription.unsubscribe();
 //        subscribe.unsubscribe();
+    }
+
+    @Override
+    public void dropSelection() {
+
     }
 }

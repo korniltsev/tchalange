@@ -87,7 +87,7 @@ public class AudioPlayerView extends LinearLayout {
         calc = app.calc;
         audioPLayer = app.audioPLayer;
 
-        blur = new BlurTransformation(getContext().getApplicationContext(), calc.dp(2));
+        blur = new BlurTransformation(calc.dp(2));
         setWillNotDraw(false);
         int trackColor = 0xFFDDDDDD;
         int positionColor = 0xFF6BADDE;

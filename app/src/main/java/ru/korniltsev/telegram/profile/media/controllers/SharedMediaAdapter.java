@@ -5,7 +5,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
@@ -17,10 +16,12 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
-import ru.korniltsev.telegram.core.utils.PhotoUtils;
 import ru.korniltsev.telegram.photoview.PhotoView;
+import rx.functions.Action1;
 
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, RecyclerView.ViewHolder> {
 
@@ -32,8 +33,27 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
     public static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("MMMM YYYY")
             .withLocale(Locale.US);
 
-    public SharedMediaAdapter(Context ctx) {
+    public void dropSelection() {
+        selectedIds.clear();
+        animateAllViews(new Action1<SharedMediaItemView>() {
+            @Override
+            public void call(SharedMediaItemView sharedMediaItemView) {
+                sharedMediaItemView.animateGreenCircle(false);
+                sharedMediaItemView.animateWhiteCircle(false);
+            }
+        });
+        cb.itemsSelected(0);
+    }
+
+    public interface Callback {
+        void itemsSelected(int selecedItems);
+    }
+    final Callback cb;
+    final RecyclerView list;
+    public SharedMediaAdapter(Context ctx, Callback cb, RecyclerView list) {
         super(ctx);
+        this.cb = cb;
+        this.list = list;
         rxGlide = ObjectGraphService.getObjectGraph(ctx).get(RxGlide.class);
         dip100 = MyApp.from(ctx).calc.dp(100);
 
@@ -53,12 +73,35 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
             };
         } else {
             final View v = getViewFactory().inflate(R.layout.profile_media_preview_item, parent, false);
-            final RecyclerView.ViewHolder viewHolder = new RecyclerView.ViewHolder(v) {
-            };
-            v.setOnClickListener(new View.OnClickListener() {
+
+
+            final MediaVH viewHolder = new MediaVH(v) ;
+
+            return viewHolder;
+        }
+    }
+
+
+    class MediaVH extends RecyclerView.ViewHolder{
+        final SharedMediaItemView root;
+        public MediaVH(View itemView) {
+            super(itemView);
+            this.root = (SharedMediaItemView) itemView;
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    toggle();
+                    return true;
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final TdApi.Message msg = ((Media) getItem(viewHolder.getAdapterPosition())).msg;
+                    if (selectedIds.size() > 0){
+                        toggle();
+                        return;
+                    }
+                    final TdApi.Message msg = ((Media) getItem(getAdapterPosition())).msg;
                     if (msg.message instanceof TdApi.MessagePhoto){
                         final TdApi.Photo photo = ((TdApi.MessagePhoto) msg.message).photo;
                         Flow.get(getCtx())
@@ -68,26 +111,85 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
                     }
                 }
             });
-            return viewHolder;
+        }
+        private void toggle() {
+            final int adapterPosition = getAdapterPosition();
+            final Media item = (Media) getItem(adapterPosition);
+            final int id = item.msg.id;
+
+            //todo clear all animations
+            if (selectedIds.isEmpty()) {
+                //animate all views white circle in
+                animateAllViews(new Action1<SharedMediaItemView>() {
+                    @Override
+                    public void call(SharedMediaItemView v) {
+                        v.animateWhiteCircle(true);
+                    }
+                });
+                //animate green circle in on current view
+                root.animateGreenCircle(true);
+                selectedIds.add(id);
+            } else {
+                final boolean wasSelected = selectedIds.contains(id);
+                if (wasSelected){
+                    selectedIds.remove(id);
+                    //animate green circle out
+                    root.animateGreenCircle(false);
+                    if (selectedIds.isEmpty()) {
+                        //animate all white circles out
+                        animateAllViews(new Action1<SharedMediaItemView>() {
+                            @Override
+                            public void call(SharedMediaItemView v) {
+                                v.animateWhiteCircle(false);
+                            }
+                        });
+                    }
+                } else {
+                    selectedIds.add(id);
+                    //animate green circle in
+                    root.animateGreenCircle(true);
+                }
+            }
+            cb.itemsSelected(selectedIds.size());
+
+
+
+        }
+
+    }
+    private void animateAllViews( Action1<SharedMediaItemView> f) {
+        for (int i =0; i< list.getChildCount(); ++i){
+            View child = list.getChildAt(i);
+            if (child instanceof SharedMediaItemView) {
+                SharedMediaItemView v = (SharedMediaItemView) child;
+                f.call(v);
+            }
         }
     }
+    final Set<Integer> selectedIds = new HashSet<>();
+
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
         final Item item = getItem(position);
         if (item instanceof Media){
-            final TdApi.MessageContent message = ((Media) item).msg.message;
-            final ImageView img = (ImageView) h.itemView;
+            MediaVH vh = (MediaVH) h;
+            final TdApi.Message rawMessage = ((Media) item).msg;
+            final TdApi.MessageContent message = rawMessage.message;
+
+
             if (message instanceof TdApi.MessagePhoto){
                 final TdApi.Photo photo = ((TdApi.MessagePhoto) message).photo;
-                final TdApi.File smallestBiggerThan = PhotoUtils.findSmallestBiggerThan(photo, dip100, dip100);
-                rxGlide.loadPhoto(smallestBiggerThan, false)
-                        .into(img);
+                vh.root.bindPhoto(photo);
             } else {
+
                 TdApi.MessageVideo v = (TdApi.MessageVideo) message;
-                rxGlide.loadPhoto(v.video.thumb.photo, false)
-                        .into(img);
+                vh.root.bindVideo(v.video);
+
             }
+            int id = rawMessage.id;
+            final boolean selected = selectedIds.contains(id);
+            vh.root.bindSelection(selected, selectedIds.size() > 0);
         } else {
             final Section section = (Section) item;
             final TextView sectionView = (TextView) h.itemView;

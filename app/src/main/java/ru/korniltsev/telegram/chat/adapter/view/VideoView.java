@@ -9,17 +9,14 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.core.picasso.VideoThumbnailRequestHandler;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.views.DownloadView;
-
-import javax.inject.Inject;
 
 import java.io.File;
 
@@ -30,9 +27,9 @@ public class VideoView extends FrameLayout {
 
     private final int dp207;
     private final int dp154;
-    @Inject RxGlide picasso;
-    @Inject DpCalculator calc;
-    @Inject RxDownloadManager downloader;
+    RxGlide picasso;
+    DpCalculator calc;
+    RxDownloadManager downloader;
 
     //    private ImageView actionIcon;
     private ImageView preview;
@@ -46,11 +43,16 @@ public class VideoView extends FrameLayout {
 
     public VideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        picasso = app.rxGlide;
+        downloader = app.downloadManager;
+
+
         //207x165
         dp207 = calc.dp(207);
         dp154 = calc.dp(154);
-        blur = new BlurTransformation(getContext().getApplicationContext(), 6);
+        blur = new BlurTransformation(6);
     }
 
     @Override
@@ -60,7 +62,7 @@ public class VideoView extends FrameLayout {
         downloadView = ((DownloadView) findViewById(R.id.download_view));
     }
 
-    private void playVideo(TdApi.File f) {
+    public static void playVideo(Context ctx, RxDownloadManager downloader, TdApi.File f) {
         assertTrue(f.isLocal());
         File src = new File(f.path);
 
@@ -70,9 +72,9 @@ public class VideoView extends FrameLayout {
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         intent.setDataAndType(uri, "video/*");
         try {
-            getContext().startActivity(intent);
+            ctx.startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            AppUtils.showNoActivityError(getContext());
+            AppUtils.showNoActivityError(ctx);
         }
     }
 
@@ -118,7 +120,7 @@ public class VideoView extends FrameLayout {
 
             @Override
             public void play(TdApi.File e) {
-                playVideo(e);
+                playVideo(getContext(), downloader, e);
             }
         }, this);
     }
