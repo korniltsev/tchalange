@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
 import org.json.JSONArray;
@@ -111,14 +112,14 @@ public class PatternController extends Controller {
             case PasscodePath.TYPE_LOCK_TO_CHANGE:
                 final boolean unlocked = unlock(passcode);
                 if (!unlocked) {
-                    passCodeHint.setError(ctx.getString(R.string.wrong_pattern));
+                    error(R.string.wrong_pattern);
                 }
                 break;
             case PasscodePath.TYPE_SET:
 
                 if (firstPassword == null) {
                     if (passcode.length() < 4) {
-                        passCodeHint.setError(ctx.getString(R.string.pattern_cannot_be_empty));
+                        error(R.string.pattern_cannot_be_empty);
                         return;
                     }
                     firstPassword = passcode;
@@ -133,6 +134,12 @@ public class PatternController extends Controller {
                 }
                 break;
         }
+    }
+
+    private void error(int wrong_pattern) {
+        final String string = ctx.getString(wrong_pattern);
+        Toast.makeText(ctx, string, Toast.LENGTH_LONG).show();
+        passCodeHint.setError("error");
     }
 
     private JSONArray passcodeFromPattern(List<PatternView.Point> points) {

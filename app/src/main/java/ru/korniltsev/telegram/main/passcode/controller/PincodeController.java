@@ -5,30 +5,23 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import flow.Flow;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.common.AppUtils;
-import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.views.RobotoMediumTextView;
 import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import ru.korniltsev.telegram.main.passcode.PasscodeView;
-import ru.korniltsev.telegram.profile.edit.passcode.EditPasscode;
 
 import java.util.Arrays;
 import java.util.List;
@@ -216,14 +209,14 @@ public class PincodeController extends Controller {
             case PasscodePath.TYPE_LOCK_TO_CHANGE:
                 final boolean unlocked = unlock(textFrom(passcodeField));
                 if (!unlocked) {
-                    passcodeField.setError(ctx.getString(R.string.wrong_pin));
+                    error(R.string.wrong_pin);
                 }
                 break;
             case PasscodePath.TYPE_SET:
                 if (firstPassword == null) {
                     final String text = textFrom(passcodeField);
                     if (text.length() < 4) {
-                        passcodeField.setError(ctx.getString(R.string.pin_cannot_be_empty));
+                        error(R.string.pin_cannot_be_empty);
                         return;
                     }
                     firstPassword = text;
@@ -238,6 +231,12 @@ public class PincodeController extends Controller {
                 }
                 break;
         }
+    }
+
+    private void error(int strResId) {
+        final String err = ctx.getString(strResId);
+        Toast.makeText(ctx, err, Toast.LENGTH_LONG).show();
+        passcodeField.setError("error");
     }
 
     public void setNewPassword(@NonNull String firstPassword) {
