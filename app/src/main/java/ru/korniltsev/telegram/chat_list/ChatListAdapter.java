@@ -67,6 +67,8 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
         TdApi.Chat chat = getItem(position);
         TdApi.MessageContent message = chat.topMessage.message;
 
+        holder.cell.setUnreadCount(chat.unreadCount);
+
         holder.cell.setTime(chat.topMessage.dateFormatted);
 
         if (chat.type instanceof TdApi.PrivateChatInfo){
@@ -83,7 +85,7 @@ public class ChatListAdapter extends BaseAdapter<TdApi.Chat, ChatListAdapter.VH>
 
 
 
-        holder.cell.setUnreadCount(chat.unreadCount);
+
 
         if (message instanceof TdApi.MessageText) {
             TdApi.MessageText text = (TdApi.MessageText) message;

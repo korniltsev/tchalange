@@ -9,14 +9,10 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.Spanned;
-import android.text.SpannedString;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.view.ViewGroup;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.debug.SquareDumbResourceView;
@@ -44,7 +40,6 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     private static TextPaint titlePaint;
     private static TextPaint unreadPaint;
     private static TextPaint textPaint;
-
 
     private final int dividerStart;
     public final AvatarView avatarView;
@@ -85,6 +80,8 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     private float textLayoutDX;
     private CharSequence ellipsizedText;
     private float titleLayoutFirstLineLeft;
+    private float iconUnreadBadgeWidth;
+    //    private int unreadLayoutWidth;
 
     public ChatListCell(Context context) {
         super(context);
@@ -92,11 +89,10 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         emoji = app.emoji;
         calc = app.calc;
 
-        if (dividerPaint == null){
+        if (dividerPaint == null) {
 
             final Typeface typeface = RobotoMediumTextView.sGetTypeface(getContext());
             final Typeface textTypeFace = Typeface.create("sans-serif", 0);
-
 
             dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             dividerPaint.setColor(0xffd4d4d4);
@@ -127,13 +123,9 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
             textPaintSystem.setTypeface(textTypeFace);
         }
 
-
-
-
         dip72 = calc.dp(72);
         this.dividerStart = dip72;
         displayWidth = app.displayWidth;
-
 
         avatarViewMargin = calc.dp(10f);
         avatarViewSize = calc.dp(52f);
@@ -159,46 +151,26 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         iconTopTopPadding = calc.dp(18f);
         iconTopRightPadding = calc.dp(6f);
 
-
         cellPaddingRight = calc.dp(15);
         timeTopPadding = calc.dp(18f);
-
 
         titlePaddingLeftRight = calc.dp(6f);
         titlePaddingTop = calc.dp(14f);
 
-
-
         icUnreadBadge = res.getDrawable(R.drawable.ic_badge);
-        assertNotNull(icUnreadBadge);
-        int right = displayWidth - cellPaddingRight;
-        int left = right- icUnreadBadge.getIntrinsicWidth();
-        int top = calc.dp(39);
-        int bottom = top + icUnreadBadge.getIntrinsicHeight();
-        icUnreadBadge.setBounds(left, top, right, bottom);
-
-
-
-
-
 
         spaceLeftForText = displayWidth
-                - avatarViewSize - avatarViewMargin* 2
+                - avatarViewSize - avatarViewMargin * 2
                 - cellPaddingRight;
 
         textLayoutDY = calc.dp(40);
 
-
-
-
-
-//        android:layout_height="72dp"
+        //        android:layout_height="72dp"
         setBackgroundResource(R.drawable.bg_keyboard_tab);
         setWillNotDraw(false);
     }
 
     String time;
-
 
     // time
     // nick
@@ -218,14 +190,13 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     public void setTitle(String title) {
         this.title = title;
 
-        
-        int spaceLeftForNick = (int) (displayWidth 
-                        - avatarViewSize - avatarViewMargin * 2 -
-                        titlePaddingLeftRight *2
-                        - (displayWidth - timeLeft)
-                        - icGroup.getIntrinsicWidth());
+        int spaceLeftForNick = (int) (displayWidth
+                - avatarViewSize - avatarViewMargin * 2 -
+                titlePaddingLeftRight * 2
+                - (displayWidth - timeLeft)
+                - icGroup.getIntrinsicWidth());
         final String titleWithoutNewLines;
-        if (title.contains("\n")){
+        if (title.contains("\n")) {
             titleWithoutNewLines = title.replaceAll("\n", "");
         } else {
             titleWithoutNewLines = title;
@@ -265,10 +236,6 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         layoutAvatar();
 
-
-
-
-
         rect.set(dividerStart, getHeight() - 1, r, getHeight());
     }
 
@@ -288,8 +255,6 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
             icGroup.draw(canvas);
         }
 
-
-
         canvas.save();
         canvas.translate(timeLeft, timeTopPadding);
         timeLayout.draw(canvas);
@@ -298,7 +263,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         iconTop.draw(canvas);
 
         canvas.save();
-        int dx = avatarViewSize + avatarViewMargin * 2 ;
+        int dx = avatarViewSize + avatarViewMargin * 2;
         if (drawGroupChatIcon) {
             dx += icGroup.getIntrinsicWidth() + titlePaddingLeftRight;
         }
@@ -307,7 +272,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         titleLayout.draw(canvas);
         canvas.restore();
 
-        if (unreadCount > 0){
+        if (unreadCount > 0) {
             icUnreadBadge.draw(canvas);
 
             canvas.save();
@@ -324,36 +289,44 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
         textLayout.draw(canvas);
         canvas.restore();
-
     }
 
     public void setUnreadCount(int unreadCount) {
         this.unreadCount = unreadCount;
-        if (unreadCount > 0){
-            unreadLayout = new StaticLayout(String.valueOf(unreadCount), unreadPaint, icUnreadBadge.getIntrinsicWidth(), Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
-            float px = (icUnreadBadge.getIntrinsicWidth() - unreadLayout.getLineWidth(0))/2;
-            float py = (icUnreadBadge.getIntrinsicHeight() - unreadLayout.getHeight())/2;
-            final Rect bounds = icUnreadBadge.getBounds();
-            unreadTx = bounds.left + px;
-            unreadTy = bounds.top + py;
+        if (unreadCount > 0) {
+            final int padding = calc.dp(4);
+
+            unreadLayout = new StaticLayout(String.valueOf(unreadCount), unreadPaint, displayWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+            final float firstLineWidth = unreadLayout.getLineWidth(0);
+            final int top = calc.dp(39);
+
+            int right = displayWidth - cellPaddingRight;
+            iconUnreadBadgeWidth = firstLineWidth + padding * 2;
+            iconUnreadBadgeWidth = Math.max(iconUnreadBadgeWidth, icUnreadBadge.getIntrinsicWidth());
+            int left = (int) (right - iconUnreadBadgeWidth);
+            int bottom = top + icUnreadBadge.getIntrinsicHeight();
+            icUnreadBadge.setBounds(left, top, right, bottom);
+
+            float p2 = (iconUnreadBadgeWidth - firstLineWidth)/2;//рсстояние от края иконки до начала текста
+            unreadTx = left + p2;;
+            unreadTy = top + calc.dpFloat(3);
         }
     }
 
     public void setText(CharSequence text, boolean system) {
-        TextPaint p ;
-        if (system ){
+        TextPaint p;
+        if (system) {
             p = textPaintSystem;
         } else {
             p = textPaint;
         }
 
-
         int spaceLeft = spaceLeftForText;
         if (unreadCount > 0) {
-            spaceLeft = spaceLeft - icUnreadBadge.getIntrinsicWidth() - calc.dp(4f);
+            spaceLeft = (int) (spaceLeft - iconUnreadBadgeWidth - calc.dp(4f));
         }
         CharSequence firstLine = text;
-        for (int i =0; i < text.length();++i){
+        for (int i = 0; i < text.length(); ++i) {
             if (text.charAt(i) == '\n') {
                 firstLine = firstLine.subSequence(0, i);
                 break;
@@ -364,9 +337,9 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         textLayout = new StaticLayout(ellipsizedText, p, spaceLeft, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
         textLayoutDX = avatarViewSize + avatarViewMargin * 2 - textLayout.getLineLeft(0);
 
-//        if (textLayout.getLineCount() > 1) {
-//            throw new RuntimeException();
-//        }
+        //        if (textLayout.getLineCount() > 1) {
+        //            throw new RuntimeException();
+        //        }
     }
 
     @Override
@@ -383,13 +356,13 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
     @Override
     public void pageLoaded(int page) {
-        if (ellipsizedText instanceof Spanned){
+        if (ellipsizedText instanceof Spanned) {
             final Spanned s = (Spanned) this.ellipsizedText;
             final Emoji.EmojiSpan[] spans = s.getSpans(0, s.length(), Emoji.EmojiSpan.class);
-            if (spans.length != 0){
+            if (spans.length != 0) {
                 for (Emoji.EmojiSpan span : spans) {
-                    if (span.d.info.page == page){
-                            invalidate();
+                    if (span.d.info.page == page) {
+                        invalidate();
                         return;
                     }
                 }
