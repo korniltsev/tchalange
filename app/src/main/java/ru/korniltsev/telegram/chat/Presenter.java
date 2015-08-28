@@ -33,8 +33,10 @@ import ru.korniltsev.telegram.profile.chat.ChatInfo;
 import ru.korniltsev.telegram.profile.chat.LeaveOnlyChatList;
 import ru.korniltsev.telegram.profile.other.ProfilePath;
 import rx.Observable;
+import rx.Subscription;
 import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
+import rx.subscriptions.Subscriptions;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -69,8 +71,11 @@ public class Presenter extends ViewPresenter<ChatView>
     private TdApi.ForwardMessages forwardMessages;
 
     private CompositeSubscription subscription;
+    private Subscription openChatSubscription = Subscriptions.empty();
+
     @Nullable private volatile TdApi.GroupChatFull mGroupChatFull;
     private int botCount;
+
 
     public Chat getPath() {
         return path;
@@ -194,6 +199,7 @@ public class Presenter extends ViewPresenter<ChatView>
         super.dropView(view);
         //        nm.dropView(path.chat.id);
         subscription.unsubscribe();
+        openChatSubscription.unsubscribe();
         //        Utils.hideKeyboard(view);
     }
 
@@ -744,8 +750,8 @@ public class Presenter extends ViewPresenter<ChatView>
         if (user == null) {
             return;
         }
-        subscription.add(
-                client.sendRx(new TdApi.CreatePrivateChat(msg.fromId))
+        openChatSubscription.unsubscribe();
+        openChatSubscription = client.sendRx(new TdApi.CreatePrivateChat(msg.fromId))
                         .observeOn(mainThread())
                         .subscribe(new ObserverAdapter<TdApi.TLObject>() {
                             @Override
@@ -753,6 +759,6 @@ public class Presenter extends ViewPresenter<ChatView>
                                 final Chat newHead = new Chat((TdApi.Chat) response, user, /* messages to forward */ null);
                                 AppUtils.flowPushAndRemove(getView(), newHead, new LeaveOnlyChatList(), Flow.Direction.FORWARD);
                             }
-                        }));
+                        });
     }
 }
