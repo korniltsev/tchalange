@@ -65,7 +65,7 @@
                         android:src="@drawable/chat_ic_keyboard_emoji_hide_levels"
                         android:scaleType="center"
                         android:background="@drawable/bg_keyboard_tab"
-                        android:layout_gravity="left"
+                        android:layout_gravity="left|bottom"
                         />
 
                 <EditText
