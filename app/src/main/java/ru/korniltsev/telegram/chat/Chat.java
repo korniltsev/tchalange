@@ -16,14 +16,15 @@ import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
+import ru.korniltsev.telegram.core.mortar.mortarscreen.ModuleFactory2;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 import ru.korniltsev.telegram.emoji.EmojiKeyboardView;
 import ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView;
 
 import java.io.Serializable;
 
-@WithModule(Chat.Module.class)
-public class Chat extends BasePath implements Serializable, NamedPath {
+
+public class Chat extends BasePath implements Serializable, NamedPath, ModuleFactory2 {
 
     public static final int LIMIT = 15;
 
@@ -48,6 +49,11 @@ public class Chat extends BasePath implements Serializable, NamedPath {
     @Override
     public String name() {
         return String.valueOf(chat.id);
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
     }
 
     @dagger.Module(

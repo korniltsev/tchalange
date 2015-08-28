@@ -60,6 +60,9 @@ public class ScreenScoper {
   }
 
   private ModuleFactory getModuleFactory(Object screen) {
+    if (screen instanceof ModuleFactory2){
+      return new DelegateModuleFactory((ModuleFactory2) screen);
+    }
     Class<?> screenType = screen.getClass();
     ModuleFactory moduleFactory = moduleFactoryCache.get(screenType);
 
@@ -166,6 +169,19 @@ public class ScreenScoper {
       } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
         throw new RuntimeException(e);
       }
+    }
+  }
+
+  private static class DelegateModuleFactory extends ModuleFactory {
+    final ModuleFactory2 delegate;
+
+    private DelegateModuleFactory(ModuleFactory2 delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    protected Object createDaggerModule(Resources resources, Object screen) {
+      return delegate.createDaggerModule();
     }
   }
 }
