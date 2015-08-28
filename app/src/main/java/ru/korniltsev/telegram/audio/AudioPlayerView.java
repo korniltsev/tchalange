@@ -25,6 +25,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.BlurTransformation;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
@@ -246,13 +247,7 @@ public class AudioPlayerView extends LinearLayout {
         });
     }
 
-    private static final PeriodFormatter DURATION_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroAlways()
-            .minimumPrintedDigits(1).appendMinutes()
-            .appendSeparator(":")
-            .minimumPrintedDigits(2).printZeroAlways()
-            .appendSeconds()
-            .toFormatter();;
+    private static final PeriodFormatter DURATION_FORMATTER = AppUtils.DURATION_FORMATTER;
 
     private void updateProgress() {
         if (handleTouch){

@@ -12,7 +12,6 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Property;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -55,7 +54,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private Observable<Long> everySecond;
     private Subscription subscription = Subscriptions.empty();
     private ObjectAnimator redDotAnimation;
-    private PeriodFormatter timeFormatter;
+    private static PeriodFormatter sTimeFormatter;
     @Inject Presenter presenter;
     @Inject DpCalculator calc;
     @Inject VoiceRecorder recorder;
@@ -104,13 +103,15 @@ public class VoiceRecordingOverlay extends FrameLayout {
         redDotAnimation.setRepeatMode(ValueAnimator.REVERSE);
         redDotAnimation.setDuration(250);
 
-        timeFormatter = new PeriodFormatterBuilder()
-                .printZeroAlways()
-                .minimumPrintedDigits(2) // gives the '01'
-                .appendMinutes()
-                .appendSeparator(":")
-                .appendSeconds()
-                .toFormatter();
+        if (sTimeFormatter == null){
+            sTimeFormatter = new PeriodFormatterBuilder()
+                    .printZeroAlways()
+                    .minimumPrintedDigits(2) // gives the '01'
+                    .appendMinutes()
+                    .appendSeparator(":")
+                    .appendSeconds()
+                    .toFormatter();
+        }
 
         redDotInitRightPadding = calc.dp(26);
         redDotRightPadding = redDotInitRightPadding;
@@ -347,7 +348,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private void setTime(Long response) {
         final Period p = new Duration(response * 1000)
                 .toPeriod();
-        time.setText(timeFormatter.print(p));
+        time.setText(sTimeFormatter.print(p));
     }
 
     final RectF rectF = new RectF();

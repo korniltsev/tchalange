@@ -27,6 +27,8 @@ import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.other.ProfileAdapter;
@@ -51,6 +53,13 @@ public class AppUtils {
     public static final int REQUEST_TAKE_PHOTO_MY_AVATAR = 4;
     public static final int REQUEST_CHOOS_FROM_GALLERY_CHAT_AVATAR = 5;
     public static final int REQUEST_TAKE_PHOTO_CHAT_AVATAR = 6;
+    public static final PeriodFormatter DURATION_FORMATTER = new PeriodFormatterBuilder()
+            .printZeroAlways()
+            .minimumPrintedDigits(1).appendMinutes()
+            .appendSeparator(":")
+            .minimumPrintedDigits(2).printZeroAlways()
+            .appendSeconds()
+            .toFormatter();
     private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
 
     public static String uiName(TdApi.User user, Context ctx) {//todo

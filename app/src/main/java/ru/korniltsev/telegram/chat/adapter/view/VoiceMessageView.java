@@ -11,9 +11,8 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -40,13 +39,7 @@ public class VoiceMessageView extends LinearLayout {
 
     private TdApi.Voice audio;
     private DownloadView download_view;
-    private static final PeriodFormatter DURATION_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroAlways()
-            .minimumPrintedDigits(1).appendMinutes()
-            .appendSeparator(":")
-            .minimumPrintedDigits(2).printZeroAlways()
-            .appendSeconds()
-            .toFormatter();;
+
     private Subscription subscription = Subscriptions.empty();
     private final Action1<TdApi.UpdateFile> decodeAction = new Action1<TdApi.UpdateFile>() {
         @Override
@@ -92,7 +85,7 @@ public class VoiceMessageView extends LinearLayout {
         Period p = new Duration(secs * 1000)
                 .toPeriod();
 
-        this.duration.setText(DURATION_FORMATTER.print(p));
+        this.duration.setText(AppUtils.DURATION_FORMATTER.print(p));
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
 //        downloader.hook(a.voice, decodeAction);
         download_view.bind(a.voice, cfg, new DownloadView.CallBack() {

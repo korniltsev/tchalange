@@ -18,6 +18,7 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.BlurTransformation;
 import ru.korniltsev.telegram.chat.adapter.view.VideoView;
+import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
@@ -162,14 +163,7 @@ public class SharedMediaItemView extends FrameLayout {
         }
     }
 
-    private static final PeriodFormatter DURATION_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroAlways()
-            .minimumPrintedDigits(1).appendMinutes()
-            .appendSeparator(":")
-            .minimumPrintedDigits(2).printZeroAlways()
-            .appendSeconds()
-            .toFormatter();
-    ;
+    private static final PeriodFormatter DURATION_FORMATTER = AppUtils.DURATION_FORMATTER;
 
     public void animateWhiteCircle(boolean in) {
         animateView(whiteCircle, in);
