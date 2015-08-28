@@ -9,14 +9,10 @@ import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat_list.ChatList;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
-import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RXClient;
-import rx.Observable;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.subscriptions.CompositeSubscription;
 import rx.subscriptions.Subscriptions;
 
@@ -24,6 +20,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+
+import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
 public class SelectChatPresenter extends ViewPresenter<SelectChatView> {
@@ -46,13 +44,23 @@ public class SelectChatPresenter extends ViewPresenter<SelectChatView> {
         getView()
                 .init(path.me, chats);
 
-        final List<TdApi.Chat> filtered = filter(chats.getAllChats());
-        getView()
-                .setData(filtered);
+        if (path.filterOnlyGroupChats){
+            final List<TdApi.Chat> filtered = filter(chats.getAllChats());
+            getView()
+                    .setData(filtered);
+            if (filtered.isEmpty()) {
+                tryRequestNewPortion();
+            }
+        } else {
+            final List<TdApi.Chat> allChats = chats.getAllChats();
+            getView().setData(allChats);
 
-        if (filtered.isEmpty()) {
-            tryRequestNewPortion();
+            if (allChats.isEmpty()) {
+                tryRequestNewPortion();
+            }
         }
+
+
 
         subscriptions.add(
                 chats.chatList()
@@ -105,19 +113,46 @@ public class SelectChatPresenter extends ViewPresenter<SelectChatView> {
     Subscription s = Subscriptions.empty();
 
     public void chatSelected(final TdApi.Chat chat) {
-        s = client.sendRx(new TdApi.AddChatParticipant(chat.id, path.user.id, 0))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
-                    @Override
-                    public void onNext(TdApi.TLObject response) {
-                        final Chat newHead = new Chat(chat, path.me);
-                        AppUtils.flowPushAndRemove(getView(), newHead, new FlowHistoryStripper() {
-                            @Override
-                            public boolean shouldRemovePath(Object path) {
-                                return !(path instanceof ChatList);
-                            }
-                        }, Flow.Direction.FORWARD);
-                    }
-                });
+        if (path.bot != null){
+            s = client.sendRx(new TdApi.AddChatParticipant(chat.id, path.bot.id, 0))
+                    .observeOn(mainThread())
+                    .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+                        @Override
+                        public void onNext(TdApi.TLObject response) {
+                            open(chat);
+                        }
+                    });
+        }
+        if (path.messagesToForward != null) {
+            final TdApi.ForwardMessages f = new TdApi.ForwardMessages(chat.id, path.forwardedMessaesFromChatId, path.messagesToForward);
+            final Chat newHead = new Chat(chat, path.me, f);
+            AppUtils.flowPushAndRemove(getView(), newHead, new FlowHistoryStripper() {
+                @Override
+                public boolean shouldRemovePath(Object path) {
+                    return !(path instanceof ChatList);
+                }
+            }, Flow.Direction.FORWARD);
+
+//            s = client.sendRx(
+
+//                    .observeOn(mainThread())
+//                    .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+//                        @Override
+//                        public void onNext(TdApi.TLObject response) {
+//                            open(chat);
+//                        }
+//                    });
+        }
+
+    }
+
+    private void open(TdApi.Chat chat) {
+        final Chat newHead = new Chat(chat, path.me, /* messages to forward */ null);
+        AppUtils.flowPushAndRemove(getView(), newHead, new FlowHistoryStripper() {
+            @Override
+            public boolean shouldRemovePath(Object path) {
+                return !(path instanceof ChatList);
+            }
+        }, Flow.Direction.FORWARD);
     }
 }

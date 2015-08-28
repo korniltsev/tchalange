@@ -27,8 +27,9 @@
                 android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:layout_marginRight="32dp"
+                android:textSize="12sp"
                 android:layout_gravity="right"
                 android:textColor="#fff"/>
     </FrameLayout>

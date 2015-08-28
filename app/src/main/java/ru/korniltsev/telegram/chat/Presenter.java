@@ -66,6 +66,7 @@ public class Presenter extends ViewPresenter<ChatView>
     private final boolean isGroupChat;
     @Nullable private final TdApi.User user;//null if groupChat
     private final TdApi.Chat chat;
+    private TdApi.ForwardMessages forwardMessages;
 
     private CompositeSubscription subscription;
     @Nullable private volatile TdApi.GroupChatFull mGroupChatFull;
@@ -112,12 +113,15 @@ public class Presenter extends ViewPresenter<ChatView>
             //                getView().setBot(assertTrue());
             //            }
         }
+        forwardMessages = path.forwardMessages;
     }
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {
 //        nm.onLoad(path.chat.id);
+
         AppUtils.logEvent("EnterCode.onLoad");
+
         if (!isGroupChat && ((TdApi.PrivateChatInfo) chat.type).user.type instanceof TdApi.UserTypeBot) {
             getView().setBot(true);
         }
@@ -129,6 +133,10 @@ public class Presenter extends ViewPresenter<ChatView>
             } else {
                 rxChat.requestUntilLastUnread(chat);
             }
+        }
+        if (forwardMessages != null) {
+            rxChat.forwardMessages(forwardMessages);
+            forwardMessages = null;
         }
 
         shareContact();
@@ -723,7 +731,8 @@ public class Presenter extends ViewPresenter<ChatView>
                         .subscribe(new ObserverAdapter<TdApi.TLObject>(){
                             @Override
                             public void onNext(TdApi.TLObject response) {
-                                AppUtils.flowPushAndRemove(getView(), new Chat((TdApi.Chat) response, user), new LeaveOnlyChatList(), Flow.Direction.FORWARD);
+                                final Chat newHead = new Chat((TdApi.Chat) response, user, /* messages to forward */ null);
+                                AppUtils.flowPushAndRemove(getView(), newHead, new LeaveOnlyChatList(), Flow.Direction.FORWARD);
                             }
                         }));
     }

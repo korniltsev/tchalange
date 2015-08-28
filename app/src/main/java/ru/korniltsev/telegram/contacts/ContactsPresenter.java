@@ -133,7 +133,7 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
                 Observable.zip(me, chat, new Func2<TdApi.TLObject, TdApi.TLObject, Chat>() {
                     @Override
                     public Chat call(TdApi.TLObject me, TdApi.TLObject chat) {
-                        return new Chat((TdApi.Chat) chat, (TdApi.User) me);
+                        return new Chat((TdApi.Chat) chat, (TdApi.User) me, /* messages to forward */ null);
                     }
                 }).observeOn(mainThread())
                         .subscribe(new ObserverAdapter<Chat>() {
@@ -188,7 +188,7 @@ public class ContactsPresenter extends ViewPresenter<ContactListView> implements
         openChatSubscription = requestOpenChat.subscribe(new ObserverAdapter<MeAndChat>() {
             @Override
             public void onNext(MeAndChat response) {
-                final Chat newTop = new Chat(response.tlObject2, response.tlObject);
+                final Chat newTop = new Chat(response.tlObject2, response.tlObject, /* messages to forward */ null);
                 openChat(newTop);
             }
         });

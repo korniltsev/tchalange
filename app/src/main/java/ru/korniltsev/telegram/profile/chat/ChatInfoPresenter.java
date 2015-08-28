@@ -193,7 +193,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                             @Override
                             public void onNext(TdApi.TLObject response) {
                                 TdApi.Chat chat = (TdApi.Chat) response;
-                                final Chat path = new Chat(chat, item.user);
+                                final Chat path = new Chat(chat, item.user, /* messages to forward */ null);
                                 AppUtils.flowPushAndRemove(getView(), path, new LeaveOnlyChatList(), Flow.Direction.FORWARD);
                             }
                         }));

@@ -178,7 +178,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     }
 
     public void startChat() {
-        AppUtils.flowPushAndRemove(getView(), new Chat(path.chat, path.me),
+        AppUtils.flowPushAndRemove(getView(), new Chat(path.chat, path.me, /* messages to forward */ null),
                 new FlowHistoryStripper() {
                     @Override
                     public boolean shouldRemovePath(Object o) {
@@ -191,7 +191,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
 
     public void addBotToGroup() {
         Flow.get(getView())
-                .set(new SelectChatPath(path.user, path.me));
+                .set(new SelectChatPath(path.user, null, 0, path.me, true));
     }
 
     class UserInfo {

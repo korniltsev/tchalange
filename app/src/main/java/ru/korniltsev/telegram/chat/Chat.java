@@ -29,13 +29,15 @@ public class Chat extends BasePath implements Serializable, NamedPath {
 
     public final TdApi.Chat chat;
     public final TdApi.User me;
+    public final TdApi.ForwardMessages forwardMessages;
     public transient boolean firstLoad = true;
 
     public @Nullable TdApi.User sharedContact;
 
-    public Chat(TdApi.Chat chat, TdApi.User me) {
+    public Chat(TdApi.Chat chat, TdApi.User me, TdApi.ForwardMessages  messagesToForward) {
         this.chat = chat;
         this.me = me;
+        this.forwardMessages = messagesToForward;
     }
 
     @Override

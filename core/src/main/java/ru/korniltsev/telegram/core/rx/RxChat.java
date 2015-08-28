@@ -429,12 +429,26 @@ public class RxChat  {
             public void onNext(VoiceRecorder.Record response) {
                 VoiceRecorder.log("send voice");
                 float duration = response.duration;
-                if (duration > 0.4f){
+                if (duration > 0.4f) {
                     final String file = response.file.getAbsolutePath();
                     sendMessageImpl(new TdApi.InputMessageVoice(new TdApi.InputFileLocal(file), (int) duration));
                 }
             }
         });
+    }
+
+    public void forwardMessages(TdApi.ForwardMessages forwardMessages) {
+        client.sendRx(forwardMessages)
+                .subscribe(new ObserverAdapter<TdApi.TLObject>() {
+                    @Override
+                    public void onNext(TdApi.TLObject response) {
+                        System.out.println(response);
+                        final TdApi.Messages ms = (TdApi.Messages) response;
+                        for (TdApi.Message m : ms.messages){
+                            simulateUpdateNewMessage(m);
+                        }
+                    }
+                });
     }
 
     private class GetUsers implements Func1<TdApi.Messages, Observable<? extends Portion>> {

@@ -1,7 +1,6 @@
 package ru.korniltsev.telegram.chat_list;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import com.crashlytics.android.core.CrashlyticsCore;
 import flow.Flow;
@@ -164,7 +163,7 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
         }
         if (supportedChats(chat)) {
             Flow.get(getView())
-                    .set(new Chat(chat, me.user));
+                    .set(new Chat(chat, me.user, /* messages to forward */ null));
         } //else do nothing
     }
 
