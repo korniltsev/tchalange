@@ -228,9 +228,9 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
 
     static class Section extends Item {
         final DateTime time;
-        private final int id;
+        private final long id;
 
-        Section(DateTime time, int id) {
+        Section(DateTime time, long id) {
             this.time = time;
             this.id = id;
         }

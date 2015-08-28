@@ -23,8 +23,10 @@ import rx.Subscription;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SharedMediaController extends MediaController {
@@ -99,6 +101,7 @@ public class SharedMediaController extends MediaController {
         adapter.setData(split);
     }
     private static int idCounter = -1;
+    final Map<Long, Long> sectionDateToId = new HashMap<>();
     private List<SharedMediaAdapter.Item> split(List<TdApi.Message> msg) {
         if (msg.isEmpty()) {
             return Collections.emptyList();
@@ -106,7 +109,7 @@ public class SharedMediaController extends MediaController {
         final ArrayList<SharedMediaAdapter.Item> res = new ArrayList<>();
         TdApi.Message first = msg.get(0);
         DateTime prevDate = time(first);
-        res.add(new SharedMediaAdapter.Section(prevDate, idCounter--));
+        res.add(new SharedMediaAdapter.Section(prevDate, idForSection(prevDate)));
         res.add(new SharedMediaAdapter.Media(first));
         for (int i = 1; i < msg.size(); ++i) {
             final TdApi.Message message = msg.get(i);
@@ -114,12 +117,24 @@ public class SharedMediaController extends MediaController {
             if (time.getMonthOfYear() == prevDate.getMonthOfYear()
                     && time.getYear() == prevDate.getYear()) {
             } else {
-                res.add(new SharedMediaAdapter.Section(time, idCounter--));
+                res.add(new SharedMediaAdapter.Section(time, idForSection(prevDate)));
             }
             res.add(new SharedMediaAdapter.Media(message));
             prevDate = time;
         }
         return res;
+    }
+
+    private Long idForSection(DateTime prevDate) {
+        final long time = prevDate.getMillis();
+        final Long id = sectionDateToId.get(time);
+        if (id != null){
+            return id;
+        } else {
+            final long newId = idCounter--;
+            sectionDateToId.put(time, newId);
+            return newId;
+        }
     }
 
     private DateTime time(TdApi.Message prev) {
