@@ -54,16 +54,17 @@ public class EmojiPagerStripView extends ViewGroup {
     private int currentPosition;
     private float currentPositionOffset;
 
-    @Inject RxGlide glide;
+    RxGlide glide;
     private List<TdApi.StickerSet> stickerSets;
     private WeakReference<GridView> stickerGrid;
     private LinearLayout stickerSetsButtonContainer;
 
     public EmojiPagerStripView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
         final MyApp app = MyApp.from(context);
         calc = app.calc;
+        glide = app.rxGlide;
+
 
         emoji = new LinearLayoutWithStrip(context);
         for (int icon : icons) {

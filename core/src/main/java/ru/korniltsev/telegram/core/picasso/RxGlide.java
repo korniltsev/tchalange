@@ -24,7 +24,7 @@ import java.util.Map;
 
 import static junit.framework.Assert.assertTrue;
 
-@Singleton
+
 public class RxGlide {
     public static final RoundTransformation ROUND = new RoundTransformation();
 
@@ -34,7 +34,7 @@ public class RxGlide {
 
     private Context ctx;
 
-    @Inject
+
     public RxGlide(Context ctx, RxDownloadManager downlaoder, final RXAuthState auth) {
         this.ctx = ctx;
 

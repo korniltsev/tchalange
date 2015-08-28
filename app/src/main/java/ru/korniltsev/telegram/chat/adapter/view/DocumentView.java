@@ -16,6 +16,7 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.views.DownloadView;
@@ -33,15 +34,17 @@ public class DocumentView extends LinearLayout{
     private TextView documentProgress;
 //    private View clicker;
 //    private Subscription subscription = Subscriptions.empty();
-    public @Inject RxDownloadManager downloader;
-    @Inject RxGlide picasso;
+    public final RxDownloadManager downloader;
+    private final RxGlide picasso;
     private TdApi.Document document;
     private DownloadView downloadView;
     private final BlurTransformation blur;
 
     public DocumentView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        final MyApp app = MyApp.from(context);
+        picasso = app.rxGlide;
+        downloader = app.downloadManager;
         blur = new BlurTransformation(12);
     }
 

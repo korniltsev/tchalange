@@ -47,7 +47,7 @@ public class ObservableLinearLayout extends FrameLayout {
     public ObservableLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         calc = MyApp.from(context).calc;
-        ObjectGraphService.inject(context, this);
+//        ObjectGraphService.inject(context, this);
         setWillNotDraw(false);
         prefs = context.getSharedPreferences("EmojiPopup", Context.MODE_PRIVATE);
 

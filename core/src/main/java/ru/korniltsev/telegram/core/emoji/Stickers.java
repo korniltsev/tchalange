@@ -25,14 +25,14 @@ import static rx.Observable.merge;
 import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-@Singleton
+
 public class Stickers {
     final RXClient client;
         private List<TdApi.StickerSet> data = new ArrayList<>();
     //maps
     private Map<String, TdApi.Sticker> filePathToStickerInfo = new HashMap<>();
 
-    @Inject
+
     public Stickers(final RXClient client, final RXAuthState auth) {
         this.client = client;
 

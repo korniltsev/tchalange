@@ -71,14 +71,30 @@ public class RootModule {
     private final RXAuthState rxAuthState;
     private final UserHolder userHolder;
     private final RxDownloadManager downloadManager;
+    private final RxGlide rxGlide;
+    private final Stickers stickers;
 
-    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState, UserHolder userHolder, RxDownloadManager downloadManager) {
+    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState, UserHolder userHolder, RxDownloadManager downloadManager, RxGlide rxGlide, Stickers stickers) {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;
         this.rxClient = rxClient;
         this.rxAuthState = rxAuthState;
         this.userHolder = userHolder;
         this.downloadManager = downloadManager;
+        this.rxGlide = rxGlide;
+        this.stickers = stickers;
+    }
+
+    @Provides
+    @Singleton
+    public Stickers provideStickers() {
+        return stickers;
+    }
+
+    @Provides
+    @Singleton
+    public RxGlide provideRxGlide() {
+        return rxGlide;
     }
 
     @Provides

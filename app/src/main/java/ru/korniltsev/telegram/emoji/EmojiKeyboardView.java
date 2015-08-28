@@ -25,7 +25,7 @@ import ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.utils.R;
 
-import javax.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,10 +40,10 @@ public class EmojiKeyboardView extends LinearLayout implements Emoji.Listener {
     public final RecentSmiles recentStickers;
     private final SharedPreferences prefs;
     private ViewPager pager;
-    Emoji emoji;
-    DpCalculator calc;
-    @Inject Stickers stickers;
-    @Inject RxGlide picasso;
+    final Emoji emoji;
+    final DpCalculator calc;
+    final Stickers stickers;
+    final RxGlide picasso;
 
     public final LayoutInflater viewFactory;
     private EmojiPagerStripView tabs;
@@ -54,12 +54,15 @@ public class EmojiKeyboardView extends LinearLayout implements Emoji.Listener {
         recentEmoji = new RecentSmiles(context, "RecentEmoji", 40);
         recentStickers = new RecentSmiles(context, "RecentStickers", 15);
         prefs = context.getSharedPreferences("EmojiKeyboardView", Context.MODE_PRIVATE);
-        ObjectGraphService.inject(context, this);
+
+
         viewFactory = LayoutInflater.from(context);
-        final MyApp from = MyApp.from(context);
-        calc = from.calc;
-        displayWidth = from.displayWidth;
-        emoji = from.emoji;
+        final MyApp app = MyApp.from(context);
+        displayWidth = app.displayWidth;
+        stickers = app.stickers;
+        picasso = app.rxGlide;
+        emoji = app.emoji;
+        calc = app.calc;
     }
 
     @Override
@@ -115,7 +118,7 @@ public class EmojiKeyboardView extends LinearLayout implements Emoji.Listener {
     public void pageLoaded(int page) {
         for (int i = 0; i < pager.getChildCount(); ++i) {
             final View c = pager.getChildAt(i);
-            if (c instanceof GridView){
+            if (c instanceof GridView) {
                 final GridView g = (GridView) c;
                 final BaseAdapter a = (BaseAdapter) g.getAdapter();
                 a.notifyDataSetChanged();

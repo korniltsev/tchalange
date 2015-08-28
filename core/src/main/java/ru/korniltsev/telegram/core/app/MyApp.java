@@ -57,6 +57,7 @@ public class MyApp extends Application {
     public UserHolder userHolder;
     public SharedMediaHelper sharedMediaHelper;
     public RxDownloadManager downloadManager;
+    public Stickers stickers;
 
     @Override
     public void onCreate() {
@@ -90,14 +91,16 @@ public class MyApp extends Application {
         sharedMediaHelper = new SharedMediaHelper(rxClient);
         downloadManager = new RxDownloadManager(this, rxClient, rxAuthState);
         audioPLayer = new AudioPLayer(this, rxClient, downloadManager);
+        rxGlide = new RxGlide(this, downloadManager, rxAuthState);
+        stickers = new Stickers(rxClient, rxAuthState);
 
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this, calc, rxClient, rxAuthState, userHolder, downloadManager));
+                new RootModule(this, calc, rxClient, rxAuthState, userHolder, downloadManager, rxGlide, stickers));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");
         graph.get(Stickers.class);//todo better solution
-        rxGlide = graph.get(RxGlide.class);
+
     }
 
 

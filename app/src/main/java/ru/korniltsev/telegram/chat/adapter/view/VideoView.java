@@ -27,9 +27,9 @@ public class VideoView extends FrameLayout {
 
     private final int dp207;
     private final int dp154;
-    RxGlide picasso;
-    DpCalculator calc;
-    RxDownloadManager downloader;
+    final RxGlide picasso;
+    final DpCalculator calc;
+    final RxDownloadManager downloader;
 
     //    private ImageView actionIcon;
     private ImageView preview;

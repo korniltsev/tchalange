@@ -7,6 +7,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
@@ -15,16 +16,20 @@ import javax.inject.Inject;
 
 public class StickerView extends ImageView {
     private final int MAX_SIZE;
-    @Inject RxGlide picasso;
-    @Inject DpCalculator calc;
-    @Inject Stickers stickersInfo;
+    final RxGlide picasso;
+    final DpCalculator calc;
+    final Stickers stickersInfo;
 
     private int height;
     private int width;
 
     public StickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        picasso = app.rxGlide;
+        stickersInfo = app.stickers;
+
             MAX_SIZE = Math.min(512, calc.dp(126 + 32));
     }
 

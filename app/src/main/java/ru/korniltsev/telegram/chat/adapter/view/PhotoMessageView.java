@@ -18,9 +18,9 @@ import javax.inject.Inject;
 public class PhotoMessageView extends ImageView {
     public static final int ZERO_MEASURE_SPEC = MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY);
     //    private final int atmost;
-    @Inject RxGlide picasso;
-    @Inject Presenter presenter;
-    DpCalculator calc;
+    final  RxGlide picasso;
+    @Inject  Presenter presenter;//todo wtf, why presenter is here
+    final DpCalculator calc;
     private TdApi.Photo photo;
     private int dip207;
     private int dip154;
@@ -30,7 +30,11 @@ public class PhotoMessageView extends ImageView {
     public PhotoMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
-        calc = MyApp.from(context).calc;
+
+
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        picasso = app.rxGlide;
         dip207 = calc.dp(207);
         dip154 = calc.dp(154);
     }

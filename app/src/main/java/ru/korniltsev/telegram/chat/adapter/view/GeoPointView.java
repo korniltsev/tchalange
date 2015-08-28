@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 
@@ -16,12 +17,14 @@ import java.util.Locale;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 
 public class GeoPointView extends ImageView {
-    @Inject DpCalculator calc;
-    @Inject RxGlide picasso;
+    final DpCalculator calc;
+    final RxGlide picasso;
 
     public GeoPointView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        picasso = app.rxGlide;
     }
 
     public void set(TdApi.MessageLocation msg) {
