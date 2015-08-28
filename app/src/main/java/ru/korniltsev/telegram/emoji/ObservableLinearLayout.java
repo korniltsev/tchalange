@@ -37,7 +37,7 @@ public class ObservableLinearLayout extends FrameLayout {
     private int keyboardHeight;
     private ObservableLinearLayout.CallBack cb;
 
-    /*@Inject*/ DpCalculator calc;
+    final DpCalculator calc;
     private final Resources res;
 
     public interface CallBack {
@@ -46,13 +46,13 @@ public class ObservableLinearLayout extends FrameLayout {
 
     public ObservableLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        calc = MyApp.from(context).calc;
-//        ObjectGraphService.inject(context, this);
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
         setWillNotDraw(false);
         prefs = context.getSharedPreferences("EmojiPopup", Context.MODE_PRIVATE);
 
         res = getResources();
-        statusBarHeight = getResource(res, "status_bar_height");
+        statusBarHeight = getResource(res, app.statusBarHeightResId);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ||
                 res.getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             navBarHeight = 0;
@@ -61,7 +61,7 @@ public class ObservableLinearLayout extends FrameLayout {
             boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
 
             if (!hasMenuKey && !hasBackKey) {
-                navBarHeight = getResource(res, "navigation_bar_height");
+                navBarHeight = getResource(res, app.navBarHeightResId);
             } else {
                 navBarHeight = 0;
             }
@@ -74,10 +74,9 @@ public class ObservableLinearLayout extends FrameLayout {
         }
     }
 
-    private int getResource(Resources res, String status_bar_height) {
-        int resourceId = res.getIdentifier(status_bar_height, "dimen", "android");
-        if (resourceId > 0) {
-            return res.getDimensionPixelSize(resourceId);
+    private int getResource(Resources res, int resId) {
+        if (resId > 0) {
+            return res.getDimensionPixelSize(resId);
         } else {
             return 0;
         }

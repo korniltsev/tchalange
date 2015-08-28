@@ -3,6 +3,8 @@ package ru.korniltsev.telegram.core.app;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -70,6 +72,8 @@ public class MyApp extends Application {
     public ActivityOwner activityOwner;
     public VoiceRecorder voiceRecorder;
     public VoicePlayer voicePlayer;
+    public int statusBarHeightResId;
+    public int navBarHeightResId;
 
     @Override
     public void onCreate() {
@@ -89,7 +93,8 @@ public class MyApp extends Application {
 
         refreshDisplay();
 
-        float density = getResources().getDisplayMetrics().density;
+        final Resources res = getResources();
+        float density = res.getDisplayMetrics().density;
         calc = new DpCalculator(density);
 
         staticLayoutCache = new StaticLayoutCache();
@@ -118,8 +123,12 @@ public class MyApp extends Application {
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");
-        graph.get(Stickers.class);//todo better solution
 
+
+        statusBarHeightResId = res.getIdentifier("status_bar_height", "dimen", "android");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            navBarHeightResId = res.getIdentifier("navigation_bar_height", "dimen", "android");
+        }
     }
 
 
