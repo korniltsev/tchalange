@@ -30,7 +30,7 @@ import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-@Singleton
+
 public class ChatDB {
 
     public static final long IMMEDIATE_BUFFER_INTERVAl = 128l + 64l;
@@ -61,7 +61,7 @@ public class ChatDB {
 
     final UserHolder userHolder;
 
-    @Inject
+
     public ChatDB(final Context ctx, final RXClient client, NotificationManager nm, RXAuthState auth, UserHolder userHolder) {
         this.ctx = ctx;
         this.client = client;

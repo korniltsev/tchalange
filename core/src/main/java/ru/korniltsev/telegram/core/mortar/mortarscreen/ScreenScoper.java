@@ -3,56 +3,49 @@ package ru.korniltsev.telegram.core.mortar.mortarscreen;
 import android.content.Context;
 import android.content.res.Resources;
 import mortar.MortarScope;
+import mortar.ViewPresenter;
 import mortar.dagger1support.ObjectGraphService;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import ru.korniltsev.telegram.core.mortar.ViewPresenterHolder;
 
 import static java.lang.String.format;
 
-/**
- * Creates {@link MortarScope}s for screens that may be annotated with {@link WithModuleFactory},
- * {@link WithModule}.
- */
+
 public class ScreenScoper {
-  private static final ModuleFactory NO_FACTORY = new ModuleFactory() {
-    @Override protected Object createDaggerModule(Resources resources, Object screen) {
-      throw new UnsupportedOperationException();
-    }
-  };
+//  private static final ModuleFactory NO_FACTORY = new ModuleFactory() {
+//    @Override protected Object createDaggerModule(Resources resources, Object screen) {
+//      throw new UnsupportedOperationException();
+//    }
+//  };
 
 //  private final Map<Class, ModuleFactory> moduleFactoryCache = new LinkedHashMap<>();
 
   public MortarScope getScreenScope(Context context, String name, Object screen) {
     MortarScope parentScope = MortarScope.getScope(context);
-    return getScreenScope(context.getResources(), parentScope, name, screen);
+    return getScreenScope(context, parentScope, name, screen);
   }
 
-  /**
-   * Finds or creates the scope for the given screen, honoring its optional {@link
-   * WithModuleFactory} or {@link WithModule} annotation. Note that scopes are also created
-   * for unannotated screens.
-   */
-  public MortarScope getScreenScope(Resources resources, MortarScope parentScope, final String name,
+
+  public MortarScope getScreenScope(Context ctx, MortarScope parentScope, final String name,
       final Object screen) {
     ModuleFactory moduleFactory = getModuleFactory(screen);
-    Object childModule;
-    if (moduleFactory != NO_FACTORY) {
-      childModule = moduleFactory.createDaggerModule(resources, screen);
-    } else {
-      // We need every screen to have a scope, so that anything it injects is scoped.  We need
-      // this even if the screen doesn't declare a module, because Dagger allows injection of
-      // objects that are annotated even if they don't appear in a module.
-      childModule = null;
+    Object childModule = moduleFactory.createDaggerModule(ctx, screen);
+
+    ViewPresenterHolder viewPresenterHolder = null;
+    if (screen instanceof ViewPresenterHolder.Factory) {
+      final ViewPresenterHolder.Factory factory = (ViewPresenterHolder.Factory) screen;
+      final ViewPresenter viewPresenter = factory.create(ctx);
+      viewPresenterHolder = new ViewPresenterHolder(viewPresenter);
     }
 
     MortarScope childScope = parentScope.findChild(name);
     if (childScope == null) {
-      childScope = parentScope.buildChild()
-          .withService(ObjectGraphService.SERVICE_NAME,
-              ObjectGraphService.create(parentScope, childModule))
+      final MortarScope.Builder builder = parentScope.buildChild()
+              .withService(ObjectGraphService.SERVICE_NAME,
+                      ObjectGraphService.create(parentScope, childModule));
+      if (viewPresenterHolder != null) {
+        builder.withService(ViewPresenterHolder.SERVICE_NAME, viewPresenterHolder);
+      }
+      childScope = builder
           .build(name);
     }
 
@@ -182,7 +175,7 @@ public class ScreenScoper {
     }
 
     @Override
-    protected Object createDaggerModule(Resources resources, Object screen) {
+    protected Object createDaggerModule(Context resources, Object screen) {
       return delegate.createDaggerModule();
     }
   }

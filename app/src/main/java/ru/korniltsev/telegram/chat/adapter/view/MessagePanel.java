@@ -26,6 +26,7 @@ import ru.korniltsev.telegram.chat.keyboard.hack.TrickyFrameLayout;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
+import ru.korniltsev.telegram.core.mortar.ViewPresenterHolder;
 import ru.korniltsev.telegram.emoji.EmojiKeyboardView;
 import ru.korniltsev.telegram.emoji.ObservableLinearLayout;
 import ru.korniltsev.telegram.chat.R;
@@ -49,10 +50,10 @@ public class MessagePanel extends FrameLayout {
     private ImageView btnRight;
     private EditText input;
 
-    @Inject Presenter presenter;
-    @Inject ActivityOwner activityOwner;
-    Emoji emoji;
-    DpCalculator calc;
+    final Presenter presenter;
+    final ActivityOwner activityOwner;
+    final Emoji emoji;
+    final DpCalculator calc;
 
     private EmojiKeyboardView.CallBack emojiKeyboardCallback = new EmojiKeyboardView.CallBack() {
         @Override
@@ -88,13 +89,15 @@ public class MessagePanel extends FrameLayout {
 
     public MessagePanel(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+
         setWillNotDraw(false);
 
         final MyApp app = MyApp.from(context);
+        activityOwner = app.activityOwner;
         emoji = app.emoji;
         calc = app.calc;
         dip1 = calc.dp(1);
+        presenter = (Presenter) ViewPresenterHolder.get(context);
     }
 
     @Override

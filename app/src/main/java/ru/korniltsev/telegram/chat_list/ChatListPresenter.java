@@ -30,11 +30,10 @@ import static rx.Observable.concat;
 import static rx.Observable.just;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-@Singleton
+
 public class ChatListPresenter extends ViewPresenter<ChatListView> {
     private final ChatList cl;
     private final RXClient client;
-    private final Emoji emoji;
     private final RXAuthState authState;
     private final PasscodeManager passcodeManager;
     private final ChatDB chatDB;
@@ -45,11 +44,9 @@ public class ChatListPresenter extends ViewPresenter<ChatListView> {
     private CompositeSubscription subscription;
     private RXAuthState.StateAuthorized me;
 
-    @Inject
-    public ChatListPresenter(Context ctx, ChatList cl, RXClient client, RXAuthState authState, PasscodeManager passcodeManager, ChatDB chatDB) {
+    public ChatListPresenter(ChatList cl, RXClient client, RXAuthState authState, PasscodeManager passcodeManager, ChatDB chatDB) {
         this.cl = cl;
         this.client = client;
-        this.emoji = MyApp.from(ctx).emoji;
         this.authState = authState;
         this.passcodeManager = passcodeManager;
         this.chatDB = chatDB;

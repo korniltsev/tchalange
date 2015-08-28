@@ -33,7 +33,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
 
-@Singleton
+
 public class VoicePlayer {
     public static final int SAMPLE_RATE_IN_HZ = 48000;
     private final Context ctx;
@@ -43,7 +43,7 @@ public class VoicePlayer {
     @Nullable private Track currentTrack;
     private final ExecutorService service = Executors.newCachedThreadPool();
 
-    @Inject
+
     public VoicePlayer(Context ctx, RXAuthState auth) {
         this.ctx = ctx;
         decodeCacheDir = createAudioCacheDir(ctx);

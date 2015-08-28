@@ -9,6 +9,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Presenter;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.mortar.ViewPresenterHolder;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.utils.PhotoUtils;
 
@@ -19,7 +20,7 @@ public class PhotoMessageView extends ImageView {
     public static final int ZERO_MEASURE_SPEC = MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY);
     //    private final int atmost;
     final  RxGlide picasso;
-    @Inject  Presenter presenter;//todo wtf, why presenter is here
+    final Presenter presenter;//todo wtf, why presenter is here
     final DpCalculator calc;
     private TdApi.Photo photo;
     private int dip207;
@@ -29,7 +30,7 @@ public class PhotoMessageView extends ImageView {
 
     public PhotoMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        presenter = (Presenter) ViewPresenterHolder.get(context);
 
 
         final MyApp app = MyApp.from(context);

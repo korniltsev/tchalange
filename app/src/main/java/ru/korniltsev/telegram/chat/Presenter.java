@@ -50,7 +50,6 @@ import static junit.framework.Assert.assertTrue;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-@Singleton
 public class Presenter extends ViewPresenter<ChatView>
         implements Toolbar.OnMenuItemClickListener,
         MessagePanel.OnSendListener,
@@ -86,14 +85,13 @@ public class Presenter extends ViewPresenter<ChatView>
     final UserHolder uerHolder;
     final ActivityOwner activity;
 
-    @Inject
-    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, UserHolder uerHolder, ActivityOwner activity) {
+    public Presenter(Chat c, RXClient client, ChatDB chatDB, NotificationManager nm, ActivityOwner owner, UserHolder uerHolder) {
         path = c;
         this.client = client;
         this.nm = nm;
         this.owner = owner;
         this.uerHolder = uerHolder;
-        this.activity = activity;
+        this.activity = owner;
         this.chat = path.chat;
         rxChat = chatDB.getRxChat(chat.id);
 

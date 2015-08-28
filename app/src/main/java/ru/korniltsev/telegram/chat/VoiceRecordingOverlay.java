@@ -26,7 +26,9 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.mortar.ViewPresenterHolder;
 import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 import rx.Observable;
 import rx.Subscription;
@@ -55,9 +57,9 @@ public class VoiceRecordingOverlay extends FrameLayout {
     private Subscription subscription = Subscriptions.empty();
     private ObjectAnimator redDotAnimation;
     private static PeriodFormatter sTimeFormatter;
-    @Inject Presenter presenter;
-    @Inject DpCalculator calc;
-    @Inject VoiceRecorder recorder;
+    final Presenter presenter;
+    final DpCalculator calc;
+    final VoiceRecorder recorder;
     private int redDotInitRightPadding;
     private int redDotRightPadding;
     private ObjectAnimator redButtonAnimation;
@@ -75,8 +77,12 @@ public class VoiceRecordingOverlay extends FrameLayout {
 
     public VoiceRecordingOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        presenter = (Presenter) ViewPresenterHolder.get(context);
+
         setWillNotDraw(false);
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        recorder = app.voiceRecorder;
         amplitudeMaxRadiusAddition = calc.dp(24f);
         paintAmplitude.setColor(0x10000000);
         dip2 = calc.dp(2);

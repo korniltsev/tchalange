@@ -1,21 +1,25 @@
 package ru.korniltsev.telegram.chat;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import dagger.Provides;
+import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.adapter.view.VoiceMessageView;
 import ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
+import ru.korniltsev.telegram.core.mortar.ViewPresenterHolder;
 import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.ModuleFactory2;
 
 import java.io.Serializable;
 
 
-public class Chat extends BasePath implements Serializable, NamedPath, ModuleFactory2 {
+public class Chat extends BasePath implements Serializable, NamedPath, ModuleFactory2 , ViewPresenterHolder.Factory {
 
 
     public static final int LIMIT = 15;
@@ -48,23 +52,14 @@ public class Chat extends BasePath implements Serializable, NamedPath, ModuleFac
         return new Module(this);
     }
 
+    @Override
+    public ViewPresenter create(Context ctx) {
+        final MyApp app = MyApp.from(ctx);
+        return new Presenter(this, app.rxClient, app.chatDb, app.notificationManager, app.activityOwner, app.userHolder);
+    }
+
     @dagger.Module(
             injects = {
-                    ChatView.class,
-                    PhotoMessageView.class,
-                    VoiceMessageView.class ,
-//                    GeoPointView.class ,
-//                    VideoView.class ,
-//                    GifView.class ,
-//                    DocumentView.class ,
-//                    StickerView.class ,
-                    MessagePanel.class ,
-                    ForwardedMessageView.class ,
-//                    CustomCeilLayout.class,
-                    VoiceRecordingOverlay.class,
-//                    EmojiKeyboardView.class,
-//                    EmojiPagerStripView.class,
-
             },
             addsTo = RootModule.class)
     public static class Module {
@@ -74,8 +69,6 @@ public class Chat extends BasePath implements Serializable, NamedPath, ModuleFac
             this.chat = chat;
         }
 
-        @Provides Chat provideChat() {
-            return chat;
-        }
+
     }
 }

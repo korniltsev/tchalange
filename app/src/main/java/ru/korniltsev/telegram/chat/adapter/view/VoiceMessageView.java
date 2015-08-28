@@ -14,6 +14,7 @@ import org.joda.time.Period;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
@@ -33,9 +34,9 @@ public class VoiceMessageView extends LinearLayout {
     private TextView duration;
     private SeekBar progress;
 
-    @Inject VoicePlayer player;
-    @Inject RXClient client;
-    @Inject RxDownloadManager downloader;
+    final VoicePlayer player;
+    final RXClient client;
+    final RxDownloadManager downloader;
 
     private TdApi.Voice audio;
     private DownloadView download_view;
@@ -50,7 +51,10 @@ public class VoiceMessageView extends LinearLayout {
 
     public VoiceMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
+        final MyApp app = MyApp.from(context);
+        player = app.voicePlayer;
+        client = app.rxClient;
+        downloader = app.downloadManager;
 
 
 //        PeriodFormatter minutesAndSeconds =

@@ -23,7 +23,7 @@ import java.util.Map;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
-@Singleton
+
 public class NotificationManager {
     final RXClient client;
     final Context ctx;
@@ -34,7 +34,7 @@ public class NotificationManager {
     private RXAuthState.AuthState state;
     final ThreadLocal<InChatRingtone> inChatRingtone;
 
-    @Inject
+
     public NotificationManager(RXClient client, final Context ctx, RXAuthState auth) {
         this.client = client;
         this.ctx = ctx;

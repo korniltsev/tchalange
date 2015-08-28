@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@Singleton
+
 public class VoiceRecorder {
     private final Context ctx;
     private final File tmpFilesDir;
@@ -29,7 +29,7 @@ public class VoiceRecorder {
     @Nullable private AudioRecord audioRecord;
     @Nullable private Reader reader;
 
-    @Inject
+
     public VoiceRecorder(Context ctx) {
         this.ctx = ctx;
         tmpFilesDir = new File(ctx.getFilesDir(), "VoiceRecorder");

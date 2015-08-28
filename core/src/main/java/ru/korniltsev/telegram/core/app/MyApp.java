@@ -17,17 +17,23 @@ import mortar.MortarScope;
 import mortar.dagger1support.ObjectGraphService;
 import net.danlew.android.joda.JodaTimeAndroid;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
+import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
+import ru.korniltsev.telegram.core.mortar.ActivityOwner;
+import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
+import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
+import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.ExecutorService;
@@ -52,12 +58,18 @@ public class MyApp extends Application {
     private ExecutorService emojiExecutorService;
     public Emoji emoji;
     public EmojiParser emojiParser;
-    private RXAuthState rxAuthState;
+    public RXAuthState rxAuthState;
     public RXClient rxClient;
     public UserHolder userHolder;
     public SharedMediaHelper sharedMediaHelper;
     public RxDownloadManager downloadManager;
     public Stickers stickers;
+    public NotificationManager notificationManager;
+    public ChatDB chatDb;
+    public PasscodeManager passcodeManager;
+    public ActivityOwner activityOwner;
+    public VoiceRecorder voiceRecorder;
+    public VoicePlayer voicePlayer;
 
     @Override
     public void onCreate() {
@@ -93,9 +105,16 @@ public class MyApp extends Application {
         audioPLayer = new AudioPLayer(this, rxClient, downloadManager);
         rxGlide = new RxGlide(this, downloadManager, rxAuthState);
         stickers = new Stickers(rxClient, rxAuthState);
+        notificationManager = new NotificationManager(rxClient, this, rxAuthState);
+        chatDb = new ChatDB(this, rxClient, notificationManager, rxAuthState, userHolder);
+        passcodeManager = new PasscodeManager(this, rxAuthState);
+        activityOwner = new ActivityOwner();
+        voiceRecorder = new VoiceRecorder(this);
+        voicePlayer = new VoicePlayer(this, rxAuthState);
 
         ObjectGraph graph = ObjectGraph.create(
-                new RootModule(this, calc, rxClient, rxAuthState, userHolder, downloadManager, rxGlide, stickers));
+                new RootModule(this, calc, rxClient, rxAuthState, userHolder, downloadManager, rxGlide, stickers,
+                        notificationManager, chatDb, passcodeManager, activityOwner, voiceRecorder, voicePlayer));
         rootScope = MortarScope.buildRootScope()
                 .withService(ObjectGraphService.SERVICE_NAME, graph)
                 .build("Root");

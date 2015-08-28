@@ -19,6 +19,7 @@ import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.audio.LinearLayoutWithShadow;
 import ru.korniltsev.telegram.audio.MiniPlayerView;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
+import ru.korniltsev.telegram.core.mortar.ViewPresenterHolder;
 import ru.korniltsev.telegram.core.recycler.CheckRecyclerViewSpan;
 import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.ChatDB;
@@ -43,10 +44,9 @@ import static ru.korniltsev.telegram.core.toolbar.ToolbarUtils.initToolbar;
 public class ChatListView extends DrawerLayout {
 
     private final DpCalculator calc;
-    @Inject ChatListPresenter presenter;
-    @Inject ChatDB chatDb;
-    //    @Inject PhoneFormat phoneFormat;
-    @Inject UserHolder userHolder;
+    final ChatListPresenter presenter;
+    final ChatDB chatDb;
+    final UserHolder userHolder;
 
     private RecyclerView list;
     private ChatListAdapter adapter;
@@ -66,8 +66,12 @@ public class ChatListView extends DrawerLayout {
 
     public ChatListView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        ObjectGraphService.inject(context, this);
-        calc = MyApp.from(context).calc;
+        presenter = (ChatListPresenter) ViewPresenterHolder.get(context);
+
+        final MyApp app = MyApp.from(context);
+        calc = app.calc;
+        chatDb = app.chatDb;
+        userHolder = app.userHolder;
         AppUtils.rtlPerformanceFix(this);
     }
 

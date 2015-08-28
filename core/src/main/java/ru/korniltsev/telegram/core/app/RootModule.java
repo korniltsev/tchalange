@@ -35,6 +35,7 @@ import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.UserHolder;
+import ru.korniltsev.telegram.core.rx.VoiceRecorder;
 import ru.korniltsev.telegram.core.views.DownloadView;
 
 import javax.inject.Singleton;
@@ -73,8 +74,18 @@ public class RootModule {
     private final RxDownloadManager downloadManager;
     private final RxGlide rxGlide;
     private final Stickers stickers;
+    private final NotificationManager notificationManager;
+    private final ChatDB chatDb;
+    private final PasscodeManager passcodeManager;
+    private final ActivityOwner activityOwner;
+    private final VoiceRecorder voiceRecorder;
+    private final VoicePlayer voicePlayer;
 
-    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState, UserHolder userHolder, RxDownloadManager downloadManager, RxGlide rxGlide, Stickers stickers) {
+    public RootModule(Context ctx, DpCalculator dpCalculator, RXClient rxClient, RXAuthState rxAuthState,
+                      UserHolder userHolder, RxDownloadManager downloadManager, RxGlide rxGlide,
+                      Stickers stickers, NotificationManager notificationManager, ChatDB chatDb,
+                      PasscodeManager passcodeManager, ActivityOwner activityOwner, VoiceRecorder voiceRecorder,
+                      VoicePlayer voicePlayer) {
         this.ctx = ctx;
         this.dpCalculator = dpCalculator;
         this.rxClient = rxClient;
@@ -83,6 +94,42 @@ public class RootModule {
         this.downloadManager = downloadManager;
         this.rxGlide = rxGlide;
         this.stickers = stickers;
+        this.notificationManager = notificationManager;
+        this.chatDb = chatDb;
+        this.passcodeManager = passcodeManager;
+        this.activityOwner = activityOwner;
+        this.voiceRecorder = voiceRecorder;
+        this.voicePlayer = voicePlayer;
+    }
+
+    @Provides
+    @Singleton
+    public VoicePlayer voicePlayer(){
+        return voicePlayer;
+    }
+
+    @Provides
+    @Singleton
+    public VoiceRecorder provideVoiceRecorder(){
+        return voiceRecorder;
+    }
+
+
+    @Provides
+    @Singleton
+    public PasscodeManager providePasscodeManager(){
+        return passcodeManager;
+    }
+
+    @Provides
+    @Singleton
+    public ChatDB provideChatDB() {
+        return chatDb;
+    }
+    @Provides
+    @Singleton
+    public NotificationManager provideNotificationsManager() {
+        return notificationManager;
     }
 
     @Provides
@@ -143,7 +190,7 @@ public class RootModule {
 
 
     @Provides @Singleton ActivityOwner provideActivityOwner() {
-        return new ActivityOwner();
+        return activityOwner;
     }
 
 

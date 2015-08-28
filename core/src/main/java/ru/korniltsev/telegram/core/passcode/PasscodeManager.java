@@ -11,8 +11,7 @@ import ru.korniltsev.telegram.core.rx.RXAuthState;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-//todo should know something about authorization!
-@Singleton
+
 public class PasscodeManager {
 
     public static final String LAST_PAUSE = "last_pause";
@@ -26,7 +25,7 @@ public class PasscodeManager {
     private final Context ctx;
     private final SharedPreferences prefs;
 
-    @Inject
+
     public PasscodeManager(Context ctx, RXAuthState auth) {
         this.ctx = ctx;
         prefs = ctx.getSharedPreferences("PassCodeManager", Context.MODE_PRIVATE);
