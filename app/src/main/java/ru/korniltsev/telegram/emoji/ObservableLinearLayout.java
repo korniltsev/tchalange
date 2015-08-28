@@ -61,7 +61,6 @@ public class ObservableLinearLayout extends FrameLayout {
             boolean hasBackKey = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK);
 
             if (!hasMenuKey && !hasBackKey) {
-                // Do whatever you need to do, this device has a navigation bar
                 navBarHeight = getResource(res, "navigation_bar_height");
             } else {
                 navBarHeight = 0;
