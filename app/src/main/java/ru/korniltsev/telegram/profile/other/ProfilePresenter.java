@@ -1,8 +1,10 @@
 package ru.korniltsev.telegram.profile.other;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -13,9 +15,13 @@ import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
+import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.profile.chatselection.SelectChatPath;
 import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import rx.Observable;
@@ -26,15 +32,17 @@ import rx.subscriptions.CompositeSubscription;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import static ru.korniltsev.telegram.common.AppUtils.getMedia;
+import static rx.Observable.combineLatest;
 import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 @Singleton
 public class ProfilePresenter extends ViewPresenter<ProfileView> implements ProfileAdapter.CallBack {
-    public static final TdApi.SearchMessagesFilterPhotoAndVideo FILTER = new TdApi.SearchMessagesFilterPhotoAndVideo();
+
     final ProfilePath path;
     final ActivityOwner owner;
+    private final RxChat rxChat;
+    private final UserHolder userHolder;
     @Nullable private ListChoicePopup popup;
     final NotificationManager nm;
     final RXClient client;
@@ -43,11 +51,13 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
     private boolean blocked;
 
     @Inject
-    public ProfilePresenter(ProfilePath path, ActivityOwner owner, NotificationManager nm, RXClient client) {
+    public ProfilePresenter(Context ctx, ProfilePath path, ActivityOwner owner, NotificationManager nm, RXClient client, ChatDB chat) {
         this.path = path;
         this.owner = owner;
         this.nm = nm;
         this.client = client;
+        rxChat = chat.getRxChat(path.chat.id);
+        userHolder = MyApp.from(ctx).userHolder;
     }
 
     @Override
@@ -69,26 +79,37 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
                             }
                         }));
 
-        final Observable<UserInfo> userInfo = zip(
-                getMedia(client, path.chat.id),
-                client.getUserFull(path.user.id),
+        final Observable<UserInfo> userInfo = combineLatest(
+                rxChat.getMediaPreview(),
+                userHolder.getUserFull(client, path.user.id),
                 new Func2<TdApi.Messages, TdApi.UserFull, UserInfo>() {
                     @Override
                     public UserInfo call(TdApi.Messages messages, TdApi.UserFull userFull) {
                         return new UserInfo(messages, userFull);
                     }
-                })
-                .observeOn(mainThread());
+                });
 
         subscriptions.add(
                 userInfo.subscribe(new ObserverAdapter<UserInfo>() {
                     @Override
                     public void onNext(UserInfo response) {
-                        view
-                                .bindUser(response.user, response.ms);
+                        bindUser(response);
                     }
                 })
         );
+    }
+
+    private void bindUser(final UserInfo response) {
+        AppUtils.runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                ProfileView v = getView();
+                if (v == null) {
+                    return;
+                }
+                v.bindUser(response.user, response.ms);
+            }
+        });
     }
 
     @NonNull

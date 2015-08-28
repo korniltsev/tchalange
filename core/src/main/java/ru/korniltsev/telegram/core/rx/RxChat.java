@@ -1,5 +1,6 @@
 package ru.korniltsev.telegram.core.rx;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -14,6 +15,7 @@ import rx.subjects.PublishSubject;
 import rx.subscriptions.Subscriptions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -25,9 +27,13 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkMainThread;
 import static ru.korniltsev.telegram.core.utils.Preconditions.checkNotMainThread;
+import static rx.Observable.just;
+import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 public class RxChat  {
+    public static final TdApi.SearchMessagesFilterPhotoAndVideo MEDIA_PREVIEW_FILTER = new TdApi.SearchMessagesFilterPhotoAndVideo();
+
 
     public static final int MESSAGE_STATE_READ = 0;
     public static final int MESSAGE_STATE_SENT = 1;
@@ -309,7 +315,7 @@ public class RxChat  {
                 .flatMap(new Func1<TdApi.Messages, Observable<TdApi.Messages>>() {
                     @Override
                     public Observable<TdApi.Messages> call(TdApi.Messages messages) {
-                        final Observable<TdApi.Messages> just = Observable.just(messages);
+                        final Observable<TdApi.Messages> just = just(messages);
                         if (contains(messages, untilId)
                                 || messages.messages.length == 0) {
                             return just;
@@ -444,12 +450,14 @@ public class RxChat  {
                     public void onNext(TdApi.TLObject response) {
                         System.out.println(response);
                         final TdApi.Messages ms = (TdApi.Messages) response;
-                        for (TdApi.Message m : ms.messages){
+                        for (TdApi.Message m : ms.messages) {
                             simulateUpdateNewMessage(m);
                         }
                     }
                 });
     }
+
+
 
     private class GetUsers implements Func1<TdApi.Messages, Observable<? extends Portion>> {
         private final TdApi.Message initMessage;
@@ -484,7 +492,7 @@ public class RxChat  {
             }
             final List<ChatListItem> split = daySplitter.split(messageList);
             Portion res = new Portion(messageList, split);
-            return Observable.just(res);
+            return just(res);
         }
     }
 
@@ -563,5 +571,78 @@ public class RxChat  {
 
     public Observable<TdApi.Message> getMessageChanged() {
         return messageChanged;
+    }
+
+    @NonNull
+    public Observable<TdApi.Messages> getMediaPreview() {
+        final TdApi.Messages lastKnownMedia = this.lastKnownMedia;
+        final Observable<TdApi.Messages> request = getMediaPreviewImpl()
+                .map(new Func1<TdApi.Messages, TdApi.Messages>() {
+                    @Override
+                    public TdApi.Messages call(TdApi.Messages messages) {
+                        RxChat.this.lastKnownMedia = messages;
+                        return messages;
+                    }
+                });
+        if (lastKnownMedia != null){
+            final Observable<TdApi.Messages> just = just(lastKnownMedia);
+            return just.concatWith(request);
+        }
+        return request;
+    }
+
+    private volatile TdApi.Messages lastKnownMedia;
+
+    @NonNull
+    private Observable<TdApi.Messages> getMediaPreviewImpl() {
+        return client.sendRx(new TdApi.GetChat(id))
+                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.Messages>>() {
+                    @Override
+                    public Observable<TdApi.Messages> call(TdApi.TLObject tlObject) {
+                        TdApi.Chat chat = (TdApi.Chat) tlObject;
+                        //todo deleted history
+                        final Observable<TdApi.Chat> justChat = just(chat);
+                        final Observable<TdApi.TLObject> messages = client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, MEDIA_PREVIEW_FILTER));
+                        return zip(justChat, messages, new Func2<TdApi.Chat, TdApi.TLObject, TdApi.Messages>() {
+                            @Override
+                            public TdApi.Messages call(TdApi.Chat chat, TdApi.TLObject tlObject) {
+                                final TdApi.Messages res = (TdApi.Messages) tlObject;
+                                if (isPhotoOrVideo(chat.topMessage)){
+                                    final ArrayList<TdApi.Message> m = new ArrayList<>(Arrays.asList(res.messages));
+                                    m.add(0, chat.topMessage);
+                                    res.messages = m.toArray(new TdApi.Message[m.size()]);
+                                    return res;
+                                } else {
+                                    return res;
+                                }
+                            }
+                        });
+                    }
+                });
+    }
+
+    public static boolean isPhotoOrVideo(TdApi.Message msg) {
+        return msg.message instanceof TdApi.MessagePhoto
+                || msg.message instanceof TdApi.MessageVideo;
+    }
+
+    private volatile TdApi.GroupChatFull lastKnownGroupChat;
+
+    public Observable<TdApi.GroupChatFull> getGroupChatFull(int groupChatId) {
+        final TdApi.GroupChatFull lastKnownGroupChat = this.lastKnownGroupChat;
+        final Observable<TdApi.GroupChatFull> request = client.getGroupChatFull(groupChatId).map(new Func1<TdApi.GroupChatFull, TdApi.GroupChatFull>() {
+            @Override
+            public TdApi.GroupChatFull call(TdApi.GroupChatFull groupChatFull) {
+                RxChat.this.lastKnownGroupChat = groupChatFull;
+                return groupChatFull;
+            }
+        });
+
+        if (lastKnownGroupChat == null){
+            return request;
+        }
+        return just(lastKnownGroupChat)
+                .concatWith(request);
+
     }
 }

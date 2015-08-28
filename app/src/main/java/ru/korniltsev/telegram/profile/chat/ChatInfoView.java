@@ -53,6 +53,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
     @Nullable private ListChoicePopup mutePopup;
     private AttachPanelPopup selectImage;
     @Nullable private TdApi.GroupChatFull chatFull;
+    private List<RecyclerView.ItemDecoration> currentDecoration;
 
     public ChatInfoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -145,6 +146,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
                 fakeToolbar.createScrollListener(listLayout, list));
         fakeToolbar.initPosition(
                 toolbar.toolbar);
+        traversalHelper.setTraversalStarted();
     }
 
     @Override
@@ -168,7 +170,17 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
     private void bindChatImpl(TdApi.GroupChatFull chat1, ChatInfo chatInfo, TdApi.Messages ms) {
         this.chatFull = chat1;
         fakeToolbar.bindChat(chat1);
-//        List<ChatInfoAdapter.Item> data = new ArrayList<>();
+        final List<ChatInfoAdapter.Item> data = adapter.getData();
+        final ChatInfoAdapter.Item header = data.get(0);
+        adapter.clearData();
+        adapter.add(header);
+
+        if (currentDecoration != null){
+            for (RecyclerView.ItemDecoration d: currentDecoration){
+                list.removeItemDecoration(d);
+            }
+        }
+        //        List<ChatInfoAdapter.Item> data = new ArrayList<>();
         List<List<ChatInfoAdapter.Item>> sections = new ArrayList<>();
         final ChatInfoAdapter.ButtonItem buttonItem = new ChatInfoAdapter.ButtonItem();
         sections.add(Collections.<ChatInfoAdapter.Item>singletonList(buttonItem));
@@ -191,7 +203,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
         }
         adapter.addAll(flatten(sections));
 
-        ProfileView.decorate(getContext(), list, calc, sections);
+        currentDecoration = ProfileView.decorate(getContext(), list, calc, sections);
     }
 
     public void bindMuteMenu(boolean muted) {

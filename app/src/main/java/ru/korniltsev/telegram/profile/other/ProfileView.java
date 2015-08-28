@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.profile.other;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -61,6 +62,7 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
     private ProfileAdapter adapter;
     private ToolbarUtils toolbar;
     private ListChoicePopup mutePopup;
+    @Nullable private List<RecyclerView.ItemDecoration> currentDecorations;
 
     public ProfileView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -147,6 +149,7 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
                 fakeToolbar.createScrollListener(listLayout, list));
         fakeToolbar.initPosition(
                 toolbar.toolbar);
+        traversalHelper.setTraversalStarted();
     }
 
     @Override
@@ -162,12 +165,18 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
                 bindUserImpl(userFill, ms);
             }
         });
-
-
-
     }
 
     private void bindUserImpl(@NonNull TdApi.UserFull userFill, TdApi.Messages ms) {
+        final ProfileAdapter.Item header = adapter.getData().get(0);
+        adapter.clearData();
+        adapter.add(header);
+        if (currentDecorations != null){
+            for (RecyclerView.ItemDecoration d: currentDecorations){
+                list.removeItemDecoration(d);
+            }
+        }
+
         final TdApi.User user = userFill.user;
         List<List<ProfileAdapter.Item>> sections = new ArrayList<>();
 
@@ -221,28 +230,40 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
 
         adapter.addAll(flatten(sections));
 
-        decorate(getContext(), list, calc, sections);
+        currentDecorations = decorate(getContext(), list, calc, sections);
     }
 
-    public static <T> void decorate(Context ctx, RecyclerView list, DpCalculator calc, List<List<T>> sections) {
+    public static <T> List<RecyclerView.ItemDecoration> decorate(Context ctx, RecyclerView list, DpCalculator calc, List<List<T>> sections) {
+        List<RecyclerView.ItemDecoration> result = new ArrayList<>();
         List<List<T>> nonEmptySections = AppUtils.filterNonEmpty(sections);
         int itemNumber = 1;
         for (int i = 0, nonEmptySectionsSize = nonEmptySections.size(); i < nonEmptySectionsSize; i++) {
             List<T> nonEmptySection = nonEmptySections.get(i);
             if (i == 0) {
-                list.addItemDecoration(new MyWhiteRectTopPaddingDecorator(itemNumber, calc.dp(15)));
+                final MyWhiteRectTopPaddingDecorator decor = new MyWhiteRectTopPaddingDecorator(itemNumber, calc.dp(15));
+                result.add(decor);
+                list.addItemDecoration(decor);
             } else {
-                list.addItemDecoration(new InsetDecorator(itemNumber, calc.dp(6)));
-                list.addItemDecoration(new TopShadow(ctx, calc, itemNumber));
+                final InsetDecorator decor = new InsetDecorator(itemNumber, calc.dp(6));
+                final TopShadow decor1 = new TopShadow(ctx, calc, itemNumber);
+                list.addItemDecoration(decor);
+                list.addItemDecoration(decor1);
+                result.add(decor);
+                result.add(decor1);
             }
             if (nonEmptySection.size() > 1){
                 for (int j = 0; j < nonEmptySection.size() - 1; j++){
-                    list.addItemDecoration(new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, itemNumber + j));
+                    final DividerItemDecorator decor = new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, itemNumber + j);
+                    list.addItemDecoration(decor);
+                    result.add(decor);
                 }
             }
             itemNumber += nonEmptySection.size();
-            list.addItemDecoration(new BottomShadow(ctx, calc, itemNumber - 1));
+            final BottomShadow decor = new BottomShadow(ctx, calc, itemNumber - 1);
+            list.addItemDecoration(decor);
+            result.add(decor);
         }
+        return result;
     }
 
     private List<ListChoicePopup.Item> createPhoneActions(final String phone) {

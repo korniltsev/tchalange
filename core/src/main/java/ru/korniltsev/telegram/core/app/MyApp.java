@@ -54,7 +54,7 @@ public class MyApp extends Application {
     public EmojiParser emojiParser;
     private RXAuthState rxAuthState;
     public RXClient rxClient;
-    private UserHolder userHolder;
+    public UserHolder userHolder;
     public SharedMediaHelper sharedMediaHelper;
     public RxDownloadManager downloadManager;
 

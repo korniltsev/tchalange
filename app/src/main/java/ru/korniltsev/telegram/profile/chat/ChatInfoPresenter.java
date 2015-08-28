@@ -22,8 +22,10 @@ import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
+import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.profile.edit.chat.title.EditChatTitlePath;
 import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import rx.Observable;
@@ -37,8 +39,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.korniltsev.telegram.common.AppUtils.getMedia;
 import static ru.korniltsev.telegram.common.AppUtils.getTmpFileForCamera;
+import static rx.Observable.combineLatest;
 import static rx.Observable.zip;
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -48,17 +50,19 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
     final ActivityOwner owner;
     final NotificationManager notifications;
     final RXClient client;
+    private final RxChat rxChat;
     private CompositeSubscription subscriptions;
 
     TdApi.Chat chat;
     @Nullable private TdApi.GroupChatFull chatFull;
 
     @Inject
-    public ChatInfoPresenter(ChatInfo path, ActivityOwner owner, NotificationManager notifications, RXClient client) {
+    public ChatInfoPresenter(ChatInfo path, ActivityOwner owner, NotificationManager notifications, RXClient client, ChatDB chats) {
         this.path = path;
         this.owner = owner;
         this.notifications = notifications;
         this.client = client;
+        rxChat = chats.getRxChat(path.chatId);
     }
 
     @Override
@@ -79,22 +83,20 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         view.bindMuteMenu(muted);
 
         final TdApi.GroupChatInfo type = (TdApi.GroupChatInfo) chat.type;
-        final Observable<ChatInfoData> chatInfo = zip(
-                client.getGroupChatFull(type.groupChat.id),
-                getMedia(client, chat.id),
+        final Observable<ChatInfoData> chatInfo = combineLatest(
+                rxChat.getGroupChatFull(type.groupChat.id),
+                rxChat.getMediaPreview(),
                 new Func2<TdApi.GroupChatFull, TdApi.Messages, ChatInfoData>() {
                     @Override
                     public ChatInfoData call(TdApi.GroupChatFull groupChatFull, TdApi.Messages messages) {
                         return new ChatInfoData(groupChatFull, messages);
                     }
                 }
-        ).observeOn(mainThread());
+        );
         subscriptions.add(chatInfo.subscribe(new ObserverAdapter<ChatInfoData>(){
             @Override
             public void onNext(ChatInfoData response) {
-                getView()
-                        .bindChat(response.chatFull, path, response.ms);
-                chatFull = response.chatFull;
+                bindView(response);
             }
         }));
         //        client.sendRx(new )
@@ -136,6 +138,21 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
                                         .setChatTitle(response.title);
                             }
                         }));
+    }
+
+    private void bindView(final ChatInfoData response) {
+        AppUtils.runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                final ChatInfoView v = getView();
+                if (v == null){
+                    return;
+                }
+                v.bindChat(response.chatFull, path, response.ms);
+                chatFull = response.chatFull;
+            }
+        });
+
     }
 
     private void onActivityResult(ActivityResult response) {

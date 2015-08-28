@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -44,9 +46,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
+import static ru.korniltsev.telegram.core.rx.RxChat.isPhotoOrVideo;
 import static rx.Observable.zip;
 
 public class AppUtils {
+    public static final Looper MAIN_LOOPER = Looper.getMainLooper();
+    public static final Handler MAIN_HANDLER = new Handler(MAIN_LOOPER);
     public static final int REQUEST_CHOOS_FROM_GALLERY = 1;
     public static final int REQUEST_TAKE_PHOTO = 2;
     public static final int REQUEST_CHOOS_FROM_GALLERY_MY_AVATAR = 3;
@@ -81,7 +86,7 @@ public class AppUtils {
         if (firstName.length() != 0) {
             sb.append(firstName);
         }
-        if (lastName.length() != 0){
+        if (lastName.length() != 0) {
             if (sb.length() != 0) {
                 sb.append(" ");
             }
@@ -102,7 +107,6 @@ public class AppUtils {
                     .withZone(DateTimeZone.getDefault());
 
             DateTime now = DateTime.now();
-
 
             String offlineStatusText;
             int daysBetween = Days.daysBetween(wasOnlineTime, now)
@@ -125,7 +129,7 @@ public class AppUtils {
                         String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
                         offlineStatusText = res.getString(R.string.user_status_last_seen, date);
                     }
-                } else if (hoursBetween > 0){
+                } else if (hoursBetween > 0) {
                     //show hours
                     offlineStatusText = res.getQuantityString(R.plurals.user_status_last_seen_n_hours_ago, hoursBetween, hoursBetween);
                 } else {
@@ -133,9 +137,9 @@ public class AppUtils {
                     String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
                     offlineStatusText = res.getString(R.string.user_status_last_seen, date);
                 }
-            } else if (daysBetween > 0){
+            } else if (daysBetween > 0) {
                 //show n days ago
-                if (daysBetween <= 7){
+                if (daysBetween <= 7) {
                     offlineStatusText = res.getQuantityString(R.plurals.user_status_last_seen_n_days_ago, daysBetween, daysBetween);
                 } else {
                     String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
@@ -147,7 +151,7 @@ public class AppUtils {
                 offlineStatusText = res.getString(R.string.user_status_last_seen, date);
             }
 
-            return  offlineStatusText;
+            return offlineStatusText;
         } else if (status instanceof TdApi.UserStatusLastWeek) {
             return context.getString(R.string.user_status_last_week);
         } else if (status instanceof TdApi.UserStatusLastMonth) {
@@ -173,11 +177,11 @@ public class AppUtils {
 
     @NonNull
     public static String phoneNumberWithPlus(@NonNull TdApi.User user) {
-        if (user.phoneNumber == null){
+        if (user.phoneNumber == null) {
             return "";
         }
         final String phoneNumber = user.phoneNumber;
-        if (phoneNumber.startsWith("+")){
+        if (phoneNumber.startsWith("+")) {
             return phoneNumber;
         } else {
             return "+" + user.phoneNumber;
@@ -189,20 +193,19 @@ public class AppUtils {
     }
 
     @Nullable
-    public static View getChildWithAdapterPosition(RecyclerView list, int position){
-        for (int i = 0; i < list.getChildCount(); ++i){
+    public static View getChildWithAdapterPosition(RecyclerView list, int position) {
+        for (int i = 0; i < list.getChildCount(); ++i) {
             final View child = list.getChildAt(i);
             final RecyclerView.ViewHolder vh = list.getChildViewHolder(child);
             if (vh.getAdapterPosition() == position) {
                 return child;
-
             }
         }
         return null;
     }
 
     public static int uiStatusColor(TdApi.UserStatus status) {
-        if (status instanceof TdApi.UserStatusOnline){
+        if (status instanceof TdApi.UserStatusOnline) {
             return 0xff2f6fb3;
         } else {
             return 0xff979797;
@@ -223,7 +226,7 @@ public class AppUtils {
             }
             paths.add(next);
         }
-        if (newTopPath != null){
+        if (newTopPath != null) {
             paths.add(newTopPath);
         }
         final History.Builder builder = history.buildUpon();
@@ -236,7 +239,7 @@ public class AppUtils {
         Toast.makeText(context, R.string.feature_unsupported, Toast.LENGTH_LONG).show();
     }
 
-    public  static void executeOnPreDraw( final View view, final Runnable run) {
+    public static void executeOnPreDraw(final View view, final Runnable run) {
         view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -249,9 +252,11 @@ public class AppUtils {
 
     public static String humanReadableByteCount(long bytes) {
         int unit = 1024;
-        if (bytes < unit) return bytes + " b";
+        if (bytes < unit) {
+            return bytes + " b";
+        }
         int exp = (int) (Math.log(bytes) / Math.log(unit));
-        String pre = ( "KMGTPE").charAt(exp-1) + "";
+        String pre = ("KMGTPE").charAt(exp - 1) + "";
         return String.format("%.1f %sb", bytes / Math.pow(unit, exp), pre);
     }
 
@@ -282,38 +287,38 @@ public class AppUtils {
     }
 
     public static void rtlPerformanceFix(View v) {
-//        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1){
-//            v.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
-//        }
+        //        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1){
+        //            v.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
+        //        }
     }
 
-    @NonNull
-    public static Observable<TdApi.Messages> getMedia(final RXClient client, long chatId) {
-        return client.sendRx(new TdApi.GetChat(chatId))
-                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.Messages>>() {
-                    @Override
-                    public Observable<TdApi.Messages> call(TdApi.TLObject tlObject) {
-                        TdApi.Chat chat = (TdApi.Chat) tlObject;
-                        //todo deleted history
-                        final Observable<TdApi.Chat> justChat = Observable.just(chat);
-                        final Observable<TdApi.TLObject> messages = client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, ProfilePresenter.FILTER));
-                        return zip(justChat, messages, new Func2<TdApi.Chat, TdApi.TLObject, TdApi.Messages>() {
-                            @Override
-                            public TdApi.Messages call(TdApi.Chat chat, TdApi.TLObject tlObject) {
-                                final TdApi.Messages res = (TdApi.Messages) tlObject;
-                                if (isPhotoOrVideo(chat.topMessage)){
-                                    final ArrayList<TdApi.Message> m = new ArrayList<>(Arrays.asList(res.messages));
-                                    m.add(0, chat.topMessage);
-                                    res.messages = m.toArray(new TdApi.Message[m.size()]);
-                                    return res;
-                                } else {
-                                    return res;
-                                }
-                            }
-                        });
-                    }
-                });
-    }
+    //    @NonNull
+    //    public static Observable<TdApi.Messages> getMedia(final RXClient client, long chatId) {
+    //        return client.sendRx(new TdApi.GetChat(chatId))
+    //                .flatMap(new Func1<TdApi.TLObject, Observable<TdApi.Messages>>() {
+    //                    @Override
+    //                    public Observable<TdApi.Messages> call(TdApi.TLObject tlObject) {
+    //                        TdApi.Chat chat = (TdApi.Chat) tlObject;
+    //                        //todo deleted history
+    //                        final Observable<TdApi.Chat> justChat = Observable.just(chat);
+    //                        final Observable<TdApi.TLObject> messages = client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, ProfilePresenter.FILTER));
+    //                        return zip(justChat, messages, new Func2<TdApi.Chat, TdApi.TLObject, TdApi.Messages>() {
+    //                            @Override
+    //                            public TdApi.Messages call(TdApi.Chat chat, TdApi.TLObject tlObject) {
+    //                                final TdApi.Messages res = (TdApi.Messages) tlObject;
+    //                                if (isPhotoOrVideo(chat.topMessage)){
+    //                                    final ArrayList<TdApi.Message> m = new ArrayList<>(Arrays.asList(res.messages));
+    //                                    m.add(0, chat.topMessage);
+    //                                    res.messages = m.toArray(new TdApi.Message[m.size()]);
+    //                                    return res;
+    //                                } else {
+    //                                    return res;
+    //                                }
+    //                            }
+    //                        });
+    //                    }
+    //                });
+    //    }
 
     public static <T> List<T> flatten(List<List<T>> sections) {
         final ArrayList<T> res = new ArrayList<>();
@@ -336,15 +341,22 @@ public class AppUtils {
     public static List<TdApi.Message> filterPhotosAndVideos(List<TdApi.Message> ms) {
         final ArrayList<TdApi.Message> res = new ArrayList<>();
         for (TdApi.Message msg : ms) {
-            if (isPhotoOrVideo(msg)){
+            if (isPhotoOrVideo(msg)) {
                 res.add(msg);
             }
         }
         return res;
     }
 
-    private static boolean isPhotoOrVideo(TdApi.Message msg) {
-        return msg.message instanceof TdApi.MessagePhoto
-                || msg.message instanceof TdApi.MessageVideo;
+    public static boolean isUIThread() {
+        return Looper.myLooper() == MAIN_LOOPER;
+    }
+
+    public static void runOnUIThread(Runnable r) {
+        if (isUIThread()) {
+            r.run();
+        } else {
+            MAIN_HANDLER.post(r);
+        }
     }
 }
