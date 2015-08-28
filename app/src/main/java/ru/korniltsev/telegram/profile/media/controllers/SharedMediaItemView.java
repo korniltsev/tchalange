@@ -42,7 +42,7 @@ public class SharedMediaItemView extends FrameLayout {
     public ImageView img;
     private View btnPlayVideo;
     private TextView videoDuration;
-    private DownloadView downloadView;
+    public DownloadView downloadView;
     private View whiteCircle;
     private View greenCircle;
 
@@ -143,7 +143,7 @@ public class SharedMediaItemView extends FrameLayout {
             public void play(TdApi.File fileLocal) {
                 VideoView.playVideo(getContext(), downloader, fileLocal);
             }
-        }, this);
+        }, null);
         videoDuration.setText(
                 DURATION_FORMATTER.print(new Period(v.duration)));
     }

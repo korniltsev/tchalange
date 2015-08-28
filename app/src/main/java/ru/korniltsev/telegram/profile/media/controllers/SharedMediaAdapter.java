@@ -119,6 +119,7 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
                                 .set(new PhotoView(photo));
                     } else {
                         //video should be downloaded
+                        root.downloadView.clicker.onClick(v);
                     }
                 }
             });

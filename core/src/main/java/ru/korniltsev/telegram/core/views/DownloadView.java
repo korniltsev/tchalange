@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LevelListDrawable;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.View;
@@ -67,7 +68,7 @@ public class DownloadView extends FrameLayout {
     private final Drawable pauseBlue;
     private final Drawable ause;
     private final int strokeWidth;
-    private final OnClickListener clicker;
+    public final OnClickListener clicker;
 
     float progress;
 
@@ -302,14 +303,16 @@ public class DownloadView extends FrameLayout {
 
         //        setProgress(progress);
     }
-    public void bind(TdApi.File f,Config cfg,  CallBack cb, View clickTarget) {
+    public void bind(TdApi.File f,Config cfg,  CallBack cb, @Nullable View clickTarget) {
         bind(f, cfg, cb, clickTarget, false);
     }
 
-    private void bind(TdApi.File f,Config cfg,  CallBack cb, View clickTarget, boolean animateIcons) {
+    private void bind(TdApi.File f,Config cfg,  CallBack cb, @Nullable View clickTarget, boolean animateIcons) {
         p.setAlpha(255);
         this.clickTarget = clickTarget;
-        clickTarget.setOnClickListener(clicker);
+        if (clickTarget != null){
+            clickTarget.setOnClickListener(clicker);
+        }
         configure(cfg);
         this.cb = cb;
         clearAnimation();

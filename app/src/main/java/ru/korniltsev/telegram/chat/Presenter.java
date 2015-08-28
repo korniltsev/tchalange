@@ -94,9 +94,8 @@ public class Presenter extends ViewPresenter<ChatView>
 
         if (chat.type instanceof TdApi.GroupChatInfo) {
             TdApi.GroupChat groupChat = ((TdApi.GroupChatInfo) chat.type).groupChat;
-            fullChatInfoRequest = client.getGroupChatFull(groupChat.id)
-                    .cache()
-                    .observeOn(mainThread());
+            fullChatInfoRequest = rxChat.getGroupChatFull(groupChat.id);
+
             this.user = null;
             isGroupChat = true;
             userFullRequest = Observable.empty();
@@ -105,20 +104,16 @@ public class Presenter extends ViewPresenter<ChatView>
             isGroupChat = false;
             final TdApi.PrivateChatInfo info = (TdApi.PrivateChatInfo) chat.type;
             this.user = info.user;
-            userFullRequest = client.getUserFull(info.user.id)
-                    .cache()
-                    .observeOn(mainThread());
-
-            //            if (info.user.type instanceof TdApi.UserTypeBot) {
-            //                getView().setBot(assertTrue());
-            //            }
+            userFullRequest = uerHolder.getUserFull(client, info.user.id)
+                    .take(1);
         }
         forwardMessages = path.forwardMessages;
+        rxChat.fetchSharedMediaPreview();
     }
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {
-//        nm.onLoad(path.chat.id);
+        //        nm.onLoad(path.chat.id);
 
         AppUtils.logEvent("EnterCode.onLoad");
 
@@ -197,7 +192,7 @@ public class Presenter extends ViewPresenter<ChatView>
     @Override
     public void dropView(ChatView view) {
         super.dropView(view);
-//        nm.dropView(path.chat.id);
+        //        nm.dropView(path.chat.id);
         subscription.unsubscribe();
         //        Utils.hideKeyboard(view);
     }
@@ -325,15 +320,7 @@ public class Presenter extends ViewPresenter<ChatView>
                 userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
                     @Override
                     public void onNext(TdApi.UserFull response) {
-                        if (response.botInfo instanceof TdApi.BotInfoGeneral) {
-                            final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
-                            List<BotCommandsAdapter.Record> cs = new ArrayList<>();
-                            for (TdApi.BotCommand command : i.commands) {
-                                cs.add(new BotCommandsAdapter.Record(response.user, command));
-                            }
-                            getView().setCommands(cs);
-                            getView().addBotInfoHeader(i, response.user);
-                        }
+                        bindView(response);
                     }
                 }));
         subscription.add(
@@ -344,7 +331,7 @@ public class Presenter extends ViewPresenter<ChatView>
                     }
                 }));
 
-        if (isGroupChat){
+        if (isGroupChat) {
             subscription.add(
                     client.updateChatPhoto(chat.id)
                             .subscribe(new ObserverAdapter<TdApi.UpdateChatPhoto>() {
@@ -378,22 +365,41 @@ public class Presenter extends ViewPresenter<ChatView>
                                     setViewTitle(response.user);
                                 }
                             }));
-
         }
+    }
+
+    private void bindView(final TdApi.UserFull response) {
+        AppUtils.runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                final ChatView v = getView();
+                if (v == null){
+                    return;
+                }
+                if (response.botInfo instanceof TdApi.BotInfoGeneral) {
+                    final TdApi.BotInfoGeneral i = (TdApi.BotInfoGeneral) response.botInfo;
+                    List<BotCommandsAdapter.Record> cs = new ArrayList<>();
+                    for (TdApi.BotCommand command : i.commands) {
+                        cs.add(new BotCommandsAdapter.Record(response.user, command));
+                    }
+
+                    v.setCommands(cs);
+                    v.addBotInfoHeader(i, response.user);
+                }
+            }
+        });
 
     }
 
-
-
     private void showBotKeyboardForMessage(@NonNull ChatDB.UpdateReplyMarkupWithData markup) {
-        if (markup.msg == null){
+        if (markup.msg == null) {
             getView().hideReplyKeyboard();
             return;
         }
         //todo
-//        if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
-//            return;//unsupported yet
-//        }
+        //        if (replyMarkup instanceof TdApi.ReplyMarkupForceReply) {
+        //            return;//unsupported yet
+        //        }
         if (markup.msg.replyMarkup instanceof TdApi.ReplyMarkupShowKeyboard) {
             getView().showBotKeyboard(markup.msg);
         }
@@ -448,15 +454,13 @@ public class Presenter extends ViewPresenter<ChatView>
                             new ObserverAdapter<TdApi.GroupChatFull>() {
                                 @Override
                                 public void onNext(@NonNull TdApi.GroupChatFull groupChatFull) {
-                                    mGroupChatFull = groupChatFull;
-                                    showMessagePanel(groupChatFull.groupChat);
-                                    updateGroupChatOnlineStatus(groupChatFull);
-                                    setBotCommands(groupChatFull);
+                                    bindGroupChatFull(groupChatFull);
                                 }
 
                                 @Override
                                 public void onError(Throwable th) {
                                     //todo
+                                    super.onError(th);
                                 }
                             }
                     ));
@@ -469,6 +473,24 @@ public class Presenter extends ViewPresenter<ChatView>
                         }
                     }));
         }
+    }
+
+    private void bindGroupChatFull(@NonNull final TdApi.GroupChatFull groupChatFull) {
+        AppUtils.runOnUIThread(new Runnable() {
+            @Override
+            public void run() {
+                if (getView() == null){
+                    return ;
+                }
+                boolean firstResponse = mGroupChatFull == null;
+                mGroupChatFull = groupChatFull;
+                updateGroupChatOnlineStatus(groupChatFull);
+                if (firstResponse){
+                    showMessagePanel(groupChatFull.groupChat);
+                    setBotCommands(groupChatFull);
+                }
+            }
+        });
     }
 
     private void setBotCommands(TdApi.GroupChatFull groupChatFull) {
@@ -573,7 +595,7 @@ public class Presenter extends ViewPresenter<ChatView>
     }
 
     public void sendSticker(final TdApi.Sticker sticker) {
-//        stickers.map(stickerFilePath, sticker);
+        //        stickers.map(stickerFilePath, sticker);
         getView().scrollToBottom();
         getView().postDelayed(new Runnable() {
             @Override
@@ -639,20 +661,19 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void open(TdApi.User user) {
         Flow.get(getView())
-                .set(new ProfilePath( chat, path.me, user));
-//        subscription.add(
-//                userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
-//                    @Override
-//                    public void onNext(TdApi.UserFull response) {
-//
-//                    }
-//                }));
+                .set(new ProfilePath(chat, path.me, user));
+        //        subscription.add(
+        //                userFullRequest.subscribe(new ObserverAdapter<TdApi.UserFull>() {
+        //                    @Override
+        //                    public void onNext(TdApi.UserFull response) {
+        //
+        //                    }
+        //                }));
     }
 
     public void open(final TdApi.Chat groupChat) {
         Flow.get(getView())
                 .set(new ChatInfo(groupChat));
-
     }
 
     public void muteFor(int duration) {
@@ -670,7 +691,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void textSpanCLicked(EmojiParser.ReferenceSpan cmd) {
         final String ref = cmd.reference;
-        if (cmd.type == EmojiParser.TYPE_BOT_COMMAND){
+        if (cmd.type == EmojiParser.TYPE_BOT_COMMAND) {
             if (isGroupChat) {
                 if (path.me.id == cmd.userId) {
                     sendText(ref);
@@ -690,7 +711,6 @@ public class Presenter extends ViewPresenter<ChatView>
         } else {
             //todo open dialog with user
         }
-
     }
 
     private void openBrowser(String url) {
@@ -708,7 +728,6 @@ public class Presenter extends ViewPresenter<ChatView>
                         "Faild to open the link. There is no browser on the phone. ;( ", Toast.LENGTH_LONG)
                         .show();
             }
-
         }
     }
 
@@ -728,7 +747,7 @@ public class Presenter extends ViewPresenter<ChatView>
         subscription.add(
                 client.sendRx(new TdApi.CreatePrivateChat(msg.fromId))
                         .observeOn(mainThread())
-                        .subscribe(new ObserverAdapter<TdApi.TLObject>(){
+                        .subscribe(new ObserverAdapter<TdApi.TLObject>() {
                             @Override
                             public void onNext(TdApi.TLObject response) {
                                 final Chat newHead = new Chat((TdApi.Chat) response, user, /* messages to forward */ null);

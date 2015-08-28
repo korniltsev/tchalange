@@ -602,7 +602,7 @@ public class RxChat  {
                         TdApi.Chat chat = (TdApi.Chat) tlObject;
                         //todo deleted history
                         final Observable<TdApi.Chat> justChat = just(chat);
-                        final Observable<TdApi.TLObject> messages = client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 20, MEDIA_PREVIEW_FILTER));
+                        final Observable<TdApi.TLObject> messages = client.sendRx(new TdApi.SearchMessages(chat.id, "", chat.topMessage.id, 8, MEDIA_PREVIEW_FILTER));
                         return zip(justChat, messages, new Func2<TdApi.Chat, TdApi.TLObject, TdApi.Messages>() {
                             @Override
                             public TdApi.Messages call(TdApi.Chat chat, TdApi.TLObject tlObject) {
@@ -621,6 +621,13 @@ public class RxChat  {
                 });
     }
 
+
+    public void fetchSharedMediaPreview() {
+        if (lastKnownMedia == null) {
+            getMediaPreview()
+                    .subscribe(new ObserverAdapter<TdApi.Messages>());
+        }
+    }
     public static boolean isPhotoOrVideo(TdApi.Message msg) {
         return msg.message instanceof TdApi.MessagePhoto
                 || msg.message instanceof TdApi.MessageVideo;
