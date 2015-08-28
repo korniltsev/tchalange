@@ -7,11 +7,9 @@ import ru.korniltsev.telegram.chat.R;
 //import ru.korniltsev.telegram.chat_list.view.DividerRelativeLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(SelectChatPath.Module.class)
 public class SelectChatPath extends BasePath implements Serializable{
     @Nullable public final TdApi.User bot;
     @Nullable public final int[] messagesToForward;
@@ -37,6 +35,11 @@ public class SelectChatPath extends BasePath implements Serializable{
         return R.layout.select_chat_view;
     }
 
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
+    }
 
     @dagger.Module(
             addsTo = RootModule.class,

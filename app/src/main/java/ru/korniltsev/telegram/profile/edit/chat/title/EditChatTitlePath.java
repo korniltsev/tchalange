@@ -6,12 +6,12 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
+import ru.korniltsev.telegram.core.mortar.mortarscreen.ModuleFactory2;
 
 import java.io.Serializable;
 
-@WithModule(EditChatTitlePath.Module.class)
-public class EditChatTitlePath extends BasePath implements Serializable{
+
+public class EditChatTitlePath extends BasePath implements Serializable, ModuleFactory2{
     final long chatId;
     public EditChatTitlePath( long chatId) {
         this.chatId = chatId;
@@ -22,6 +22,10 @@ public class EditChatTitlePath extends BasePath implements Serializable{
         return R.layout.profile_chat_title;
     }
 
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+    }
 
     @dagger.Module(
             addsTo = RootModule.class,

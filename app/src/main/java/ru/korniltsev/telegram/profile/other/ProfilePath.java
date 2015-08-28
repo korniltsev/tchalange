@@ -6,11 +6,9 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(ProfilePath.Module.class)
 public class ProfilePath extends BasePath implements Serializable{
 //    public final TdApi.UserFull user;
     public final TdApi.Chat chat;
@@ -35,6 +33,11 @@ public class ProfilePath extends BasePath implements Serializable{
         return R.layout.profile_view;
     }
 
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
+    }
 
     @dagger.Module(
             addsTo = RootModule.class,

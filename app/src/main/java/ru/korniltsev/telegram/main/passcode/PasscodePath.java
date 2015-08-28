@@ -6,11 +6,9 @@ import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(PasscodePath.Module.class)
 public class PasscodePath extends BasePath implements Serializable, NamedPath{
     public static final int TYPE_LOCK = 0;
     public static final int TYPE_SET = 1;
@@ -38,6 +36,12 @@ public class PasscodePath extends BasePath implements Serializable, NamedPath{
     @Override
     public String name() {
         return String.format("%d-%d", actionType, setPasswordType);
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
     }
 
     @dagger.Module(

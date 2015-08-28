@@ -17,7 +17,6 @@ import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import rx.Observable;
@@ -41,7 +40,6 @@ import static rx.android.schedulers.AndroidSchedulers.mainThread;
 /**
  * Created by korniltsev on 21/04/15.
  */
-@WithModule(EnterCode.Module.class)
 public class EnterCode extends BasePath implements Serializable {
 
     private static Subscription smsSubscription;
@@ -50,6 +48,11 @@ public class EnterCode extends BasePath implements Serializable {
     public EnterCode(String phoneNumber) {
 
         this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
     }
 
     @dagger.Module(injects = EnterCodeView.class, addsTo = RootModule.class)

@@ -6,11 +6,9 @@ import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(SharedMediaPath.Module.class)
 public class SharedMediaPath extends BasePath implements Serializable, NamedPath{
 
     public static final int TYPE_MEDIA = 0;
@@ -34,6 +32,12 @@ public class SharedMediaPath extends BasePath implements Serializable, NamedPath
     @Override
     public String name() {
         return String.valueOf(type);
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
     }
 
     @dagger.Module(

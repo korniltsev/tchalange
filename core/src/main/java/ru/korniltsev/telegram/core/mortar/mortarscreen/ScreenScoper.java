@@ -23,7 +23,7 @@ public class ScreenScoper {
     }
   };
 
-  private final Map<Class, ModuleFactory> moduleFactoryCache = new LinkedHashMap<>();
+//  private final Map<Class, ModuleFactory> moduleFactoryCache = new LinkedHashMap<>();
 
   public MortarScope getScreenScope(Context context, String name, Object screen) {
     MortarScope parentScope = MortarScope.getScope(context);
@@ -62,115 +62,117 @@ public class ScreenScoper {
   private ModuleFactory getModuleFactory(Object screen) {
     if (screen instanceof ModuleFactory2){
       return new DelegateModuleFactory((ModuleFactory2) screen);
+    } else {
+      throw new RuntimeException("screen should implement ModuleFactory2");
     }
-    Class<?> screenType = screen.getClass();
-    ModuleFactory moduleFactory = moduleFactoryCache.get(screenType);
-
-    if (moduleFactory != null) return moduleFactory;
-
-    WithModule withModule = screenType.getAnnotation(WithModule.class);
-    if (withModule != null) {
-      Class<?> moduleClass = withModule.value();
-
-      Constructor<?>[] constructors = moduleClass.getDeclaredConstructors();
-
-      if (constructors.length != 1) {
-        throw new IllegalArgumentException(
-            format("Module %s for screen %s should have exactly one public constructor",
-                moduleClass.getName(), screen));
-      }
-
-      Constructor constructor = constructors[0];
-
-      Class[] parameters = constructor.getParameterTypes();
-
-      if (parameters.length > 1) {
-        throw new IllegalArgumentException(
-            format("Module %s for screen %s should have 0 or 1 parameter", moduleClass.getName(),
-                screen));
-      }
-
-      Class screenParameter;
-      if (parameters.length == 1) {
-        screenParameter = parameters[0];
-        if (!screenParameter.isInstance(screen)) {
-          throw new IllegalArgumentException(format("Module %s for screen %s should have a "
-                  + "constructor parameter that is a super class of %s", moduleClass.getName(),
-              screen, screen.getClass().getName()));
-        }
-      } else {
-        screenParameter = null;
-      }
-
-      try {
-        if (screenParameter == null) {
-          moduleFactory = new NoArgsFactory(constructor);
-        } else {
-          moduleFactory = new SingleArgFactory(constructor);
-        }
-      } catch (Exception e) {
-        throw new RuntimeException(
-            format("Failed to instantiate module %s for screen %s", moduleClass.getName(), screen),
-            e);
-      }
-    }
-
-    if (moduleFactory == null) {
-      WithModuleFactory withModuleFactory = screenType.getAnnotation(WithModuleFactory.class);
-      if (withModuleFactory != null) {
-        Class<? extends ModuleFactory> mfClass = withModuleFactory.value();
-
-        try {
-          moduleFactory = mfClass.newInstance();
-        } catch (Exception e) {
-          throw new RuntimeException(format("Failed to instantiate module factory %s for screen %s",
-              withModuleFactory.value().getName(), screen), e);
-        }
-      }
-    }
-
-    if (moduleFactory == null) moduleFactory = NO_FACTORY;
-
-    moduleFactoryCache.put(screenType, moduleFactory);
-
-    return moduleFactory;
+//    Class<?> screenType = screen.getClass();
+//    ModuleFactory moduleFactory = moduleFactoryCache.get(screenType);
+//
+//    if (moduleFactory != null) return moduleFactory;
+//
+//    WithModule withModule = screenType.getAnnotation(WithModule.class);
+//    if (withModule != null) {
+//      Class<?> moduleClass = withModule.value();
+//
+//      Constructor<?>[] constructors = moduleClass.getDeclaredConstructors();
+//
+//      if (constructors.length != 1) {
+//        throw new IllegalArgumentException(
+//            format("Module %s for screen %s should have exactly one public constructor",
+//                moduleClass.getName(), screen));
+//      }
+//
+//      Constructor constructor = constructors[0];
+//
+//      Class[] parameters = constructor.getParameterTypes();
+//
+//      if (parameters.length > 1) {
+//        throw new IllegalArgumentException(
+//            format("Module %s for screen %s should have 0 or 1 parameter", moduleClass.getName(),
+//                screen));
+//      }
+//
+//      Class screenParameter;
+//      if (parameters.length == 1) {
+//        screenParameter = parameters[0];
+//        if (!screenParameter.isInstance(screen)) {
+//          throw new IllegalArgumentException(format("Module %s for screen %s should have a "
+//                  + "constructor parameter that is a super class of %s", moduleClass.getName(),
+//              screen, screen.getClass().getName()));
+//        }
+//      } else {
+//        screenParameter = null;
+//      }
+//
+//      try {
+//        if (screenParameter == null) {
+//          moduleFactory = new NoArgsFactory(constructor);
+//        } else {
+//          moduleFactory = new SingleArgFactory(constructor);
+//        }
+//      } catch (Exception e) {
+//        throw new RuntimeException(
+//            format("Failed to instantiate module %s for screen %s", moduleClass.getName(), screen),
+//            e);
+//      }
+//    }
+//
+//    if (moduleFactory == null) {
+//      WithModuleFactory withModuleFactory = screenType.getAnnotation(WithModuleFactory.class);
+//      if (withModuleFactory != null) {
+//        Class<? extends ModuleFactory> mfClass = withModuleFactory.value();
+//
+//        try {
+//          moduleFactory = mfClass.newInstance();
+//        } catch (Exception e) {
+//          throw new RuntimeException(format("Failed to instantiate module factory %s for screen %s",
+//              withModuleFactory.value().getName(), screen), e);
+//        }
+//      }
+//    }
+//
+//    if (moduleFactory == null) moduleFactory = NO_FACTORY;
+//
+//    moduleFactoryCache.put(screenType, moduleFactory);
+//
+//    return moduleFactory;
   }
 
-  private static class NoArgsFactory extends ModuleFactory<Object> {
-    final Constructor moduleConstructor;
-
-    private NoArgsFactory(Constructor moduleConstructor) {
-      this.moduleConstructor = moduleConstructor;
-    }
-
-    @Override protected Object createDaggerModule(Resources resources, Object ignored) {
-      try {
-        return moduleConstructor.newInstance();
-      } catch (InstantiationException e) {
-        throw new RuntimeException(e);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  private static class SingleArgFactory extends ModuleFactory {
-    final Constructor moduleConstructor;
-
-    public SingleArgFactory(Constructor moduleConstructor) {
-      this.moduleConstructor = moduleConstructor;
-    }
-
-    @Override protected Object createDaggerModule(Resources resources, Object screen) {
-      try {
-        return moduleConstructor.newInstance(screen);
-      } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
+//  private static class NoArgsFactory extends ModuleFactory<Object> {
+//    final Constructor moduleConstructor;
+//
+//    private NoArgsFactory(Constructor moduleConstructor) {
+//      this.moduleConstructor = moduleConstructor;
+//    }
+//
+//    @Override protected Object createDaggerModule(Resources resources, Object ignored) {
+//      try {
+//        return moduleConstructor.newInstance();
+//      } catch (InstantiationException e) {
+//        throw new RuntimeException(e);
+//      } catch (IllegalAccessException e) {
+//        throw new RuntimeException(e);
+//      } catch (InvocationTargetException e) {
+//        throw new RuntimeException(e);
+//      }
+//    }
+//  }
+//
+//  private static class SingleArgFactory extends ModuleFactory {
+//    final Constructor moduleConstructor;
+//
+//    public SingleArgFactory(Constructor moduleConstructor) {
+//      this.moduleConstructor = moduleConstructor;
+//    }
+//
+//    @Override protected Object createDaggerModule(Resources resources, Object screen) {
+//      try {
+//        return moduleConstructor.newInstance(screen);
+//      } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//        throw new RuntimeException(e);
+//      }
+//    }
+//  }
 
   private static class DelegateModuleFactory extends ModuleFactory {
     final ModuleFactory2 delegate;

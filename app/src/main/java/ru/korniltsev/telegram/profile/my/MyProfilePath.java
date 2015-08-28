@@ -6,11 +6,9 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(MyProfilePath.Module.class)
 public class MyProfilePath extends BasePath implements Serializable{
 
     public MyProfilePath() {
@@ -21,6 +19,11 @@ public class MyProfilePath extends BasePath implements Serializable{
         return R.layout.profile_my_view;
     }
 
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
+    }
 
     @dagger.Module(
             addsTo = RootModule.class,

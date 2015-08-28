@@ -7,13 +7,11 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
 import static junit.framework.Assert.assertTrue;
 
-@WithModule(PhotoView.Module.class)
 public class PhotoView extends BasePath implements Serializable {
 
     public static final int NO_MESSAGE = 0;
@@ -47,6 +45,12 @@ public class PhotoView extends BasePath implements Serializable {
     @Override
     public int getRootLayout() {
         return R.layout.photo_view_view;
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
     }
 
     @dagger.Module(

@@ -3,28 +3,20 @@ package ru.korniltsev.telegram.chat;
 import android.support.annotation.Nullable;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.chat.adapter.view.GifView;
 import ru.korniltsev.telegram.chat.adapter.view.VoiceMessageView;
-import ru.korniltsev.telegram.chat.adapter.view.DocumentView;
 import ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView;
-import ru.korniltsev.telegram.chat.adapter.view.GeoPointView;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
-import ru.korniltsev.telegram.chat.adapter.view.StickerView;
-import ru.korniltsev.telegram.chat.adapter.view.VideoView;
-import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
 import ru.korniltsev.telegram.core.mortar.mortarflow.NamedPath;
 import ru.korniltsev.telegram.core.mortar.mortarscreen.ModuleFactory2;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
-import ru.korniltsev.telegram.emoji.EmojiKeyboardView;
-import ru.korniltsev.telegram.emoji.strip.EmojiPagerStripView;
 
 import java.io.Serializable;
 
 
 public class Chat extends BasePath implements Serializable, NamedPath, ModuleFactory2 {
+
 
     public static final int LIMIT = 15;
 

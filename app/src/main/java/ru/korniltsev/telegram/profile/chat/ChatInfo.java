@@ -1,31 +1,25 @@
 package ru.korniltsev.telegram.profile.chat;
 
-import android.support.annotation.Nullable;
 import dagger.Provides;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
+import ru.korniltsev.telegram.core.mortar.mortarscreen.ModuleFactory2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@WithModule(ChatInfo.Module.class)
-public class ChatInfo extends BasePath implements Serializable{
-//    public final TdApi.GroupChatFull chatFull;
-    public final long chatId;
-    //    public final TdApi.Chat chat;
 
+public class ChatInfo extends BasePath implements Serializable, ModuleFactory2 {
+    public final long chatId;
     public List<TdApi.User> addedUsers = new ArrayList<>();
 
 
-    public ChatInfo(/*TdApi.GroupChatFull chatFull,*/ TdApi.Chat chat) {
-//        this.chatFull = chatFull;
+    public ChatInfo(TdApi.Chat chat) {
         this.chatId = chat.id;
-//        this.chat = chat;
     }
 
 
@@ -34,6 +28,10 @@ public class ChatInfo extends BasePath implements Serializable{
         return R.layout.chat_info_view;
     }
 
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+    }
 
     @dagger.Module(
             addsTo = RootModule.class,

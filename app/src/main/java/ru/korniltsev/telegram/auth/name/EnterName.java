@@ -12,7 +12,6 @@ import ru.korniltsev.telegram.auth.code.EnterCode;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import rx.Observable;
 import rx.Subscription;
@@ -27,13 +26,17 @@ import static junit.framework.Assert.assertNull;
 /**
  * Created by korniltsev on 21/04/15.
  */
-@WithModule(EnterName.Module.class)
 public class EnterName extends BasePath implements Serializable {
     private final String phoneNumber;
 
     public EnterName(String phoneNumber) {
 
         this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
     }
 
     @dagger.Module(injects = EnterNameView.class, addsTo = RootModule.class)

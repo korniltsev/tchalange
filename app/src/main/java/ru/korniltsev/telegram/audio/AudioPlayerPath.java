@@ -1,17 +1,13 @@
 package ru.korniltsev.telegram.audio;
 
 import dagger.Provides;
-import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-import static junit.framework.Assert.assertTrue;
 
-@WithModule(AudioPlayerPath.Module.class)
 public class AudioPlayerPath extends BasePath implements Serializable {
 
 
@@ -22,6 +18,11 @@ public class AudioPlayerPath extends BasePath implements Serializable {
     @Override
     public int getRootLayout() {
         return R.layout.audio_player_view;
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
     }
 
     @dagger.Module(

@@ -21,7 +21,6 @@ import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import rx.Observable;
 import rx.Subscription;
@@ -39,7 +38,6 @@ import static junit.framework.Assert.assertNull;
 /**
  * Created by korniltsev on 21/04/15.
  */
-@WithModule(EnterPhoneFragment.Module.class)
 public class EnterPhoneFragment extends BasePath implements Serializable {
 
     private Countries.Entry c;
@@ -49,6 +47,12 @@ public class EnterPhoneFragment extends BasePath implements Serializable {
     public void setCountry(Countries.Entry c) {
 
         this.c = c;
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+
     }
 
     @dagger.Module(injects = {

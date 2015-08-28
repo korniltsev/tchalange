@@ -7,11 +7,9 @@ import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
 import ru.korniltsev.telegram.common.view.AnimatedCheckbox;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
 
 import java.io.Serializable;
 
-@WithModule(EditPasscode.Module.class)
 public class EditPasscode extends BasePath implements Serializable{
 
     public EditPasscode() {
@@ -22,6 +20,10 @@ public class EditPasscode extends BasePath implements Serializable{
         return R.layout.profile_edit_pass_code;
     }
 
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
+    }
 
     @dagger.Module(
             addsTo = RootModule.class,

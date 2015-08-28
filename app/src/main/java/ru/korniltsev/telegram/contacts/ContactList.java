@@ -6,16 +6,14 @@ import dagger.Provides;
 import flow.path.Path;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView;
 import ru.korniltsev.telegram.core.app.RootModule;
 import ru.korniltsev.telegram.core.flow.pathview.BasePath;
-import ru.korniltsev.telegram.core.mortar.mortarscreen.WithModule;
+import ru.korniltsev.telegram.core.mortar.mortarscreen.ModuleFactory2;
 
 import java.io.Serializable;
 import java.util.List;
 
-@WithModule(ContactList.Module.class)
-public class ContactList extends BasePath implements Serializable {
+public class ContactList extends BasePath implements Serializable, ModuleFactory2{
     public static final int TYPE_LIST = 0;
     public static final int TYPE_ADD_MEMBER = 1;
     public static final int TYPE_SHARE_USER = 2;
@@ -51,6 +49,11 @@ public class ContactList extends BasePath implements Serializable {
     @Override
     public int getRootLayout() {
         return R.layout.contacts_view;
+    }
+
+    @Override
+    public Object createDaggerModule() {
+        return new Module(this);
     }
 
     @dagger.Module(
