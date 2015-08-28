@@ -10,12 +10,10 @@ import com.squareup.picasso.RequestCreator;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.app.AndroidBackgroundPriorityThreadFactory;
 import ru.korniltsev.telegram.core.rx.RXAuthState;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.core.views.RoundTransformation;
-import rx.functions.Action1;
 import rx.functions.Func1;
 
 import javax.inject.Inject;
@@ -23,7 +21,6 @@ import javax.inject.Singleton;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -78,6 +75,10 @@ public class RxGlide {
                 cache.clear();
             }
         });
+    }
+
+    public LruCache getCache() {
+        return cache;
     }
 
     private static final RxGlide.StubAware<TdApi.GroupChat> STUB_AWARE_GROUP_CHAT = new StubAware<TdApi.GroupChat>() {
@@ -270,11 +271,10 @@ public class RxGlide {
 //        Utils.logDuration(start, end, "uri creation");
 
         return picasso.load(load)
-                .stableKey(stableKeyForTdApiFile(f, webp));
+                .stableKey(stableKeyForTdApiFile(f));
     }
 
-    private String stableKeyForTdApiFile(TdApi.File f, boolean webp) {
-
+    public static  String stableKeyForTdApiFile(TdApi.File f) {
         return String.format("tdfile:%d", f.id);
     }
 

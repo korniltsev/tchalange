@@ -44,7 +44,7 @@ public class VoiceRecordingOverlay extends FrameLayout {
     public static final Interpolator INTERPOLATOR = new DecelerateInterpolator(1.5f);
     public static final int SLIDE_DURATION = 256;
     public static final DecelerateInterpolator VALUE = new DecelerateInterpolator(1.5f);
-    public static final int AMPLITUDE_ANIMATION_DURATION = 300;
+    public static final int AMPLITUDE_ANIMATION_DURATION = 160;
     private final int dip2;
     private View anchor;
     private TextView time;

@@ -71,7 +71,7 @@ public class PhotoMessageView extends ImageView {
         }
 
         picasso.loadPhoto(f, false)
-                .resize(width, height)
+//                .resize(width, height)
                 .into(this);
     }
 }

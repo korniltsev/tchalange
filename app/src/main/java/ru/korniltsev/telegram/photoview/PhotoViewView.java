@@ -1,6 +1,7 @@
 package ru.korniltsev.telegram.photoview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
@@ -81,10 +82,15 @@ public class PhotoViewView extends FrameLayout {
 
     public void show(TdApi.File f) {
         picasso.loadPhoto(f, false)
+                .noPlaceholder()
                 .into(this.imageView);
     }
 
     public void hideDeleteMessageMenuItem() {
         toolbar.hideMenu(R.id.menu_delete);
+    }
+
+    public void setStub(Bitmap stub) {
+        imageView.setImageBitmap(stub);
     }
 }

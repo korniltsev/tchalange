@@ -1,13 +1,16 @@
 package ru.korniltsev.telegram.photoview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.WindowManager;
+import com.squareup.picasso.LruCache;
 import flow.Flow;
 import mortar.ViewPresenter;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.GalleryService;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -30,16 +33,18 @@ public class PhotoViewPresenter extends ViewPresenter<PhotoViewView> {
     final RXClient client;
     final ChatDB chats;
     final GalleryService galleryService;
+    private final LruCache cache;
 
     private Observable<TdApi.TLObject> deleteRequest;
     private CompositeSubscription subs;
 
     @Inject
-    public PhotoViewPresenter(PhotoView path, RXClient client, ChatDB chats, GalleryService galleryService) {
+    public PhotoViewPresenter(PhotoView path, RXClient client, ChatDB chats, GalleryService galleryService, RxGlide glide) {
         this.path = path;
         this.client = client;
         this.chats = chats;
         this.galleryService = galleryService;
+        cache = glide.getCache();
     }
 
     @Override
@@ -50,10 +55,27 @@ public class PhotoViewPresenter extends ViewPresenter<PhotoViewView> {
         Display display = wm.getDefaultDisplay();
         int width = display.getWidth();
         int height = display.getHeight();
-        if (path.photo == null
-                && path.profilePhoto != null) {
+        if (path.profilePhoto != null) {
+            String key = RxGlide.stableKeyForTdApiFile(path.profilePhoto.small) + "\n"
+                    + RxGlide.ROUND.key() + "\n";
+            final Bitmap smallRoundBitmap = cache.get(key);
+            if (smallRoundBitmap != null) {
+                getView()
+                        .setStub(smallRoundBitmap);
+            }
             getView().show(path.profilePhoto.big);
-        } else {
+        } else if (path.photo != null){
+            Bitmap stub = null;
+            for (TdApi.PhotoSize s: path.photo.photos) {
+                String key = RxGlide.stableKeyForTdApiFile(s.photo) + "\n";
+                stub = cache.get(key);
+                if (stub != null){
+                    break;
+                }
+            }
+            if (stub != null){
+                getView().setStub(stub);
+            }
             TdApi.File f = PhotoUtils.findSmallestBiggerThan(path.photo, width, height);
             getView()
                     .show(f);
