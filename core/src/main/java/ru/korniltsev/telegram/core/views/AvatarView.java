@@ -2,21 +2,16 @@ package ru.korniltsev.telegram.core.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ImageView;
 import com.crashlytics.android.core.CrashlyticsCore;
-import flow.Flow;
 import junit.framework.Assert;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
-import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.utils.R;
 
-import static junit.framework.Assert.assertNotNull;
 
 public class AvatarView extends ImageView {
 
@@ -25,9 +20,9 @@ public class AvatarView extends ImageView {
     public final RxGlide picasso2;
     public TdApi.TLObject boundObject;
 
-    public AvatarView(Context context, int size, MyApp app) {
+    public AvatarView(Context context, int size, RxGlide glide) {
         super(context);
-        picasso2 = app.rxGlide;//ObjectGraphService.getObjectGraph(context)
+        picasso2 = glide;// app.rxGlide;//ObjectGraphService.getObjectGraph(context)
                 //.get(RxGlide.class);
 
 //        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AvatarView);

@@ -12,6 +12,7 @@ import android.text.Spannable;
 import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,22 +35,28 @@ public class TextMessageView extends View implements Emoji.Listener {
     private final Emoji emoji;
     private final EmojiParser emojiParser;
     private StaticLayout staticLayout;
-    private TextPaint paint;
+    private static TextPaint paint;
 //    private Subscription subscription;
     private Spannable currentText;
     @Nullable private EmojiParser.ReferenceSpan currentTouchSpan;
 
     public TextMessageView(Context context) {
-        super(context);
+        this(context, null);
+    }
+
+    public TextMessageView(Context context, AttributeSet attrs) {
+        super(context, attrs);
         final MyApp app = MyApp.from(context);
 
         final int displayWidth = app.displayWidth;
         final DpCalculator calc = app.calc;
 
         width = displayWidth - calc.dp(41 + 9 + 11 + 8);
-        paint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(calc.dp(14f));
+        if (paint == null){
+            paint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(calc.dp(14f));
+        }
         emoji = app.emoji;
         emojiParser = app.emojiParser;
         AppUtils.rtlPerformanceFix(this);

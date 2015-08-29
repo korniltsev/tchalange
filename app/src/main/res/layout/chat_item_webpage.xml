@@ -5,12 +5,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-    <TextView
+    <ru.korniltsev.telegram.chat.adapter.view.TextMessageView
             android:id="@+id/link"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingRight="4dp"
-            android:paddingBottom="8dp"
+            android:layout_marginBottom="8dp"
             android:textColor="#000"
             android:autoLink="web"/>
     <ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView

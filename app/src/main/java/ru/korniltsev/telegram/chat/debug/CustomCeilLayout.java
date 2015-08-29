@@ -93,7 +93,7 @@ public class CustomCeilLayout extends ViewGroup {
         //avatar
         avatarSize = calc.dp(41);
         avatarMeasureSpec = makeMeasureSpec(avatarSize, EXACTLY);
-        avatarView = new AvatarView(ctx, avatarSize, app);
+        avatarView = new AvatarView(ctx, avatarSize, app.rxGlide);
         avatarView.setId(R.id.avatar);
         avatarMarginLeft = calc.dp(9);
         avatarMarginRight = calc.dp(11);

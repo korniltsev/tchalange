@@ -8,13 +8,14 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
+import ru.korniltsev.telegram.chat.adapter.view.TextMessageView;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
 class WebPagePreviewVH extends BaseAvatarVH {
     private final PhotoMessageView image;
-    private final TextView link;
+    private final TextMessageView link;
 
     public WebPagePreviewVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
@@ -29,8 +30,8 @@ class WebPagePreviewVH extends BaseAvatarVH {
         });
 
         image = (PhotoMessageView) contentView.findViewById(R.id.image);
-        link = (TextView) contentView.findViewById(R.id.link);
-        TextMessageVH.applyTextStyle(link);
+        link = (TextMessageView) contentView.findViewById(R.id.link);
+//        TextMessageVH.applyTextStyle(link);
 
 
     }
@@ -62,6 +63,6 @@ class WebPagePreviewVH extends BaseAvatarVH {
             image.setVisibility(View.VISIBLE);
             image.load(webPage.webPage.photo, null);
         }
-        link.setText(webPage.text);
+        link.setText(webPage.parsedText);
     }
 }

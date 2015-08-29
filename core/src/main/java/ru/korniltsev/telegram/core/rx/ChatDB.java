@@ -7,7 +7,6 @@ import android.view.WindowManager;
 import junit.framework.Assert;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.operators.ImmediateBufferOperator;
 import rx.Observable;
@@ -62,12 +61,13 @@ public class ChatDB {
     final UserHolder userHolder;
 
 
-    public ChatDB(final Context ctx, final RXClient client, NotificationManager nm, RXAuthState auth, UserHolder userHolder) {
+    public ChatDB(final Context ctx, final RXClient client, NotificationManager nm, RXAuthState auth,
+                  UserHolder userHolder, DpCalculator calc, EmojiParser emojiParser) {
         this.ctx = ctx;
         this.client = client;
-        final MyApp from = MyApp.from(ctx);
-        parser = from.emojiParser;
-        DpCalculator calc = from.calc;
+
+        parser = emojiParser;
+//        DpCalculator calc = from.calc;
 //        this.parser = parser;
         this.nm = nm;
         this.userHolder = userHolder;

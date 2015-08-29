@@ -147,7 +147,7 @@ public class ChatListViewFactory {
         blueHeader.setBackgroundColor(0xFF5D96C0);
         blueHeader.setOrientation(LinearLayout.VERTICAL);
 
-        final AvatarView avatarView = new AvatarView(ctx, calc.dp(64), from);
+        final AvatarView avatarView = new AvatarView(ctx, calc.dp(64), from.rxGlide);
         avatarView.setId(R.id.drawer_avatar);
         final LinearLayout.LayoutParams avatarLP = new LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         avatarLP.leftMargin = calc.dp(16);

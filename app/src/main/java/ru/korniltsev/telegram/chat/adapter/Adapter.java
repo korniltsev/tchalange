@@ -9,6 +9,7 @@ import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
+import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.recycler.BaseAdapter;
 import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
@@ -189,6 +190,15 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     @Override
     public RealBaseVH onCreateViewHolder(ViewGroup p, int viewType) {
+        long start = System.nanoTime();
+        final RealBaseVH res = createViewHolderImpl(p, viewType);
+        long end = System.nanoTime();
+        Utils.logDuration(start, end, "onCreateViewHolder Chat ");
+        return res;
+    }
+
+    @NonNull
+    private RealBaseVH createViewHolderImpl(ViewGroup p, int viewType) {
         switch (viewType) {
             case VIEW_TYPE_PHOTO: {
                 return new PhotoMessageVH(cell(), this);
@@ -265,8 +275,12 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     @Override
     public void onBindViewHolder(RealBaseVH holder, int position) {
+        long start = System.nanoTime();
         ChatListItem item1 = getItem(position);
         holder.bind(item1, lastReadOutbox);
+        long end = System.nanoTime();
+        Utils.logDuration(start, end, "onBindViewHolder Chat ");
+
     }
 
     public void setChat(RxChat chat) {

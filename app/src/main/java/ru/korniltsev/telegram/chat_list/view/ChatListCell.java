@@ -129,7 +129,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
         avatarViewMargin = calc.dp(10f);
         avatarViewSize = calc.dp(52f);
-        avatarView = new AvatarView(context, avatarViewSize, app);
+        avatarView = new AvatarView(context, avatarViewSize, app.rxGlide);
         addView(avatarView);
 
         final Resources res = getResources();

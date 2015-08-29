@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -196,6 +197,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
             @Override
             public void run() {
                 updateEmptyView();
+                Log.d("Duration", "datasetchanged");
             }
         }));
         activity.setStatusBarColor(getResources().getColor(R.color.primary_dark));

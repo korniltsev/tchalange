@@ -1498,6 +1498,7 @@ public class TdApi {
 
     public static class MessageWebPage extends MessageContent {
         public String text;
+        public transient Spannable parsedText;
         public WebPage webPage;
 
         public MessageWebPage() {

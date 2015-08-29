@@ -111,7 +111,8 @@ public class MyApp extends Application {
         rxGlide = new RxGlide(this, downloadManager, rxAuthState);
         stickers = new Stickers(rxClient, rxAuthState);
         notificationManager = new NotificationManager(rxClient, this, rxAuthState);
-        chatDb = new ChatDB(this, rxClient, notificationManager, rxAuthState, userHolder);
+        chatDb = new ChatDB(this, rxClient, notificationManager, rxAuthState, userHolder, calc, emojiParser);
+        //todo we can loose some updates between rxClient and chatDB creation
         passcodeManager = new PasscodeManager(this, rxAuthState);
         activityOwner = new ActivityOwner();
         voiceRecorder = new VoiceRecorder(this);

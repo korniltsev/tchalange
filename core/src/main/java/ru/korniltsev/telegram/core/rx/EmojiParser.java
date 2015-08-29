@@ -46,6 +46,10 @@ public class EmojiParser {
             parseEmojis(msg);
         } else if (msg.message instanceof TdApi.MessagePhoto) {
             pareImageSizes((TdApi.MessagePhoto) msg.message);
+        } else if (msg.message instanceof TdApi.MessageWebPage){
+            final TdApi.MessageWebPage message = (TdApi.MessageWebPage) msg.message;
+
+            message.parsedText = parseEmoji(message.text, msg.fromId);
         }
     }
 
