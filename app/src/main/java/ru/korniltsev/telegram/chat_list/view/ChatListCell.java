@@ -19,6 +19,7 @@ import ru.korniltsev.telegram.chat.debug.SquareDumbResourceView;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
+import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.views.AvatarView;
 import ru.korniltsev.telegram.core.views.RobotoMediumTextView;
 
@@ -61,6 +62,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
     private final Drawable icUnreadBadge;
 
     private final Emoji emoji;
+    private final StaticLayoutCache layoutCache;
 
     DpCalculator calc;
 
@@ -88,6 +90,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
         final MyApp app = MyApp.from(context);
         emoji = app.emoji;
         calc = app.calc;
+        layoutCache = app.staticLayoutCache;
 
         if (dividerPaint == null) {
 
@@ -180,7 +183,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
 
     public void setTime(String time) {
         this.time = time;
-        timeLayout = new StaticLayout(time, timePaint, displayWidth, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        timeLayout = layoutCache.getLayout(displayWidth, timePaint, time);
         timeLeft = displayWidth - cellPaddingRight - timeLayout.getLineWidth(0);
         iconTop.layout(iconTopTopPadding, (int) (timeLeft - iconTopSize - iconTopRightPadding));
     }
@@ -202,7 +205,7 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
             titleWithoutNewLines = title;
         }
         final CharSequence ellipsized = TextUtils.ellipsize(titleWithoutNewLines, titlePaint, spaceLeftForNick - calc.dp(12), TextUtils.TruncateAt.END);
-        titleLayout = new StaticLayout(ellipsized, titlePaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        titleLayout = layoutCache.getLayout(spaceLeftForNick, titlePaint, ellipsized);
         titleLayoutFirstLineLeft = titleLayout.getLineLeft(0);
     }
 
