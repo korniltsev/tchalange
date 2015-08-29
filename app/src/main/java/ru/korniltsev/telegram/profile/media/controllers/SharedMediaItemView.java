@@ -3,7 +3,6 @@ package ru.korniltsev.telegram.profile.media.controllers;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -14,11 +13,10 @@ import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.BlurTransformation;
 import ru.korniltsev.telegram.chat.adapter.view.VideoView;
-import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.core.app.Formatters;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;
@@ -28,6 +26,8 @@ import ru.korniltsev.telegram.core.views.DownloadView;
 import static ru.korniltsev.telegram.core.views.DownloadView.Config.FINAL_ICON_EMPTY;
 
 public class SharedMediaItemView extends FrameLayout {
+    private final PeriodFormatter DURATION_FORMATTER ;
+
 
     public static final BlurTransformation BLUR = new BlurTransformation(6);
     public static final float SCALE_SELECTED = 0.83f;
@@ -52,6 +52,7 @@ public class SharedMediaItemView extends FrameLayout {
         dip100 = app.calc.dp(100);
         picasso = app.rxGlide;
         downloader = app.downloadManager;
+        DURATION_FORMATTER = app.formatters.DURATION_FORMATTER.get();
     }
 
     @Override
@@ -163,7 +164,7 @@ public class SharedMediaItemView extends FrameLayout {
         }
     }
 
-    private static final PeriodFormatter DURATION_FORMATTER = AppUtils.DURATION_FORMATTER;
+
 
     public void animateWhiteCircle(boolean in) {
         animateView(whiteCircle, in);

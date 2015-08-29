@@ -22,11 +22,10 @@ import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.BlurTransformation;
-import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.Formatters;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
@@ -80,11 +79,14 @@ public class AudioPlayerView extends LinearLayout {
     private TextView positionText;
     private boolean handleTouch;
     private boolean skipNextTimerTick;
+    private final PeriodFormatter DURATION_FORMATTER;
+
 
     public AudioPlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         ObjectGraphService.inject(context, this);
         final MyApp app = MyApp.from(context);
+        DURATION_FORMATTER = app.formatters.DURATION_FORMATTER.get();
         calc = app.calc;
         audioPLayer = app.audioPLayer;
 
@@ -247,7 +249,7 @@ public class AudioPlayerView extends LinearLayout {
         });
     }
 
-    private static final PeriodFormatter DURATION_FORMATTER = AppUtils.DURATION_FORMATTER;
+
 
     private void updateProgress() {
         if (handleTouch){

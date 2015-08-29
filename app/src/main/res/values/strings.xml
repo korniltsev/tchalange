@@ -65,6 +65,9 @@
     <string name="user_status_last_month">last seen within a month</string>
     <string name="user_status_recently">last seen recently</string>
     <string name="user_status_just_now">last seen just now</string>
+    <string name="user_status_last_seen_word">last seen</string>
+    <string name="user_status_last_today_at_word">today at</string>
+    <string name="user_status_last_yesterday_at_word">yesterday at</string>
 
     <plurals name="user_status_last_seen_n_minutes_ago">
         <item quantity="one">last seen %1$d minute ago</item>

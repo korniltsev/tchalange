@@ -7,13 +7,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
 import ru.korniltsev.telegram.chat.R;
-import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.Formatters;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.rx.RXClient;
@@ -23,14 +23,13 @@ import rx.Subscription;
 import rx.functions.Action1;
 import rx.subscriptions.Subscriptions;
 
-import javax.inject.Inject;
-
 import static junit.framework.Assert.assertTrue;
 
 public class VoiceMessageView extends LinearLayout {
 
     public static final Subscription EMPTY_SUBSCRIPTION = Subscriptions.empty();
-//    private ImageView btnPlay;
+    private final PeriodFormatter DURATION_FORMATTER;
+    //    private ImageView btnPlay;
     private TextView duration;
     private SeekBar progress;
 
@@ -55,6 +54,7 @@ public class VoiceMessageView extends LinearLayout {
         player = app.voicePlayer;
         client = app.rxClient;
         downloader = app.downloadManager;
+        DURATION_FORMATTER = app.formatters.DURATION_FORMATTER.get();
 
 
 //        PeriodFormatter minutesAndSeconds =
@@ -89,7 +89,7 @@ public class VoiceMessageView extends LinearLayout {
         Period p = new Duration(secs * 1000)
                 .toPeriod();
 
-        this.duration.setText(AppUtils.DURATION_FORMATTER.print(p));
+        this.duration.setText(DURATION_FORMATTER.print(p));
         DownloadView.Config cfg = new DownloadView.Config(R.drawable.ic_play, R.drawable.ic_pause, true, true, 38);
 //        downloader.hook(a.voice, decodeAction);
         download_view.bind(a.voice, cfg, new DownloadView.CallBack() {

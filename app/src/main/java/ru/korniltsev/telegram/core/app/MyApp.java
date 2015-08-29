@@ -77,6 +77,7 @@ public class MyApp extends Application {
     public VoicePlayer voicePlayer;
     public int statusBarHeightResId;
     public int navBarHeightResId;
+    public Formatters formatters;
 
     @Override
     public void onCreate() {
@@ -103,6 +104,7 @@ public class MyApp extends Application {
         final Resources res = getResources();
         float density = res.getDisplayMetrics().density;
         calc = new DpCalculator(density);
+        formatters = new Formatters(this);
 
         staticLayoutCache = new StaticLayoutCache();
         final AndroidBackgroundPriorityThreadFactory factory = new AndroidBackgroundPriorityThreadFactory("Emoji/AudioPlayer singleton executor");

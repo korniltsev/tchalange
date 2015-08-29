@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -32,6 +33,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.app.Formatters;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.profile.other.ProfileAdapter;
 import ru.korniltsev.telegram.profile.other.ProfilePresenter;
@@ -42,8 +45,11 @@ import rx.functions.Func2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import static android.text.TextUtils.isEmpty;
 import static ru.korniltsev.telegram.core.rx.RxChat.isPhotoOrVideo;
@@ -58,14 +64,6 @@ public class AppUtils {
     public static final int REQUEST_TAKE_PHOTO_MY_AVATAR = 4;
     public static final int REQUEST_CHOOS_FROM_GALLERY_CHAT_AVATAR = 5;
     public static final int REQUEST_TAKE_PHOTO_CHAT_AVATAR = 6;
-    public static final PeriodFormatter DURATION_FORMATTER = new PeriodFormatterBuilder()
-            .printZeroAlways()
-            .minimumPrintedDigits(1).appendMinutes()
-            .appendSeparator(":")
-            .minimumPrintedDigits(2).printZeroAlways()
-            .appendSeconds()
-            .toFormatter();
-    private static DateTimeFormatter SUBTITLE_FORMATTER = DateTimeFormat.forPattern("dd/MM/yy");
 
     public static String uiName(TdApi.User user, Context ctx) {//todo
         if (user == null) {
@@ -100,57 +98,7 @@ public class AppUtils {
         if (status instanceof TdApi.UserStatusOnline) {
             return context.getString(R.string.user_status_online);
         } else if (status instanceof TdApi.UserStatusOffline) {
-            long wasOnline = ((TdApi.UserStatusOffline) status).wasOnline;
-            long timeInMillis = wasOnline * 1000;
-
-            DateTime wasOnlineTime = new DateTime(timeInMillis);
-
-            DateTime now = DateTime.now();
-
-            String offlineStatusText;
-            int daysBetween = Days.daysBetween(wasOnlineTime, now)
-                    .getDays();
-            final Resources res = context.getResources();
-            if (daysBetween == 0) {
-                int hoursBetween = Hours.hoursBetween(wasOnlineTime, now)
-                        .getHours();
-                if (hoursBetween == 0) {
-                    int minutesBetween = Minutes.minutesBetween(wasOnlineTime, now)
-                            .getMinutes();
-                    if (minutesBetween == 0) {
-                        //just now
-                        offlineStatusText = res.getString(R.string.user_status_just_now);
-                    } else if (minutesBetween > 0) {
-                        //n minutes
-                        offlineStatusText = res.getQuantityString(R.plurals.user_status_last_seen_n_minutes_ago, minutesBetween, minutesBetween);
-                    } else {
-                        //user has wrong date - fallback to SUBTITLE_FORMATTER
-                        String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
-                        offlineStatusText = res.getString(R.string.user_status_last_seen, date);
-                    }
-                } else if (hoursBetween > 0) {
-                    //show hours
-                    offlineStatusText = res.getQuantityString(R.plurals.user_status_last_seen_n_hours_ago, hoursBetween, hoursBetween);
-                } else {
-                    //user has wrong date - fallback to SUBTITLE_FORMATTER
-                    String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
-                    offlineStatusText = res.getString(R.string.user_status_last_seen, date);
-                }
-            } else if (daysBetween > 0) {
-                //show n days ago
-                if (daysBetween <= 7) {
-                    offlineStatusText = res.getQuantityString(R.plurals.user_status_last_seen_n_days_ago, daysBetween, daysBetween);
-                } else {
-                    String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
-                    offlineStatusText = res.getString(R.string.user_status_last_seen, date);
-                }
-            } else {
-                //user has wrong date - fallback to SUBTITLE_FORMATTER
-                String date = SUBTITLE_FORMATTER.print(wasOnlineTime);
-                offlineStatusText = res.getString(R.string.user_status_last_seen, date);
-            }
-
-            return offlineStatusText;
+            return formatLastSeen(context, (TdApi.UserStatusOffline) status);
         } else if (status instanceof TdApi.UserStatusLastWeek) {
             return context.getString(R.string.user_status_last_week);
         } else if (status instanceof TdApi.UserStatusLastMonth) {
@@ -162,6 +110,34 @@ public class AppUtils {
             return "";
         }
     }
+
+    private static String formatLastSeen(Context context, TdApi.UserStatusOffline status) {
+        final Resources res = context.getResources();
+        final Formatters formatters = MyApp.from(context).formatters;
+        long wasOnline = status.wasOnline;
+        long timeInMillis = wasOnline * 1000;
+
+        DateTime now = DateTime.now();
+        int nowDay = now.getDayOfYear();
+        int nowYear = now.getYear();
+        DateTime wasOnlineTime = new DateTime(timeInMillis);
+        int wasOnlineDay = wasOnlineTime.getDayOfYear();
+        int wasOnlineYear = wasOnlineTime.getYear();
+        if (nowDay == wasOnlineDay && nowYear == wasOnlineYear) {
+            final DateTimeFormatter formatter = formatters.TIME_FORMATTER.get();
+            return res.getString(R.string.user_status_last_seen_word) + " " + res.getString(R.string.user_status_last_today_at_word) + " " + formatter.print(wasOnlineTime);
+        } else if (nowDay == wasOnlineDay + 1 && nowYear == wasOnlineYear) {
+            final DateTimeFormatter formatter = formatters.TIME_FORMATTER.get();
+            return res.getString(R.string.user_status_last_seen_word) + " " + res.getString(R.string.user_status_last_yesterday_at_word) + " " + formatter.print(wasOnlineTime);
+            //yesterday
+        } else {
+            //this year
+            final DateTimeFormatter formatter = formatters.DATE_FORMATTER.get();
+            return res.getString(R.string.user_status_last_seen_word) + " " + formatter.print(wasOnlineTime);
+        }
+    }
+
+
 
     public static void copy(Context ctx, String phone) {
         ClipboardManager clipboard = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
