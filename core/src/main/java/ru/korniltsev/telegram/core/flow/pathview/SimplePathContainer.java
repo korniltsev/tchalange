@@ -71,7 +71,7 @@ public class SimplePathContainer extends PathContainer {
     View newView;
     context = PathContext.create(oldPath, to, contextFactory);
 
-    long start = System.nanoTime();
+//    long start = System.nanoTime();
 //    Debug.startMethodTracing("create_view");
     newView = to.constructViewManually(context, (FrameLayout) containerView);
     if (newView == null){
@@ -81,8 +81,8 @@ public class SimplePathContainer extends PathContainer {
               .inflate(layout, containerView, false);
     }
 //    Debug.stopMethodTracing();
-    long end = System.nanoTime();
-    ru.korniltsev.telegram.core.Utils.logDuration(start, end, "view inflation");
+//    long end = System.nanoTime();
+//    ru.korniltsev.telegram.core.Utils.logDuration(start, end, "view inflation");
 
     View fromView =
             null;

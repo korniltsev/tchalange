@@ -193,16 +193,16 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     @Override
     public RealBaseVH onCreateViewHolder(ViewGroup p, int viewType) {
-        long start = System.nanoTime();
+//        long start = System.nanoTime();
         final RealBaseVH res = createViewHolderImpl(p, viewType);
-        long end = System.nanoTime();
-        if (BuildConfig.DEBUG){
-            if ((end - start)/1000000 > 10) {
-                Log.e("Duration", "view creation is too slow " + viewType);
-            }
-        }
+//        long end = System.nanoTime();
+//        if (BuildConfig.DEBUG){
+//            if ((end - start)/1000000 > 10) {
+//                Log.e("Duration", "view creation is too slow " + viewType);
+//            }
+//        }
 
-        Utils.logDuration(start, end, "onCreateViewHolder @ " + viewType + " ");
+//        Utils.logDuration(start, end, "onCreateViewHolder @ " + viewType + " ");
         return res;
     }
 
@@ -284,18 +284,18 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
 
     @Override
     public void onBindViewHolder(RealBaseVH holder, int position) {
-        long start = System.nanoTime();
+//        long start = System.nanoTime();
         ChatListItem item1 = getItem(position);
         holder.bind(item1, lastReadOutbox);
-        long end = System.nanoTime();
-        final int itemViewType = getItemViewType(position);
-        if (BuildConfig.DEBUG){
-            if ((end - start)/1000000 > 10) {
-                Log.e("Duration", "view binding is too slow " + itemViewType);
-            }
-        }
+//        long end = System.nanoTime();
+//        final int itemViewType = getItemViewType(position);
+//        if (BuildConfig.DEBUG){
+//            if ((end - start)/1000000 > 10) {
+//                Log.e("Duration", "view binding is too slow " + itemViewType);
+//            }
+//        }
 
-        Utils.logDuration(start, end, "onBindViewHolder @ " + itemViewType + " ");
+//        Utils.logDuration(start, end, "onBindViewHolder @ " + itemViewType + " ");
 
     }
 
