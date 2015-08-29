@@ -697,7 +697,7 @@ public class Presenter extends ViewPresenter<ChatView>
         final String ref = cmd.reference;
         if (cmd.type == EmojiParser.TYPE_BOT_COMMAND) {
             if (isGroupChat) {
-                if (path.me.id == cmd.userId) {
+                if (path.me.id == cmd.userId || ref.contains("@")) {
                     sendText(ref.replaceAll("\n", ""));//todo fix regexp!!
                 } else {
                     final TdApi.User user = uerHolder.getUser(cmd.userId);

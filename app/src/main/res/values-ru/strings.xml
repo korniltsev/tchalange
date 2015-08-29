@@ -173,8 +173,8 @@
     <string name="enter_your_pass">Пожалуйста, введите Ваш пароль</string>
     <string name="password">Пароль</string>
     <string name="sms_code">SMS код</string>
-    <string name="shared_media_title">Shared media</string>
-    <string name="audio_files">Audio Files</string>
+    <string name="shared_media_title">Медиа</string>
+    <string name="audio_files">Аудио файлы</string>
     <string name="passcode_title_password">Password</string>
     <string name="choose_your_PIN_2">Введите Ваш PIN повторно</string>
     <string name="choose_your_pin">Выберите Ваш PIN</string>
@@ -188,4 +188,7 @@
     <string name="enter_your_pattern">Введите Ваш паттерн для разблокировки</string>
     <string name="pattern_cannot_be_empty">Паттерн слишком короткий</string>
     <string name="wrong_pattern">Неверный паттерн</string>
+    <string name="user_status_last_seen_word">был в сети</string>
+    <string name="user_status_last_today_at_word">сегодня в</string>
+    <string name="user_status_last_yesterday_at_word">вчера в</string>
 </resources>
