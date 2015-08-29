@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.core.picasso;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.util.Log;
 import android.widget.ImageView;
 import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
@@ -62,7 +63,10 @@ public class RxGlide {
         ctx.registerComponentCallbacks(new ComponentCallbacks2() {
             @Override
             public void onTrimMemory(int level) {
-                cache.clear();
+                if (level >= TRIM_MEMORY_MODERATE){
+                    cache.clear();
+                }
+                Log.d("RxGlide", "trim memory " + level);
             }
 
             @Override
@@ -73,6 +77,8 @@ public class RxGlide {
             @Override
             public void onLowMemory() {
                 cache.clear();
+                Log.d("RxGlide", "onLowMemory -> clear cache");
+
             }
         });
     }

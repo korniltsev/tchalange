@@ -698,16 +698,17 @@ public class Presenter extends ViewPresenter<ChatView>
         if (cmd.type == EmojiParser.TYPE_BOT_COMMAND) {
             if (isGroupChat) {
                 if (path.me.id == cmd.userId) {
-                    sendText(ref);
+                    sendText(ref.replaceAll("\n", ""));//todo fix regexp!!
                 } else {
                     final TdApi.User user = uerHolder.getUser(cmd.userId);
                     if (user == null) {
                         return;
                     }
-                    sendText(ref + "@" + user.username);
+                    final String text = ref + "@" + user.username;
+                    sendText(text.replaceAll("\n", ""));
                 }
             } else {
-                sendText(ref);
+                sendText(ref.replaceAll("\n", ""));
             }
         } else if (cmd.type == EmojiParser.TYPE_URL) {
             String url = ref;

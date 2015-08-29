@@ -287,4 +287,10 @@ public class CustomCeilLayout extends ViewGroup {
     public boolean isLayoutDirectionResolved() {
         return super.isLayoutDirectionResolved();
     }
+
+    @Override
+    public boolean hasOverlappingRendering() {
+        return false;
+    }
+
 }

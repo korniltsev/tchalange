@@ -102,9 +102,8 @@ public class AppUtils {
         } else if (status instanceof TdApi.UserStatusOffline) {
             long wasOnline = ((TdApi.UserStatusOffline) status).wasOnline;
             long timeInMillis = wasOnline * 1000;
-            //            Date date = new Date(timeInMillis);
-            DateTime wasOnlineTime = new DateTime(timeInMillis, DateTimeZone.UTC)
-                    .withZone(DateTimeZone.getDefault());
+
+            DateTime wasOnlineTime = new DateTime(timeInMillis);
 
             DateTime now = DateTime.now();
 

@@ -374,4 +374,10 @@ public class ChatListCell extends ViewGroup implements Emoji.Listener {
             invalidate();
         }
     }
+
+    @Override
+    public boolean hasOverlappingRendering() {
+        return false;
+    }
+
 }
