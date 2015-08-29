@@ -14,19 +14,12 @@ import ru.korniltsev.telegram.core.utils.Colors;
 
 public class TextMessageVH extends BaseAvatarVH {
 
-//    private final EmojiTextView message;
     private final TextMessageView message;
 
 
     public TextMessageVH(CustomCeilLayout itemView, Adapter adapter) {
         super(itemView, adapter);
 
-//        message = new EmojiTextView(itemView.getContext());
-//        message.setTextColor(Color.BLACK);
-//        message.setPadding(0, 0, root.calc.dp(8), 0);
-//        message.setMovementMethod(LinkMovementMethod.getInstance());
-//
-//        applyTextStyle(message);
         message = new TextMessageView(itemView.getContext());
         root.addContentView(message);
 
@@ -52,15 +45,15 @@ public class TextMessageVH extends BaseAvatarVH {
     public static void newBind(CustomCeilLayout root, Adapter adapter, ChatListItem item, long lastReadOutbox) {
         TdApi.Message msg = ((MessageItem) item).msg;
         TdApi.User user = adapter.getUserHolder().getUser(msg.fromId);
-        String print = BaseAvatarVH.format(msg);
-        root.setTime(print);
+
+        root.setTime(msg);
 
         if (user != null) {
             root.avatarView.loadAvatarFor(user);
-            String name = AppUtils.uiName(user, root.getContext());
-            root.setNick(name);
+//            String name = AppUtils.uiName(user, root.getContext());
+            root.setNick(user);
         } else {
-            root.setNick("");
+            root.setNick(null);
         }
 
         switch (adapter.chat.getMessageState(msg, lastReadOutbox, adapter.myId)) {

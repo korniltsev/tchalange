@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -14,6 +15,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.app.MyApp;
@@ -31,31 +33,29 @@ public class CustomCeilLayout extends ViewGroup {
     public static final int STATE_IC_NULL = 2;
 
     //staff
-    public/* @Inject */ DpCalculator calc;
-    public/* @Inject */ StaticLayoutCache layoutCache;
+    public final DpCalculator calc;
+    public final StaticLayoutCache layoutCache;
     private final int screenWidth;
-    private final int paddingTopBottom;
-    private final int unspecifiedMeasureSpec;
+    private static int paddingTopBottom;
+    private static int unspecifiedMeasureSpec;
 
     //avatarview
     public final AvatarView avatarView;
-    private final int avatarSize;
-    private final int avatarMeasureSpec;
-    private final int avatarMarginLeft;
-    private final int avatarMarginRight;
+    private static int avatarMeasureSpec;
+    private static int avatarSize;
+    private static int avatarMarginLeft;
+    private static int avatarMarginRight;
 
     //iconright
-    private final int iconRightMarginRight;
-    private final int iconRightSize;
+    private static int iconRightMarginRight;
+    private static int iconRightSize;
     public final SquareDumbResourceView iconRight3;
 
-    private String time;
     private StaticLayout timeLayout;
     private int timeWidth;
-    private final int timePadding;
+    private static int timePadding;
 
     //nick
-    private String nick;
     private Layout nickLayout;
     private int nickWidth;
     private int nickHeight;
@@ -63,12 +63,10 @@ public class CustomCeilLayout extends ViewGroup {
     private int nickLeft;
     //content
     private View contentView;
-    private int marginBetweenNickAndContentView;
-
+    private static int marginBetweenNickAndContentView;
 
     private static TextPaint nickPaint;
     private static TextPaint timePaint;
-
 
     boolean bottomMarginEnabled = true;
     private float nickLayoutFirstLineLeft;
@@ -79,6 +77,7 @@ public class CustomCeilLayout extends ViewGroup {
 
     public CustomCeilLayout(Context ctx, AttributeSet attrs) {
         super(ctx, attrs);
+
         //todo all dp lazy
         //        ObjectGraphService.inject(ctx, this);
 
@@ -86,22 +85,20 @@ public class CustomCeilLayout extends ViewGroup {
         screenWidth = app.displayWidth;
         calc = app.calc;
         layoutCache = app.staticLayoutCache;
+        initPaints(calc);
 
-        paddingTopBottom = calc.dp(8);
-        unspecifiedMeasureSpec = makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+
+
+
 
         //avatar
-        avatarSize = calc.dp(41);
-        avatarMeasureSpec = makeMeasureSpec(avatarSize, EXACTLY);
+
         avatarView = new AvatarView(ctx, avatarSize, app.rxGlide);
         avatarView.setId(R.id.avatar);
-        avatarMarginLeft = calc.dp(9);
-        avatarMarginRight = calc.dp(11);
         addView(avatarView);
 
         //iconRight
-        iconRightSize = calc.dp(12);
-        iconRightMarginRight = calc.dp(15);
+
 
         final Drawable[] ds = new Drawable[3];
         final Resources res = getContext().getResources();
@@ -116,23 +113,40 @@ public class CustomCeilLayout extends ViewGroup {
         }
 
         //time
-        timePadding = calc.dp(8);
-        if (timePaint == null){
+
+
+
+
+        setWillNotDraw(false);
+
+    }
+
+    public static synchronized void initPaints(DpCalculator calc) {
+        if (timePaint == null) {
             timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             timePaint.setTextSize(calc.dpFloat(14));
             timePaint.setColor(0xff939494);
-
 
             nickPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             nickPaint.setTextSize(calc.dpFloat(14));
             nickPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             nickPaint.setColor(Colors.USER_NAME_COLOR);
+
+            timePadding = calc.dp(8);
+
+            avatarSize = calc.dp(41);
+            avatarMeasureSpec = makeMeasureSpec(avatarSize, EXACTLY);
+            avatarMarginLeft = calc.dp(9);
+            avatarMarginRight = calc.dp(11);
+
+            iconRightSize = calc.dp(12);
+            iconRightMarginRight = calc.dp(15);
+            paddingTopBottom = calc.dp(8);
+            marginBetweenNickAndContentView = calc.dp(4);
+
+
+            unspecifiedMeasureSpec = makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         }
-
-
-        marginBetweenNickAndContentView = calc.dp(4);
-        setWillNotDraw(false);
-        AppUtils.rtlPerformanceFix(this);
     }
 
     public void addContentView(View v) {
@@ -157,8 +171,6 @@ public class CustomCeilLayout extends ViewGroup {
                 + contentView.getMeasuredHeight()
                 + marginBetweenNickAndContentView;
         setMeasuredDimension(availableWidth, Math.max(min, real));
-
-
     }
 
     @Override
@@ -188,51 +200,61 @@ public class CustomCeilLayout extends ViewGroup {
         //        DebugRelativeLayout.log(start, end, "total дфнщге");
     }
 
-    public void setTime(@NonNull String time) {
-        if (!time.equals(this.time)) {
-            this.time = time;
-            timeLayout = getStaticLayoutForTime(time);
-            timeWidth = (int) (timeLayout.getLineWidth(0) + timePadding * 2);
-        }
+    public void setTime(@NonNull TdApi.Message msg) {
+        timeLayout = getStaticLayoutForTime(layoutCache, msg);
+        timeWidth = getTimeWidth(timeLayout);
+    }
+
+    public static int getTimeWidth(StaticLayout timeLayout) {
+        return (int) (timeLayout.getLineWidth(0) + timePadding * 2);
     }
 
     @NonNull
-    private StaticLayout getStaticLayoutForTime(@NonNull String time) {
+    public static StaticLayout getStaticLayoutForTime(StaticLayoutCache layoutCache, TdApi.Message msg) {
         final int width = 700;
-        final StaticLayoutCache.Key key = new StaticLayoutCache.Key(time, width);
-        final StaticLayout check = layoutCache.check(key);
-        if (check != null) {
-            return check;
-        }
-        final StaticLayout res = new StaticLayout(time, timePaint, width, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
-        layoutCache.put(key, res);
-        return res;
+        return layoutCache.getLayout(width, timePaint, msg.dateFormatted);
+        //        final StaticLayoutCache.Key key = new StaticLayoutCache.Key(time, width);
+        //        final StaticLayout check = layoutCache.check(key);
+        //        if (check != null) {
+        //            return check;
+        //        }
+        //        final StaticLayout res = new StaticLayout(time, timePaint, width, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        //        layoutCache.put(key, res);
+        //        return res;
     }
 
-    public void setNick(@NonNull String nick) {
-        if (!nick.equals(this.nick)) {
-            this.nick = nick;
-            final int spaceLeftForNick = screenWidth - avatarSize - avatarMarginLeft - avatarMarginRight
-                    - timeWidth - iconRightSize - iconRightMarginRight;
-            CharSequence str2 = TextUtils.ellipsize(nick, nickPaint, spaceLeftForNick, TextUtils.TruncateAt.END);
-            this.nickLayout = getStaticLayoutForNick(spaceLeftForNick, str2);
-            nickLayoutFirstLineLeft = nickLayout.getLineLeft(0);
-            nickWidth = (int) nickLayout.getLineWidth(0);
-            nickHeight = nickLayout.getHeight();
+    public void setNick(@Nullable TdApi.User user) {
+        String nick;
+        if (user == null){
+            nick = "";
+        } else {
+            if (user.nullableUiName != null) {
+                nick = user.nullableUiName;
+            } else {
+                nick = AppUtils.uiName(user, getContext());
+            }
         }
+
+        final int spaceLeftForNick = getSpaceLeftForNick(this.screenWidth, this.timeWidth);
+        CharSequence str2 = getEllipsizedNick(nick, spaceLeftForNick);
+        this.nickLayout = getStaticLayoutForNick(spaceLeftForNick, str2, layoutCache);
+        nickLayoutFirstLineLeft = nickLayout.getLineLeft(0);
+        nickWidth = (int) nickLayout.getLineWidth(0);
+        nickHeight = nickLayout.getHeight();
+    }
+
+    public static CharSequence getEllipsizedNick(@NonNull String nick, int spaceLeftForNick) {
+        return TextUtils.ellipsize(nick, nickPaint, spaceLeftForNick, TextUtils.TruncateAt.END);
+    }
+
+    public static  int getSpaceLeftForNick(int screenWidth, int timeWidth) {
+        return screenWidth - avatarSize - avatarMarginLeft - avatarMarginRight
+                - timeWidth - iconRightSize - iconRightMarginRight;
     }
 
     @NonNull
-    private StaticLayout getStaticLayoutForNick(int spaceLeftForNick, CharSequence str2) {
-        final StaticLayoutCache.Key key = new StaticLayoutCache.Key(str2.toString(), spaceLeftForNick);
-
-        StaticLayout fromCache = layoutCache.check(key);
-        if (fromCache != null) {
-            return fromCache;
-        }
-        final StaticLayout staticLayout = new StaticLayout(str2, nickPaint, spaceLeftForNick, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
-        layoutCache.put(key, staticLayout);
-        return staticLayout;
+    public static StaticLayout getStaticLayoutForNick(int spaceLeftForNick, CharSequence str2, StaticLayoutCache layoutCache) {
+        return layoutCache.getLayout(spaceLeftForNick, nickPaint, str2);
     }
 
     @Override
@@ -265,6 +287,4 @@ public class CustomCeilLayout extends ViewGroup {
     public boolean isLayoutDirectionResolved() {
         return super.isLayoutDirectionResolved();
     }
-
-
 }

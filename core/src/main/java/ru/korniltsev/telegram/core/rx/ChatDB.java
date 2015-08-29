@@ -60,9 +60,10 @@ public class ChatDB {
 
     final UserHolder userHolder;
 
+    final PrepareMessageLayoutHook layoutHook;
 
     public ChatDB(final Context ctx, final RXClient client, NotificationManager nm, RXAuthState auth,
-                  UserHolder userHolder, DpCalculator calc, EmojiParser emojiParser) {
+                  UserHolder userHolder, DpCalculator calc, EmojiParser emojiParser, PrepareMessageLayoutHook layoutHook) {
         this.ctx = ctx;
         this.client = client;
 
@@ -71,6 +72,7 @@ public class ChatDB {
 //        this.parser = parser;
         this.nm = nm;
         this.userHolder = userHolder;
+        this.layoutHook = layoutHook;
         prepareForUpdates();
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -416,5 +418,9 @@ public class ChatDB {
 
     public int getMessageLimit() {
         return messageLimit;
+    }
+
+    public interface PrepareMessageLayoutHook{
+        void prepare(TdApi.Message msg, boolean initRequest, int messageNumber);
     }
 }

@@ -487,8 +487,10 @@ public class RxChat  {
             }
             addAll(messageList, portion.messages);
 
-            for (TdApi.Message message : messageList) {
+            for (int i = 0, messageListSize = messageList.size(); i < messageListSize; i++) {
+                TdApi.Message message = messageList.get(i);
                 holder.parser.parse(message);
+                holder.layoutHook.prepare(message, initMessage != null, i);
             }
             final List<ChatListItem> split = daySplitter.split(messageList);
             Portion res = new Portion(messageList, split);

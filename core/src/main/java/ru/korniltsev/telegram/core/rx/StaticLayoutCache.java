@@ -1,7 +1,9 @@
 package ru.korniltsev.telegram.core.rx;
 
 import android.content.Context;
+import android.text.Layout;
 import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.LruCache;
 
 import javax.inject.Inject;
@@ -25,10 +27,10 @@ public class StaticLayoutCache {
     }
 
     public static class Key {
-        final String str;
+        final CharSequence str;
         final int width;
 
-        public Key(String str, int width) {
+        public Key(CharSequence str, int width) {
             this.str = str;
             this.width = width;
         }
@@ -56,6 +58,20 @@ public class StaticLayoutCache {
             result = 31 * result + width;
             return result;
         }
+    }
+    public StaticLayout getLayout(int width, TextPaint paint, CharSequence text){
+//        final int width = 700;
+        final StaticLayoutCache.Key key = new StaticLayoutCache.Key(text, width);
+        final StaticLayout check = check(key);
+        if (check != null) {
+            return check;
+        }
+        final StaticLayout res = new StaticLayout(text, paint, width, Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+        put(key, res);
+        return res;
+    }
+    public interface Factory {
+        StaticLayout create(int width, TextPaint paint, CharSequence text);
     }
 
 

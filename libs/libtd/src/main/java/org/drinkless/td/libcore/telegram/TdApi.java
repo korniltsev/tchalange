@@ -3676,6 +3676,8 @@ public class TdApi {
         public LinkState foreignLink;
         public UserType type;
 
+        public transient String nullableUiName;
+
         public User() {
         }
 

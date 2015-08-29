@@ -23,6 +23,7 @@ import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
+import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import rx.Subscription;
 
 import java.util.Arrays;
@@ -36,9 +37,10 @@ public class TextMessageView extends View implements Emoji.Listener {
     private final EmojiParser emojiParser;
     private StaticLayout staticLayout;
     private static TextPaint paint;
-//    private Subscription subscription;
+    //    private Subscription subscription;
     private Spannable currentText;
     @Nullable private EmojiParser.ReferenceSpan currentTouchSpan;
+    private StaticLayoutCache layoutCache;
 
     public TextMessageView(Context context) {
         this(context, null);
@@ -47,19 +49,26 @@ public class TextMessageView extends View implements Emoji.Listener {
     public TextMessageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         final MyApp app = MyApp.from(context);
-
+        layoutCache = app.staticLayoutCache;
         final int displayWidth = app.displayWidth;
         final DpCalculator calc = app.calc;
 
-        width = displayWidth - calc.dp(41 + 9 + 11 + 8);
-        if (paint == null){
+        width = getTextWidth(displayWidth, calc);
+        initPaints(calc);
+        emoji = app.emoji;
+        emojiParser = app.emojiParser;
+    }
+
+    public static synchronized void initPaints(DpCalculator calc) {
+        if (paint == null) {
             paint = new TextPaint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
             paint.setColor(Color.BLACK);
             paint.setTextSize(calc.dp(14f));
         }
-        emoji = app.emoji;
-        emojiParser = app.emojiParser;
-        AppUtils.rtlPerformanceFix(this);
+    }
+
+    public static int getTextWidth(int displayWidth, DpCalculator calc) {
+        return displayWidth - calc.dp(41 + 9 + 11 + 8);
     }
 
     @Override
@@ -85,15 +94,15 @@ public class TextMessageView extends View implements Emoji.Listener {
                 int lineNumber = y / lineHeight;
                 final float x = event.getX();
                 final float lineWidth = staticLayout.getLineWidth(lineNumber);
-                if (x > lineWidth){
+                if (x > lineWidth) {
                     return false;
                 }
                 final int offset = staticLayout.getOffsetForHorizontal(lineNumber, x);
                 final EmojiParser.ReferenceSpan[] spans = currentText.getSpans(offset, offset, EmojiParser.ReferenceSpan.class);
-                if (spans.length == 0){
+                if (spans.length == 0) {
                     return false;
                 }
-                if (actionMasked == ACTION_DOWN){
+                if (actionMasked == ACTION_DOWN) {
                     currentTouchSpan = spans[0];
                     return true;
                 } else {
@@ -118,12 +127,13 @@ public class TextMessageView extends View implements Emoji.Listener {
     }
 
     public void setText(@NonNull Spannable text) {
-        if (currentText != null && currentText.equals(text)) {
-            return;
-        }
         this.currentText = text;
-        staticLayout = new StaticLayout(text, paint, width, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        staticLayout = getLayoutForText(layoutCache, width, text);
         requestLayout();
+    }
+
+    public static StaticLayout getLayoutForText(StaticLayoutCache cache, int width, @NonNull Spannable text) {
+        return cache.getLayout(width, paint, text);
     }
 
     @Override
@@ -131,14 +141,13 @@ public class TextMessageView extends View implements Emoji.Listener {
         staticLayout.draw(canvas);
     }
 
-
     @Override
     public void pageLoaded(int page) {
-        if (currentText != null){
+        if (currentText != null) {
             final Emoji.EmojiSpan[] spans = currentText.getSpans(0, currentText.length(), Emoji.EmojiSpan.class);
-            if (spans.length != 0){
+            if (spans.length != 0) {
                 for (Emoji.EmojiSpan span : spans) {
-                    if (span.d.info.page == page){
+                    if (span.d.info.page == page) {
                         invalidate();
                         return;
                     }

@@ -1,11 +1,14 @@
 package ru.korniltsev.telegram.chat.adapter;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.chat.BuildConfig;
 import ru.korniltsev.telegram.chat.Chat;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
@@ -193,7 +196,13 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
         long start = System.nanoTime();
         final RealBaseVH res = createViewHolderImpl(p, viewType);
         long end = System.nanoTime();
-        Utils.logDuration(start, end, "onCreateViewHolder Chat ");
+        if (BuildConfig.DEBUG){
+            if ((end - start)/1000000 > 10) {
+                Log.e("Duration", "view creation is too slow " + viewType);
+            }
+        }
+
+        Utils.logDuration(start, end, "onCreateViewHolder @ " + viewType + " ");
         return res;
     }
 
@@ -279,7 +288,14 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
         ChatListItem item1 = getItem(position);
         holder.bind(item1, lastReadOutbox);
         long end = System.nanoTime();
-        Utils.logDuration(start, end, "onBindViewHolder Chat ");
+        final int itemViewType = getItemViewType(position);
+        if (BuildConfig.DEBUG){
+            if ((end - start)/1000000 > 10) {
+                Log.e("Duration", "view binding is too slow " + itemViewType);
+            }
+        }
+
+        Utils.logDuration(start, end, "onBindViewHolder @ " + itemViewType + " ");
 
     }
 

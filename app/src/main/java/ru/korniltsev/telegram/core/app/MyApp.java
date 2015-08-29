@@ -18,6 +18,9 @@ import io.fabric.sdk.android.services.concurrency.PriorityThreadPoolExecutor;
 import mortar.MortarScope;
 import mortar.dagger1support.ObjectGraphService;
 import net.danlew.android.joda.JodaTimeAndroid;
+import ru.korniltsev.telegram.chat.BuildConfig;
+import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
@@ -50,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MyApp extends Application {
     private MortarScope rootScope;
-    public int displayWidth;
+    public volatile int displayWidth;
 //    public DpCalculator dpCalculator;
 //    public RxGlide rxGlide;
     public StaticLayoutCache staticLayoutCache;
@@ -78,6 +81,10 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (BuildConfig.DEBUG){
+            ObserverAdapter.ctx = this;
+            ObserverAdapter.MAIN_THREAD_HANDLER = AppUtils.MAIN_HANDLER;
+        }
 //        Debug.startMethodTracing("startup");
         System.setProperty("rx.scheduler.jdk6.purge-force", "true");
         maximizeCurrentThreadPriority();
@@ -111,7 +118,8 @@ public class MyApp extends Application {
         rxGlide = new RxGlide(this, downloadManager, rxAuthState);
         stickers = new Stickers(rxClient, rxAuthState);
         notificationManager = new NotificationManager(rxClient, this, rxAuthState);
-        chatDb = new ChatDB(this, rxClient, notificationManager, rxAuthState, userHolder, calc, emojiParser);
+        chatDb = new ChatDB(this, rxClient, notificationManager, rxAuthState, userHolder, calc, emojiParser,
+                new MessageLayoutGenerator(staticLayoutCache, this, calc, userHolder));
         //todo we can loose some updates between rxClient and chatDB creation
         passcodeManager = new PasscodeManager(this, rxAuthState);
         activityOwner = new ActivityOwner();
