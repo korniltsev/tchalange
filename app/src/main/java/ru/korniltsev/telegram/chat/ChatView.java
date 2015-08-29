@@ -211,6 +211,12 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
         botStartPanel = findViewById(R.id.bot_start_panel);
         btnBotStart = (TextView) findViewById(R.id.btn_bot_start);
         botCommandsShadow = findViewById(R.id.bot_command_shadow);
+        botCommandsShadow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideCommandList();
+            }
+        });
         botCommandsListConainer = findViewById(R.id.bot_commands_list_container);
 
         final TrickyBottomFrame bottomFrame = (TrickyBottomFrame) findViewById(R.id.frame_under_message_panel);
@@ -397,6 +403,10 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
             return true;
         }
         mutePopup = null;
+        if (botCommandListVisible){
+            hideCommandList();
+            return true;
+        }
         return messagePanel.onBackPressed();
     }
 

@@ -38,6 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@id/forward_nick"
             android:layout_below="@id/forward_nick"
+            android:textColor="#333333"
             android:paddingRight="8dp"
             />
 </ru.korniltsev.telegram.chat.adapter.view.ForwardedMessageView>
