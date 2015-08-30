@@ -1,8 +1,11 @@
 package ru.korniltsev.telegram.core.picasso;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Request;
@@ -13,6 +16,7 @@ import ru.korniltsev.telegram.core.rx.RxDownloadManager;
 import webp.SupportBitmapFactory;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -59,13 +63,27 @@ public class TDFileRequestHandler extends RequestHandler {
                         Picasso.LoadedFrom.NETWORK);
             } else {
                 //may be it is not webp
-                return new Result(new FileInputStream(path), Picasso.LoadedFrom.NETWORK);
+                return load(path);
             }
         } else {
-            return new Result(new FileInputStream(path), Picasso.LoadedFrom.NETWORK);
+            return load(path);
         }
     }
 
+    @NonNull
+    private Result load(String path) throws FileNotFoundException {
+        return new Result(null, new FileInputStream(path), Picasso.LoadedFrom.NETWORK, getExifOrientation(path));
+    }
+
+    public static int getExifOrientation(String path) {
+        try {
+            return new ExifInterface(path ).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        } catch ( IOException e ) {
+            e.printStackTrace();
+            return ExifInterface.ORIENTATION_UNDEFINED;
+        }
+
+    }
 
     private String downloadAndGetPath(int id) throws IOException {
         try {

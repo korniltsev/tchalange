@@ -63,9 +63,9 @@ public class RxGlide {
         ctx.registerComponentCallbacks(new ComponentCallbacks2() {
             @Override
             public void onTrimMemory(int level) {
-                if (level >= TRIM_MEMORY_MODERATE){
-                    cache.clear();
-                }
+//                if (level >= TRIM_MEMORY_MODERATE){
+//                    cache.clear();
+//                }
                 Log.d("RxGlide", "trim memory " + level);
             }
 

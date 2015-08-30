@@ -1,11 +1,13 @@
 package ru.korniltsev.telegram.core.rx;
 
+import android.media.ExifInterface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.SparseArray;
 import com.crashlytics.android.core.CrashlyticsCore;
 import org.drinkless.td.libcore.telegram.TdApi;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.picasso.TDFileRequestHandler;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import rx.Observable;
 import rx.Subscription;
@@ -125,8 +127,16 @@ public class RxChat  {
     }
 
     //hack to prevent reloading of newly added image
-    final SparseArray<TdApi.File> sentMessageIdToImageLink = new SparseArray<>();
+    final SparseArray<SentImageInfo> sentMessageIdToImageLink = new SparseArray<>();
+    public class SentImageInfo {
+        public final TdApi.File f;
+public         final int exif;
 
+        public SentImageInfo(TdApi.File f, int exif) {
+            this.f = f;
+            this.exif = exif;
+        }
+    }
     private void sentPhotoHack(TdApi.Message msg) {
         if (msg.message instanceof TdApi.MessagePhoto
                 && msg.id >= MSG_WITHOUT_VALID_ID) {
@@ -134,13 +144,14 @@ public class RxChat  {
             if (p.photos.length == 1) {
                 final TdApi.PhotoSize photo = p.photos[0];
                 if (photo.type.equals("i") && photo.photo.isLocal()) {
-                    sentMessageIdToImageLink.put(msg.id, photo.photo);
+                    final int exif = TDFileRequestHandler.getExifOrientation(photo.photo.path);
+                    sentMessageIdToImageLink.put(msg.id, new SentImageInfo(photo.photo, exif));
                 }
             }
         }
     }
 
-    @Nullable public TdApi.File getSentImage(@Nullable TdApi.Message msg) {
+    @Nullable public SentImageInfo getSentImage(@Nullable TdApi.Message msg) {
         if (msg == null){
             return null;
         }

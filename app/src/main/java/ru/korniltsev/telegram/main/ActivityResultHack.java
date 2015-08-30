@@ -21,9 +21,13 @@ public class ActivityResultHack extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent i = getIntent().getParcelableExtra(EXTRA_REQUEST);
-        int requestCode = getIntent().getIntExtra(EXTRA_REQUEST_CODE, 0);
-        startActivityForResult(i, requestCode);
+        if (savedInstanceState == null){
+            Intent i = getIntent().getParcelableExtra(EXTRA_REQUEST);
+            int requestCode = getIntent().getIntExtra(EXTRA_REQUEST_CODE, 0);
+            startActivityForResult(i, requestCode);
+        } else {
+//            finish();
+        }
     }
 
     @Override

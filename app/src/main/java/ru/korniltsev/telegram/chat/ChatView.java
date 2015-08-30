@@ -598,7 +598,11 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
             if (it instanceof MessageItem) {
                 final TdApi.Message msg = ((MessageItem) it).msg;
                 if (msg == response) {
+                    if (msg.message instanceof TdApi.MessagePhoto){
+                        return;
+                    }
                     adapter.notifyItemChanged(i);
+                    break;
                 }
             }
         }
@@ -783,6 +787,20 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
                 it.remove();
                 adapter.notifyDataSetChanged();
                 break;
+            }
+        }
+    }
+
+    public void notifyMessageIdChanged(TdApi.UpdateMessageId response) {
+        final List<ChatListItem> data = adapter.getData();
+        for (int i = 0; i < data.size(); i++) {
+            ChatListItem it = data.get(i);
+            if (it instanceof MessageItem) {
+                final TdApi.Message msg = ((MessageItem) it).msg;
+                if (msg.id == response.oldId) {
+                    adapter.notifyItemChanged(i);
+                    break;
+                }
             }
         }
     }

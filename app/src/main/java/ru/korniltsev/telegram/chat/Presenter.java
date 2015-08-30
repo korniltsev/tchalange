@@ -282,9 +282,10 @@ public class Presenter extends ViewPresenter<ChatView>
                         .subscribe(new ObserverAdapter<TdApi.UpdateMessageId>() {
                             @Override
                             public void onNext(TdApi.UpdateMessageId response) {
-                                getView()
-                                        .getAdapter()
-                                        .notifyDataSetChanged();
+//                                getView()
+//                                        .getAdapter()
+//                                        .notifyDataSetChanged();
+                                getView().notifyMessageIdChanged(response);
                             }
                         })
         );

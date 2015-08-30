@@ -223,10 +223,11 @@ public class AppUtils {
         Toast.makeText(ctx, "There is no app to view the document. The file is stored in downloads foled", Toast.LENGTH_LONG)
                 .show();
     }
-
+    static int counter = 0;
     @NonNull
     public static File getTmpFileForCamera() {
-        return new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+        counter ++;
+        return new File(Environment.getExternalStorageDirectory(),  "temp" + ".jpg");
     }
 
     public static void logEvent(String event) {
