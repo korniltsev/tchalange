@@ -238,23 +238,23 @@ public class MainActivity extends Activity implements ActivityOwner.AnActivity {
         super.onDestroy();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("BTF", "onActivityResult");
-        activityResult.onNext(new ActivityResult(requestCode, resultCode, data));
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        Log.d("BTF", "onActivityResult");
+//
+//    }
 
-    private final PublishSubject<ActivityResult> activityResult = PublishSubject.create();
+
 
     @Override
     public Activity expose() {
         return this;
     }
 
-    @Override
-    public Observable<ActivityResult> activityResult() {
-        return activityResult;
-    }
+//    @Override
+//    public Observable<ActivityResult> activityResult() {
+//        return activityResult;
+//    }
 
     @Override
     public void setStatusBarColor(int color) {

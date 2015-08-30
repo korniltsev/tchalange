@@ -9,7 +9,7 @@ public class ActivityOwner extends Presenter<ActivityOwner.AnActivity> {
 
     public interface AnActivity {
         Activity expose();
-        Observable<ActivityResult> activityResult();
+//        Observable<ActivityResult> activityResult();
 
         void setStatusBarColor(int color);
     }
@@ -23,9 +23,9 @@ public class ActivityOwner extends Presenter<ActivityOwner.AnActivity> {
         return getView().expose();
     }
 
-    public Observable<ActivityResult> activityResult() {
-        return getView().activityResult();
-    }
+//    public Observable<ActivityResult> activityResult() {
+//        return getView().activityResult();
+//    }
 
     public void setStatusBarColor(int color) {
         getView().setStatusBarColor(color);

@@ -21,6 +21,7 @@ import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.rx.EmojiParser;
@@ -30,6 +31,7 @@ import ru.korniltsev.telegram.core.rx.RxChat;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.rx.VoiceRecorder;
+import ru.korniltsev.telegram.main.ActivityResultHack;
 import ru.korniltsev.telegram.profile.chat.ChatInfo;
 import ru.korniltsev.telegram.profile.chat.LeaveOnlyChatList;
 import ru.korniltsev.telegram.profile.other.ProfilePath;
@@ -315,7 +317,7 @@ public class Presenter extends ViewPresenter<ChatView>
         );
 
         subscription.add(
-                owner.activityResult()
+                MyApp.from(getView()).activityResult
                         .subscribe(new ObserverAdapter<ActivityResult>() {
                             @Override
                             public void onNext(ActivityResult response) {
@@ -635,8 +637,9 @@ public class Presenter extends ViewPresenter<ChatView>
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        owner.expose()
-                .startActivityForResult(Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY);
+        ActivityResultHack.startActivityForResult(owner.expose(), Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY);
+//        owner.expose()
+//                .startActivityForResult(Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY);
     }
 
     @Override
@@ -645,8 +648,10 @@ public class Presenter extends ViewPresenter<ChatView>
         f.delete();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-        owner.expose()
-                .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO);
+
+        ActivityResultHack.startActivityForResult(owner.expose(),intent, AppUtils.REQUEST_TAKE_PHOTO);
+//        owner.expose()
+//                .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO);
     }
 
     public void onActivityResult(int request, int result, Intent data) {

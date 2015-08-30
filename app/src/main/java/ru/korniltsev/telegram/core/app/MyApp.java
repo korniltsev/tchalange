@@ -28,6 +28,7 @@ import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.emoji.Stickers;
 import ru.korniltsev.telegram.core.emoji.images.Emoji;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
+import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.ChatDB;
@@ -40,6 +41,7 @@ import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.core.rx.StaticLayoutCache;
 import ru.korniltsev.telegram.core.rx.UserHolder;
 import ru.korniltsev.telegram.core.rx.VoiceRecorder;
+import rx.subjects.PublishSubject;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.ExecutorService;
@@ -141,7 +143,10 @@ public class MyApp extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             navBarHeightResId = res.getIdentifier("navigation_bar_height", "dimen", "android");
         }
+
     }
+
+    public final PublishSubject<ActivityResult> activityResult = PublishSubject.create();
 
 
 

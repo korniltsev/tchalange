@@ -20,12 +20,14 @@ import ru.korniltsev.telegram.common.FlowHistoryStripper;
 import ru.korniltsev.telegram.contacts.ContactList;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.rx.ChatDB;
 import ru.korniltsev.telegram.core.rx.NotificationManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
 import ru.korniltsev.telegram.core.rx.RxChat;
+import ru.korniltsev.telegram.main.ActivityResultHack;
 import ru.korniltsev.telegram.profile.edit.chat.title.EditChatTitlePath;
 import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import rx.Observable;
@@ -112,7 +114,7 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
 //        );
 
         subscriptions.add(
-                owner.activityResult().subscribe(new ObserverAdapter<ActivityResult>() {
+                MyApp.from(getView()).activityResult.subscribe(new ObserverAdapter<ActivityResult>() {
                     @Override
                     public void onNext(ActivityResult response) {
                         onActivityResult(response);
@@ -293,8 +295,8 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        owner.expose()
-                .startActivityForResult(Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY_CHAT_AVATAR);
+
+        ActivityResultHack.startActivityForResult(owner.expose(), Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY_CHAT_AVATAR);
     }
 
     @Override
@@ -303,8 +305,8 @@ public class ChatInfoPresenter extends ViewPresenter<ChatInfoView> implements Ch
         f.delete();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-        owner.expose()
-                .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO_CHAT_AVATAR);
+        ActivityResultHack.startActivityForResult(owner.expose(), intent, AppUtils.REQUEST_TAKE_PHOTO_CHAT_AVATAR);
+
     }
 
     class ChatInfoData {

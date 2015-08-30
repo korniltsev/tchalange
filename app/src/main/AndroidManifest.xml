@@ -23,6 +23,10 @@
                 <category android:name='android.intent.category.LAUNCHER' />
             </intent-filter>
         </activity>
+
+        <activity android:name="ru.korniltsev.telegram.main.ActivityResultHack"
+                android:theme="@style/Theme.Transparent"
+                />
         <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="05e29ff0553286a95bb79bcb17fe73a1b412bcec" />

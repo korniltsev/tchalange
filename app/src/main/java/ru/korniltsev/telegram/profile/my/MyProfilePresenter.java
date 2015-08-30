@@ -14,10 +14,12 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
 import ru.korniltsev.telegram.core.mortar.ActivityResult;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.rx.RXClient;
+import ru.korniltsev.telegram.main.ActivityResultHack;
 import ru.korniltsev.telegram.main.passcode.PasscodePath;
 import ru.korniltsev.telegram.profile.edit.name.EditNamePath;
 import ru.korniltsev.telegram.profile.edit.passcode.EditPasscode;
@@ -63,7 +65,7 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> implements 
         }
 
         subscription.add(
-                owner.activityResult().subscribe(new ObserverAdapter<ActivityResult>() {
+                MyApp.from(getView()).activityResult.subscribe(new ObserverAdapter<ActivityResult>() {
                     @Override
                     public void onNext(ActivityResult response) {
                         onActivityResult(response);
@@ -152,8 +154,9 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> implements 
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        activity.expose()
-                .startActivityForResult(Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY_MY_AVATAR);
+        ActivityResultHack.startActivityForResult(owner.expose(), Intent.createChooser(intent, title), AppUtils.REQUEST_CHOOS_FROM_GALLERY_MY_AVATAR);
+
+
     }
 
     @Override
@@ -162,7 +165,8 @@ public class MyProfilePresenter extends ViewPresenter<MyProfileView> implements 
         f.delete();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-        activity.expose()
-                .startActivityForResult(intent, AppUtils.REQUEST_TAKE_PHOTO_MY_AVATAR);
+
+        ActivityResultHack.startActivityForResult(owner.expose(), intent, AppUtils.REQUEST_TAKE_PHOTO_MY_AVATAR);
+
     }
 }
