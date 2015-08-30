@@ -18,13 +18,12 @@ import javax.inject.Inject;
 //todo draw only bitmap
 public class PhotoMessageView extends ImageView {
     public static final int ZERO_MEASURE_SPEC = MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY);
-    //    private final int atmost;
     final  RxGlide picasso;
     final Presenter presenter;//todo wtf, why presenter is here
     final DpCalculator calc;
+    private final int horizontalWidth;
+    private final int verticalWidth;
     private TdApi.Photo photo;
-    private int dip207;
-    private int dip154;
     private int width;
     private int height;
 
@@ -36,8 +35,10 @@ public class PhotoMessageView extends ImageView {
         final MyApp app = MyApp.from(context);
         calc = app.calc;
         picasso = app.rxGlide;
-        dip207 = calc.dp(207);
-        dip154 = calc.dp(154);
+        int spaceLeft = app.displayWidth - calc.dp(41 + 9 + 11 + 16);
+        spaceLeft = Math.max(spaceLeft, calc.dp(300));
+        horizontalWidth = spaceLeft;
+        verticalWidth = (int) (spaceLeft * 0.7);
     }
 
     @Override
@@ -55,16 +56,15 @@ public class PhotoMessageView extends ImageView {
         if (this.photo == photo1) {
             return;
         }
-//        final TdApi.MessagePhoto photo = (TdApi.MessagePhoto) msg.message;
-         this.photo = photo1;
-//        this.msg = msg;
+        this.photo = photo1;
+
         setImageDrawable(null);
 
         float ratio = PhotoUtils.getPhotoRation(photo1);
         if (ratio > 1) {
-            width = dip207;
+            width = horizontalWidth;
         } else {
-            width = dip154;
+            width = verticalWidth;
         }
         height = (int) ( width/ratio);
 
