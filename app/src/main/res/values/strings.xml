@@ -64,6 +64,7 @@
     <string name="user_status_last_week">last seen within a week</string>
     <string name="user_status_last_month">last seen within a month</string>
     <string name="user_status_recently">last seen recently</string>
+    <string name="user_status_empty">last seen a long time ago</string>
     <string name="user_status_just_now">last seen just now</string>
     <string name="user_status_last_seen_word">last seen</string>
     <string name="user_status_last_today_at_word">today at</string>

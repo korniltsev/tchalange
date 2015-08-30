@@ -87,7 +87,7 @@ public class AppUtils {
             return context.getString(R.string.user_status_recently);
         } else {
             //empty
-            return "";
+            return context.getString(R.string.user_status_empty);
         }
     }
 
