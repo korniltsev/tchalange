@@ -2,6 +2,7 @@ package ru.korniltsev.telegram.chat.adapter;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.text.SpannableString;
 import android.view.View;
 import android.widget.TextView;
 import com.crashlytics.android.core.CrashlyticsCore;
@@ -10,12 +11,15 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.PhotoMessageView;
 import ru.korniltsev.telegram.chat.adapter.view.TextMessageView;
 import ru.korniltsev.telegram.chat.debug.CustomCeilLayout;
+import ru.korniltsev.telegram.core.app.MyApp;
+import ru.korniltsev.telegram.core.rx.EmojiParser;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.MessageItem;
 
 class WebPagePreviewVH extends BaseAvatarVH {
     private final PhotoMessageView image;
     private final TextMessageView link;
+    private final EmojiParser emojiParser;
 
     public WebPagePreviewVH(CustomCeilLayout itemView, final Adapter adapter) {
         super(itemView, adapter);
@@ -33,7 +37,7 @@ class WebPagePreviewVH extends BaseAvatarVH {
         link = (TextMessageView) contentView.findViewById(R.id.link);
 //        TextMessageVH.applyTextStyle(link);
 
-
+        emojiParser = MyApp.from(itemView.getContext()).emojiParser;
     }
 
     private void openLink() {
@@ -63,6 +67,17 @@ class WebPagePreviewVH extends BaseAvatarVH {
             image.setVisibility(View.VISIBLE);
             image.load(webPage.webPage.photo, null);
         }
-        link.setText(webPage.parsedText);
+        if (webPage.parsedText != null){
+            link.setText(webPage.parsedText);
+        } else if (webPage.text != null){
+            webPage.parsedText = emojiParser.parseEmoji(webPage.text, msg.fromId);
+            if (webPage.parsedText !=null){
+                link.setText(webPage.parsedText);
+            } else {
+                link.setText(new SpannableString(webPage.text));
+            }
+        } else {
+            link.setText(new SpannableString(""));
+        }
     }
 }
