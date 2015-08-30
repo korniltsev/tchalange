@@ -118,14 +118,9 @@ public class MessagePanel extends FrameLayout {
         btnRight.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = textFrom(input);
-                //                if (text.length() == 0) {
-                //                    showAttachPopup();
-                //                } else {
                 listener.sendText(
-                        text);
+                        textFrom(input));
                 input.setText("");
-                //                }
             }
         });
 

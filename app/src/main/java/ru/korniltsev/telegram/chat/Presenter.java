@@ -596,24 +596,28 @@ public class Presenter extends ViewPresenter<ChatView>
 
     @Override
     public void sendText(final String text) {
-        getView().scrollToBottom();
-        getView().postDelayed(new Runnable() {
+        final ChatView view = getView();
+        view.scrollToBottom();
+        view.postDelayed(new Runnable() {
             @Override
             public void run() {
                 rxChat.sendMessage(text);
+                view.removeNewMessagesItem();
             }
-        }, 16);
+        }, 16);//todo wtf, why delayed
+
     }
 
     public void sendSticker(final TdApi.Sticker sticker) {
-        //        stickers.map(stickerFilePath, sticker);
-        getView().scrollToBottom();
-        getView().postDelayed(new Runnable() {
+        final ChatView view = getView();
+        view.scrollToBottom();
+        view.postDelayed(new Runnable() {
             @Override
             public void run() {
                 rxChat.sendSticker(sticker.sticker);
+                view.removeNewMessagesItem();
             }
-        }, 32);
+        }, 32);//todo wtf, why delayed
     }
 
     @Override

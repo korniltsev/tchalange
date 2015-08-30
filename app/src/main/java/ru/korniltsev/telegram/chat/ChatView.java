@@ -62,6 +62,7 @@ import rx.Subscription;
 import rx.functions.Action1;
 
 import javax.inject.Inject;
+import java.util.Iterator;
 import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
@@ -736,6 +737,17 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     @Override
     public void onTraversalCompleted() {
         list.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public void removeNewMessagesItem() {
+        for (Iterator<ChatListItem> it = adapter.getData().iterator(); it.hasNext(); ) {
+            ChatListItem item = it.next();
+            if (item instanceof NewMessagesItem){
+                it.remove();
+                adapter.notifyDataSetChanged();
+                break;
+            }
+        }
     }
 
     //    public void setCommands(TdApi.ChatParticipant[] participants) {
