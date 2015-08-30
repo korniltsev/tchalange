@@ -36,7 +36,7 @@ public class PhotoMessageView extends ImageView {
         calc = app.calc;
         picasso = app.rxGlide;
         int spaceLeft = app.displayWidth - calc.dp(41 + 9 + 11 + 16);
-        spaceLeft = Math.max(spaceLeft, calc.dp(300));
+        spaceLeft = Math.min(spaceLeft, calc.dp(300));
         horizontalWidth = spaceLeft;
         verticalWidth = (int) (spaceLeft * 0.7);
     }
