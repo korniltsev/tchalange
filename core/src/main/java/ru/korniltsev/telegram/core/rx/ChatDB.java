@@ -6,6 +6,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import junit.framework.Assert;
 import org.drinkless.td.libcore.telegram.TdApi;
+import ru.korniltsev.telegram.core.Formatters;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.rx.operators.ImmediateBufferOperator;
@@ -61,9 +62,11 @@ public class ChatDB {
     final UserHolder userHolder;
 
     final PrepareMessageLayoutHook layoutHook;
+    public final Formatters fmt;
 
     public ChatDB(final Context ctx, final RXClient client, NotificationManager nm, RXAuthState auth,
-                  UserHolder userHolder, DpCalculator calc, EmojiParser emojiParser, PrepareMessageLayoutHook layoutHook) {
+                  UserHolder userHolder, DpCalculator calc, EmojiParser emojiParser,
+                  PrepareMessageLayoutHook layoutHook, Formatters fmt) {
         this.ctx = ctx;
         this.client = client;
 
@@ -73,6 +76,7 @@ public class ChatDB {
         this.nm = nm;
         this.userHolder = userHolder;
         this.layoutHook = layoutHook;
+        this.fmt = fmt;
         prepareForUpdates();
 
         DisplayMetrics displaymetrics = new DisplayMetrics();

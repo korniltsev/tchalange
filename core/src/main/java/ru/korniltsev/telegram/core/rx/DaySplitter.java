@@ -3,6 +3,9 @@ package ru.korniltsev.telegram.core.rx;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import ru.korniltsev.telegram.core.Formatters;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.rx.items.ChatListItem;
 import ru.korniltsev.telegram.core.rx.items.DaySeparatorItem;
@@ -22,11 +25,15 @@ public class DaySplitter {
     public static final long ID_BOT_INFO = -2;
     //guarded by lock
     private final Map<DateTime, DaySeparatorItem> cache = new HashMap<>();
+    private final Formatters fmt;
     //guarded by lock
     private int counter = -10;
 
     public final Object lock = new Object();
 
+    public DaySplitter(Formatters fmt) {
+        this.fmt = fmt;
+    }
 
     public boolean hasTheSameDay(TdApi.Message a, TdApi.Message b) {
         return hasTheSameDay(timInMillis(a), timInMillis(b));
@@ -88,7 +95,8 @@ public class DaySplitter {
             if (cached != null) {
                 return cached;
             } else {
-                DaySeparatorItem newSeparator = new DaySeparatorItem(counter--, time);
+                final String timeFormatted = fmt.DAY_SEPARATOR_FORMATTER.get().print(time);
+                DaySeparatorItem newSeparator = new DaySeparatorItem(counter--, time, timeFormatted);
                 cache.put(time, newSeparator);
                 return newSeparator;
             }

@@ -249,8 +249,7 @@ public class Adapter extends BaseAdapter<ChatListItem, RealBaseVH> {
                 return new ContactVH(cell(), this);
             }
             case VIEW_TYPE_DAY_SEPARATOR: {
-                View view = inflate(R.layout.chat_item_day_separator, p);
-                return new DaySeparatorVH(view, this);
+                return new DaySeparatorVH(new DaySeparatorView(getCtx()), this);
             }
             case VIEW_TYPE_NEW_MESSAGES: {
                 View view = inflate(R.layout.chat_item_new_messages, p);

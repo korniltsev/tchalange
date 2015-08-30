@@ -16,7 +16,6 @@ import org.joda.time.format.PeriodFormatter;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.chat.adapter.view.BlurTransformation;
 import ru.korniltsev.telegram.chat.adapter.view.VideoView;
-import ru.korniltsev.telegram.core.app.Formatters;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.picasso.RxGlide;
 import ru.korniltsev.telegram.core.rx.RxDownloadManager;

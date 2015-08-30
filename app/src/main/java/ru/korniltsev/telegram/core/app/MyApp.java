@@ -20,6 +20,7 @@ import mortar.dagger1support.ObjectGraphService;
 import net.danlew.android.joda.JodaTimeAndroid;
 import ru.korniltsev.telegram.chat.BuildConfig;
 import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.core.Formatters;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.audio.AudioPLayer;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
@@ -121,7 +122,7 @@ public class MyApp extends Application {
         stickers = new Stickers(rxClient, rxAuthState);
         notificationManager = new NotificationManager(rxClient, this, rxAuthState);
         chatDb = new ChatDB(this, rxClient, notificationManager, rxAuthState, userHolder, calc, emojiParser,
-                new MessageLayoutGenerator(staticLayoutCache, this, calc, userHolder));
+                new MessageLayoutGenerator(staticLayoutCache, this, calc, userHolder), formatters);
         //todo we can loose some updates between rxClient and chatDB creation
         passcodeManager = new PasscodeManager(this, rxAuthState);
         activityOwner = new ActivityOwner();

@@ -40,20 +40,7 @@ public class RxChat  {
     public static final int MESSAGE_STATE_NOT_SENT = 2;
     private static final int MSG_WITHOUT_VALID_ID = 1000000000;
 
-    //    public static int compareInt(int lhs, int rhs) {
-    //        return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
-    //    }
 
-    //    private SortedSet<TdApi.Message> ms = new TreeSet<>(new Comparator<TdApi.Message>() {
-    //        @Override
-    //        public int compare(TdApi.Message lhs, TdApi.Message rhs) {
-    //            int dateCompare = -compareInt(lhs.date, rhs.date);
-    //            if (dateCompare == 0) {
-    //                return -compareInt(lhs.id, rhs.id);
-    //            }
-    //            return dateCompare;
-    //        }
-    //    });
 
     final List<TdApi.Message> data = new ArrayList<>();
     public final DaySplitter daySplitter;
@@ -105,7 +92,7 @@ public class RxChat  {
         this.id = id;
         this.client = client;
         this.holder = holder;
-        daySplitter = new DaySplitter();
+        daySplitter = new DaySplitter(holder.fmt);
     }
 
     public Observable<List<TdApi.Message>> getNewMessage() {

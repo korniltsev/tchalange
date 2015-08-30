@@ -13,31 +13,19 @@ import java.util.Locale;
 
 public class DaySeparatorVH extends RealBaseVH {
 
-    public static DateTimeFormatter FORMATTER;
 
-    static {
 
-        Locale l = Locale.getDefault();
-        if (l.getCountry().equals("RU")){
-            FORMATTER = DateTimeFormat.forPattern("d MMMM");
-        } else {
-            FORMATTER =  DateTimeFormat.forPattern("MMMM d");
-        }
-    }
-
-    private final TextView text;
-    private final Calendar cal;
+    private final DaySeparatorView text;
 
     public DaySeparatorVH(View itemView, Adapter adapter) {
         super(itemView, adapter);
-        text = (TextView) itemView.findViewById(R.id.text);
-        cal = Calendar.getInstance();
+        text = (DaySeparatorView) itemView;
     }
 
     @Override
     public void bind(ChatListItem item, long lastReadOutbox) {
         DaySeparatorItem s = (DaySeparatorItem) item;
-        text.setText(FORMATTER.print(s.day));
+        text.setText(s.dayFormatted);
 
     }
 

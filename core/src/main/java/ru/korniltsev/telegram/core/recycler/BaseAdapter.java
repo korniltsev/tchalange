@@ -60,7 +60,7 @@ public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends
         return ts;
     }
 
-    public Context getCtx() {
+    public final Context getCtx() {
         return ctx;
     }
 

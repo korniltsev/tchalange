@@ -13,7 +13,6 @@ import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
-import ru.korniltsev.telegram.core.app.Formatters;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
 import ru.korniltsev.telegram.core.rx.RXClient;
