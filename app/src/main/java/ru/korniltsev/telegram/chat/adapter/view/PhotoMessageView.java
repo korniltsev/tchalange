@@ -68,12 +68,11 @@ public class PhotoMessageView extends ImageView {
         setImageDrawable(null);
 
         float ratio;
-        TdApi.File file;
+        TdApi.File file = null;
         RxChat.SentImageInfo f = presenter.getRxChat()
                 .getSentImage(sentPhotoMessageHack);
         if (f == null) {
             ratio = PhotoUtils.getPhotoRation(photo1);
-            file = PhotoUtils.findSmallestBiggerThan(photo1, width, height);
         } else {
             //
             if (photo.photos.length == 1
@@ -113,7 +112,9 @@ public class PhotoMessageView extends ImageView {
             width = verticalWidth;
         }
         height = (int) (width / ratio);
-
+        if (file == null){
+            file = PhotoUtils.findSmallestBiggerThan(photo1, width, height);
+        }
         picasso.loadPhoto(file, false)
                 .resize(width, height)
                 .into(this);
