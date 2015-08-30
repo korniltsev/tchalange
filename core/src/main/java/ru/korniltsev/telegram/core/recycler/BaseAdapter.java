@@ -109,4 +109,6 @@ public abstract class BaseAdapter<T, VH extends RecyclerView.ViewHolder> extends
         ts.remove(i);
         notifyItemRemoved(i);
     }
+
+
 }

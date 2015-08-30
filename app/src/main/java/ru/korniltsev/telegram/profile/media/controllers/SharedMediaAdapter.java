@@ -30,6 +30,7 @@ public class SharedMediaAdapter extends BaseAdapter<SharedMediaAdapter.Item, Rec
     private final RxGlide rxGlide;
     private int dip100;
 
+
     public static final DateTimeFormatter MESSAGE_TIME_FORMAT = DateTimeFormat.forPattern("MMMM YYYY")
             .withLocale(Locale.US);
 

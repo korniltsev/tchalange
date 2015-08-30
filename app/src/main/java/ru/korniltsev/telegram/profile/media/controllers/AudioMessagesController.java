@@ -1,11 +1,8 @@
 package ru.korniltsev.telegram.profile.media.controllers;
 
 import android.content.Context;
-import android.graphics.Rect;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.TextView;
 import org.drinkless.td.libcore.telegram.TdApi;
 import org.joda.time.DateTime;
@@ -15,9 +12,7 @@ import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
-import ru.korniltsev.telegram.core.recycler.EndlessOnScrollListener;
 import ru.korniltsev.telegram.core.rx.RXClient;
-import ru.korniltsev.telegram.core.rx.SharedMediaHelper;
 import ru.korniltsev.telegram.profile.media.SharedMediaPath;
 import ru.korniltsev.telegram.profile.media.SharedMediaView;
 import rx.Subscription;
@@ -40,7 +35,7 @@ public class AudioMessagesController extends MediaController {
     private final Subscription subscription;
     private final AudioMessagesAdapter adapter;
 
-    public AudioMessagesController(SharedMediaView sharedMediaView, RecyclerView list, TextView title, SharedMediaPath path, RXClient client) {
+    public AudioMessagesController(final SharedMediaView sharedMediaView, RecyclerView list, TextView title, SharedMediaPath path, RXClient client) {
         this.sharedMediaView = sharedMediaView;
         this.list = list;
         this.path = path;
@@ -61,7 +56,13 @@ public class AudioMessagesController extends MediaController {
                     }
                 });
 
-        adapter = new AudioMessagesAdapter(ctx);
+        adapter = new AudioMessagesAdapter(ctx, list, new AudioMessagesAdapter.Callback() {
+            @Override
+            public void itemsSelected(int count) {
+                sharedMediaView.setToolbarVisible(count);
+
+            }
+        });
         list.setAdapter(adapter);
         list.setLayoutManager(new LinearLayoutManager(ctx));
         //        final List<TdApi.Message> msg = helper.msg;
@@ -156,24 +157,22 @@ public class AudioMessagesController extends MediaController {
 
     @Override
     public Set<Integer> getSelectedMessagesIds() {
-        throw new RuntimeException("unimplemented");
+        return adapter.getSelectedIds();
     }
 
     @Override
     public void drop() {
         subscription.unsubscribe();
-//        subscribe.unsubscribe();
     }
 
     @Override
     public void dropSelection() {
-        throw new RuntimeException("unimplemented");
+        adapter.dropSelection();
 
     }
 
     @Override
     public void messagesDeleted(int[] msgIds) {
-        throw new RuntimeException("unimplemented");
-
+        adapter.deleteMessages(msgIds);
     }
 }

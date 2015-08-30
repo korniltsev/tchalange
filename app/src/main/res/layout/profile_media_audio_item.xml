@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ru.korniltsev.telegram.chat.adapter.view.AudioMessageView
-        android:id="@+id/audio_message_view"
         xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/audio_message_view"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -10,10 +10,27 @@
         android:paddingBottom="3dp"
         >
 
-    <ru.korniltsev.telegram.core.views.DownloadView
-            android:id="@+id/download_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <FrameLayout android:layout_width="38dp"
+                 android:layout_height="38dp">
+        <ru.korniltsev.telegram.core.views.DownloadView
+                android:id="@+id/download_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <ImageView
+                android:id="@+id/white_circle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_check_big_player_white"
+                android:scaleType="centerInside"
+                android:visibility="gone"/>
+        <ImageView
+                android:id="@+id/green_circle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_check_big_player"
+                android:scaleType="centerInside"
+                android:visibility="gone"/>
+    </FrameLayout>
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
