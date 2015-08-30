@@ -777,7 +777,9 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
 
     @Override
     public void onTraversalCompleted() {
-        list.setItemAnimator(new DefaultItemAnimator());
+        final DefaultItemAnimator animator = new DefaultItemAnimator();
+        animator.setSupportsChangeAnimations(false);
+        list.setItemAnimator(animator);
     }
 
     public void removeNewMessagesItem() {
