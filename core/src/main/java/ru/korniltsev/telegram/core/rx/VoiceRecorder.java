@@ -46,8 +46,13 @@ public class VoiceRecorder {
         if (audioRecord != null){
             return null;
         }
-        audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
-        audioRecord.startRecording();
+        try {
+            audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
+            audioRecord.startRecording();
+        } catch (Exception e) {
+            CrashlyticsCore.getInstance().logException(e);
+            return Observable.empty();
+        }
         reader = new Reader(audioRecord, getTemporaryFile(), playerBufferSize);
         new Thread(reader)
                 .start();
@@ -82,7 +87,7 @@ public class VoiceRecorder {
                 reader = null;
                 return result;
             }
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
             CrashlyticsCore.getInstance().logException(e);
             return Observable.empty();
         }
