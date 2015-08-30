@@ -62,8 +62,10 @@ import rx.Subscription;
 import rx.functions.Action1;
 
 import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -487,10 +489,45 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
                 }
             }
         } else {
-            adapter.addAll(split);
+            //todo WTF
+            //todo   delete all these shit
+            tmpMessageIdSet.clear();
+            for (ChatListItem i: data){
+                if (i instanceof MessageItem) {
+                    tmpMessageIdSet.add(((MessageItem) i).msg.id);
+                }
+            }
+            boolean shouldAdd = false;
+            for (Iterator<ChatListItem> it = split.iterator(); it.hasNext(); ) {
+                ChatListItem chatListItem = it.next();
+                if (chatListItem instanceof MessageItem) {
+                    final TdApi.Message msg = ((MessageItem) chatListItem).msg;
+                    if (tmpMessageIdSet.contains(
+                            getIdForMessageItem(msg))) {
+                        it.remove();
+                    } else {
+                        shouldAdd = true;
+                    }
+                }
+            }
+            if (shouldAdd){
+                //leave only this line
+                adapter.addAll(split);
+            }
         }
         addBotInfoItem();
     }
+
+    public int getIdForMessageItem(TdApi.Message msg) {
+        TdApi.UpdateMessageId upd = presenter.getRxChat().getUpdForNewId(msg.id);
+        if (upd != null) {
+            return upd.oldId;
+        }
+        return msg.id;
+    }
+
+    final Set<Integer> tmpMessageIdSet = new HashSet<>();
+
 
     @NonNull
     private List<ChatListItem> removeBotItem() {
