@@ -49,7 +49,11 @@ class ContactVH extends BaseAvatarVH {
 
 
         TdApi.User user = adapter.getUserHolder().getUser(msg.userId);
-        avatar.loadAvatarFor(user);
+        if (user == null){
+            avatar.setStub(msg);
+        } else {
+            avatar.loadAvatarFor(user);
+        }
         nick.setText(
                 AppUtils.uiName(msg.firstName, msg.lastName));
 

@@ -104,4 +104,9 @@ public class AvatarView extends ImageView {
     public int getSize() {
         return size;
     }
+
+    public void setStub(TdApi.MessageContact msg) {
+        picasso2.getPicasso().cancelRequest(this);
+        picasso2.setStub(msg, size, this);
+    }
 }

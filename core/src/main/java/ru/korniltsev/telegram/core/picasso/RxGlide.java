@@ -3,6 +3,7 @@ package ru.korniltsev.telegram.core.picasso;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import com.squareup.picasso.LruCache;
@@ -23,6 +24,7 @@ import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.text.TextUtils.isEmpty;
 import static junit.framework.Assert.assertTrue;
 
 
@@ -224,6 +226,34 @@ public class RxGlide {
 //        TdApi.FileEmpty sticker1 = (TdApi.FileEmpty) sticker;
         picasso.load(TDFileRequestHandler.load(sticker, true))
                 .fetch();
+    }
+
+    public void setStub(TdApi.MessageContact msg, int size, AvatarView avatarView) {
+        String as1;
+        if (isEmpty(msg.firstName) && isEmpty(msg.lastName)){
+            as1 = msg.phoneNumber;
+            if (as1 == null) {
+                as1 = "";
+            }
+        } else {
+            StringBuilder sb = new StringBuilder();
+            if (msg.firstName.length() > 0) {
+                sb.append(
+                        Character.toUpperCase(
+                                msg.firstName.charAt(0)));
+            }
+            if (msg.lastName.length() > 0) {
+                sb.append(
+                        Character.toUpperCase(
+                                msg.lastName.charAt(0)));
+            }
+            as1 = sb.toString();
+        }
+
+
+
+        final StubDrawable as = getStubDrawable(as1,as1.hashCode() , size);
+        avatarView.setImageDrawable(as);
     }
 
     public class StubKey {
