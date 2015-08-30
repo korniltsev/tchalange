@@ -170,9 +170,7 @@ public class ProfilePresenter extends ViewPresenter<ProfileView> implements Prof
         getView().bindBlockMenu(blocked);
     }
 
-    public void edit() {
-        AppUtils.toastUnsupported(getView().getContext());
-    }
+
 
     public void delete() {
         final int id = path.user.id;

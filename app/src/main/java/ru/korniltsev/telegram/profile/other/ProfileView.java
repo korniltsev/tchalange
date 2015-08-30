@@ -97,9 +97,6 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
                             case R.id.menu_block:
                                 presenter.block();
                                 return true;
-                            case R.id.menu_edit:
-                                presenter.edit();
-                                return true;
                             case R.id.menu_delete:
                                 presenter.delete();
                                 return true;

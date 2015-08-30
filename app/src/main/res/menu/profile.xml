@@ -23,11 +23,7 @@
             android:title="@string/menu_block"
             />
 
-    <item
-            android:id="@+id/menu_edit"
-            app:showAsAction="never"
-            android:title="@string/menu_edit"
-            />
+
     <item
             android:id="@+id/menu_delete"
             app:showAsAction="never"
