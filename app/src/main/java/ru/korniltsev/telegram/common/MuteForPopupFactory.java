@@ -3,18 +3,20 @@ package ru.korniltsev.telegram.common;
 import android.app.Activity;
 import ru.korniltsev.telegram.attach_panel.ListChoicePopup;
 import ru.korniltsev.telegram.chat.R;
+import ru.korniltsev.telegram.core.rx.NotificationManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MuteForPopupFactory {
+
     public static ListChoicePopup create(Activity ctx, final Callback cb){
         final List<ListChoicePopup.Item> items = new ArrayList<>();
         items.add(new ListChoicePopup.Item(ctx.getString(R.string.notifications_enabled), new Runnable() {
             @Override
             public void run() {
-                cb.muteFor(0);
+                cb.muteFor(NotificationManager.NOTIFICATIONS_ENABLED);
 
             }
         }));
@@ -39,7 +41,7 @@ public class MuteForPopupFactory {
         items.add(new ListChoicePopup.Item(ctx.getString(R.string.notifications_disabled), new Runnable() {
             @Override
             public void run() {
-                cb.muteFor((int) TimeUnit.DAYS.toSeconds(365));
+                cb.muteFor(NotificationManager.NOTIFICATIONS_DISABLED_FOREVER);
             }
         }));
         return ListChoicePopup.create(ctx, items);

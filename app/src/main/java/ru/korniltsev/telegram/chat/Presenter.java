@@ -18,6 +18,7 @@ import ru.korniltsev.telegram.attach_panel.AttachPanelPopup;
 import ru.korniltsev.telegram.chat.adapter.view.MessagePanel;
 import ru.korniltsev.telegram.chat.bot.BotCommandsAdapter;
 import ru.korniltsev.telegram.common.AppUtils;
+import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.core.Utils;
 import ru.korniltsev.telegram.core.adapters.ObserverAdapter;
 import ru.korniltsev.telegram.core.mortar.ActivityOwner;
@@ -74,7 +75,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     @Nullable private volatile TdApi.GroupChatFull mGroupChatFull;
     private int botCount;
-
+    private boolean muted;
 
     public Chat getPath() {
         return path;
@@ -142,7 +143,8 @@ public class Presenter extends ViewPresenter<ChatView>
         ChatView view = getView();
 
         view.loadToolBarImage(this.chat);
-        view.initMenu(chat, nm.isMuted(this.chat));
+        initMenu(chat, nm.isMuted(this.chat));
+
         setViewSubtitle();
 
         getView().initList(rxChat);
@@ -257,7 +259,7 @@ public class Presenter extends ViewPresenter<ChatView>
                         .subscribe(new ObserverAdapter<TdApi.NotificationSettings>() {
                                        @Override
                                        public void onNext(TdApi.NotificationSettings s) {
-                                           getView().initMenu(chat, nm.isMuted(s));
+                                           initMenu(chat, nm.isMuted(s));
                                        }
                                    }
                         ));
@@ -372,6 +374,11 @@ public class Presenter extends ViewPresenter<ChatView>
         }
     }
 
+    private void initMenu(TdApi.Chat chat, boolean muted) {
+        getView().initMenu(chat, muted);
+        this.muted = muted;
+    }
+
     private void bindView(final TdApi.UserFull response) {
         AppUtils.runOnUIThread(new Runnable() {
             @Override
@@ -483,13 +490,13 @@ public class Presenter extends ViewPresenter<ChatView>
         AppUtils.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                if (getView() == null){
-                    return ;
+                if (getView() == null) {
+                    return;
                 }
                 boolean firstResponse = mGroupChatFull == null;
                 mGroupChatFull = groupChatFull;
                 updateGroupChatOnlineStatus(groupChatFull);
-                if (firstResponse){
+                if (firstResponse) {
                     showMessagePanel(groupChatFull.groupChat);
                     setBotCommands(groupChatFull);
                 }
@@ -682,7 +689,7 @@ public class Presenter extends ViewPresenter<ChatView>
 
     public void muteFor(int duration) {
         nm.muteChat(chat, duration);
-        getView().initMenu(chat, nm.isMuted(this.chat));
+        initMenu(chat, nm.isMuted(this.chat));
     }
 
     public void sendBotCommand(TdApi.User bot, TdApi.BotCommand cmd) {
@@ -759,5 +766,14 @@ public class Presenter extends ViewPresenter<ChatView>
                                 AppUtils.flowPushAndRemove(getView(), newHead, new LeaveOnlyChatList(), Flow.Direction.FORWARD);
                             }
                         });
+    }
+
+    public void muteUnmuteClicked() {
+        if (muted){
+            muteFor(NotificationManager.NOTIFICATIONS_ENABLED);
+        } else {
+            muteFor(NotificationManager.NOTIFICATIONS_DISABLED_FOREVER);
+        }
+
     }
 }

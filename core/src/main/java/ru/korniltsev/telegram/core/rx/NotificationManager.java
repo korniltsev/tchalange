@@ -20,11 +20,14 @@ import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static rx.android.schedulers.AndroidSchedulers.mainThread;
 
 
 public class NotificationManager {
+    public static final int NOTIFICATIONS_ENABLED = 0;
+    public static final int NOTIFICATIONS_DISABLED_FOREVER = (int) TimeUnit.DAYS.toSeconds(365);
     final RXClient client;
     final Context ctx;
 //    private final Ringtone ringtone;

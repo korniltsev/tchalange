@@ -97,7 +97,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
 
     private Adapter adapter;
 
-    private ListChoicePopup mutePopup;
+//    private ListChoicePopup mutePopup;
 
     //    private TdApi.BotInfoGeneral commands;
     private BotCommandsAdapter botsCommandAdapter;
@@ -318,6 +318,7 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
 
         final MenuItem muteMenu = toolbar.toolbar.getMenu().findItem(R.id.menu_mute_unmute);
         if (muted) {
+
             muteMenu.setTitle(R.string.unmute);
         } else {
             muteMenu.setTitle(R.string.mute);
@@ -390,19 +391,19 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
 
 //    private final DaySplitter splitter = new DaySplitter();
 
-    //    public void setMessages( List<TdApi.Message> messages) {
+    //    public void setMessages( List<TdApi.Message> messages) {                                             it
     //        List<RxChat.ChatListItem> split = splitter.split(messages);
     //        adapter.setData(split);
     //    }
 
     @Override
     public boolean onBackPressed() {
-        if (mutePopup != null && mutePopup.isShowing()) {
-            mutePopup.dismiss();
-            mutePopup = null;
-            return true;
-        }
-        mutePopup = null;
+//        if (mutePopup != null && mutePopup.isShowing()) {
+//            mutePopup.dismiss();
+//            mutePopup = null;
+//            return true;
+//        }
+//        mutePopup = null;
         if (botCommandListVisible){
             hideCommandList();
             return true;
@@ -570,12 +571,8 @@ public class ChatView extends ObservableLinearLayout implements HandlesBack , Tr
     }
 
     public void showMutePopup() {
-        mutePopup = MuteForPopupFactory.create(activity.expose(), new MuteForPopupFactory.Callback() {
-            @Override
-            public void muteFor(int duration) {
-                presenter.muteFor(duration);
-            }
-        });
+        presenter.muteUnmuteClicked();
+
     }
 
     boolean botCommandListVisible = false;
