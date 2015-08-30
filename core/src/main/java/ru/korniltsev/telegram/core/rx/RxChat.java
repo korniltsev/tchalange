@@ -176,6 +176,7 @@ public class RxChat  {
                         deletedMessagesSubject.onNext(ALL_DELETED_MESSAGES);
                     }
                 });
+        handleReplyMarkup(new ChatDB.UpdateReplyMarkupWithData(id, null));
     }
 
     public static final DeletedMessages ALL_DELETED_MESSAGES = new DeletedMessages();
@@ -407,13 +408,15 @@ public class RxChat  {
 
     @Nullable ChatDB.UpdateReplyMarkupWithData currentMarkup;
     private PublishSubject<ChatDB.UpdateReplyMarkupWithData> markup = PublishSubject.create();
-    public void handleReplyMarkup(ChatDB.UpdateReplyMarkupWithData response) {
+    public void handleReplyMarkup(@NonNull ChatDB.UpdateReplyMarkupWithData response) {
         //save
         currentMarkup = response;//.replyMarkup;
         //todo serialize async
         //show to user
         markup.onNext(response);
     }
+
+
 
     public Observable<ChatDB.UpdateReplyMarkupWithData> getMarkup() {
         return markup

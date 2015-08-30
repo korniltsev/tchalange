@@ -44,7 +44,6 @@ import static ru.korniltsev.telegram.common.AppUtils.flatten;
 public class ChatInfoView extends FrameLayout implements HandlesBack , TraversalAware{
     @Inject ChatInfoPresenter presenter;
     @Inject DpCalculator calc;
-    @Inject PhoneFormat phoneFormat;
     @Inject ActivityOwner owner;
     final TraversalAwareHelper traversalHelper = new TraversalAwareHelper();
 
