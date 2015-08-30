@@ -13,9 +13,11 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.view.View.MeasureSpec.EXACTLY;
+import static android.view.View.MeasureSpec.UNSPECIFIED;
 import static android.view.View.MeasureSpec.makeMeasureSpec;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -28,9 +30,9 @@ public class DropdownPopup extends PopupWindow {
         final DpCalculator dpCalculator = MyApp.from(ctx).calc;
         final LinearLayout linearLayout = new LinearLayout(ctx);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        int height = 0;
         final int buttonHeight = dpCalculator.dp(56f);
         final int dip16 = dpCalculator.dp(16f);
+        List<TextView> buttons = new ArrayList<>();
         for (final Item item : items) {
             final TextView textView = new TextView(ctx);
             textView.setOnClickListener(new View.OnClickListener() {
@@ -42,20 +44,21 @@ public class DropdownPopup extends PopupWindow {
             });
             textView.setText(item.title);
             textView.setBackgroundResource(R.drawable.bg_keyboard_tab);
-            linearLayout.addView(textView, MATCH_PARENT, buttonHeight);
             textView.setGravity(Gravity.CENTER_VERTICAL);
+            linearLayout.addView(textView, MATCH_PARENT, buttonHeight);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
             textView.setTextColor(0xff333333);
             textView.setPadding(dip16, 0, dip16, 0);
-            height += buttonHeight;
         }
         linearLayout.setBackgroundResource(R.drawable.bg_popup);
         setContentView(linearLayout);
-        final int widthSpec = makeMeasureSpec(dpCalculator.dp(200), EXACTLY);
-        final int heightSpec = makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+//        final int widthSpec = makeMeasureSpec(dpCalculator.dp(200), EXACTLY);
+        final int widthSpec = makeMeasureSpec(0, UNSPECIFIED);
+        final int heightSpec = makeMeasureSpec(0, UNSPECIFIED);
         linearLayout.measure(widthSpec, heightSpec);
         setOutsideTouchable(true);
-        setWidth(widthSpec);
+        setWidth(
+                makeMeasureSpec(linearLayout.getMeasuredWidth(), EXACTLY));
         setHeight(
                 makeMeasureSpec(linearLayout.getMeasuredHeight(), EXACTLY));
         setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

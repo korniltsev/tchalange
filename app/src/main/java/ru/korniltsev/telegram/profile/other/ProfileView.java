@@ -7,9 +7,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.PopupWindow;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -19,6 +21,7 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.flow.pathview.TraversalAware;
@@ -55,13 +58,12 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
 
     final TraversalAwareHelper traversalHelper = new TraversalAwareHelper();
 
-
     private RecyclerView list;
     private LinearLayoutManager listLayout;
     private FakeToolbar fakeToolbar;
     private ProfileAdapter adapter;
     private ToolbarUtils toolbar;
-    private ListChoicePopup mutePopup;
+    private PopupWindow mutePopup;
     @Nullable private List<RecyclerView.ItemDecoration> currentDecorations;
 
     public ProfileView(Context context, AttributeSet attrs) {
@@ -138,6 +140,11 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
                 presenter.muteFor(duration);
             }
         });
+
+        final int displayWidth = MyApp.from(getContext()).displayWidth;
+        final int popupWidth = MeasureSpec.getSize(mutePopup.getWidth());
+        final int dx = displayWidth - popupWidth - calc.dp(40);
+        mutePopup.showAtLocation(this, Gravity.LEFT | Gravity.TOP, dx, calc.dp(28));
     }
 
     @Override
@@ -171,8 +178,8 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
         final ProfileAdapter.Item header = adapter.getData().get(0);
         adapter.clearData();
         adapter.add(header);
-        if (currentDecorations != null){
-            for (RecyclerView.ItemDecoration d: currentDecorations){
+        if (currentDecorations != null) {
+            for (RecyclerView.ItemDecoration d : currentDecorations) {
                 list.removeItemDecoration(d);
             }
         }
@@ -251,8 +258,8 @@ public class ProfileView extends FrameLayout implements HandlesBack, TraversalAw
                 result.add(decor);
                 result.add(decor1);
             }
-            if (nonEmptySection.size() > 1){
-                for (int j = 0; j < nonEmptySection.size() - 1; j++){
+            if (nonEmptySection.size() > 1) {
+                for (int j = 0; j < nonEmptySection.size() - 1; j++) {
                     final DividerItemDecorator decor = new DividerItemDecorator(calc.dp(72), 0xffe5e5e5, itemNumber + j);
                     list.addItemDecoration(decor);
                     result.add(decor);

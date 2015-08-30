@@ -6,9 +6,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.PopupWindow;
 import flow.Flow;
 import mortar.dagger1support.ObjectGraphService;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -20,6 +22,7 @@ import ru.korniltsev.telegram.chat.R;
 import ru.korniltsev.telegram.common.AppUtils;
 import ru.korniltsev.telegram.common.MuteForPopupFactory;
 import ru.korniltsev.telegram.common.toolbar.FakeToolbar;
+import ru.korniltsev.telegram.core.app.MyApp;
 import ru.korniltsev.telegram.core.emoji.DpCalculator;
 import ru.korniltsev.telegram.core.flow.pathview.HandlesBack;
 import ru.korniltsev.telegram.core.flow.pathview.TraversalAware;
@@ -50,7 +53,7 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
     private FakeToolbar fakeToolbar;
     private ChatInfoAdapter adapter;
     private ToolbarUtils toolbar;
-    @Nullable private ListChoicePopup mutePopup;
+    @Nullable private PopupWindow mutePopup;
     private AttachPanelPopup selectImage;
     @Nullable private TdApi.GroupChatFull chatFull;
     private List<RecyclerView.ItemDecoration> currentDecoration;
@@ -135,6 +138,10 @@ public class ChatInfoView extends FrameLayout implements HandlesBack , Traversal
                 presenter.muteFor(duration);
             }
         });
+        final int displayWidth = MyApp.from(getContext()).displayWidth;
+        final int popupWidth = MeasureSpec.getSize(mutePopup.getWidth());
+        final int dx = displayWidth - popupWidth - calc.dp(40);
+        mutePopup.showAtLocation(this, Gravity.LEFT | Gravity.TOP, dx, calc.dp(28));
     }
 
     @Override
