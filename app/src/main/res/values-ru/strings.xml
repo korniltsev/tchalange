@@ -192,4 +192,7 @@
     <string name="user_status_last_today_at_word">сегодня в</string>
     <string name="user_status_last_yesterday_at_word">вчера в</string>
     <string name="user_status_empty">был в сети очень давно</string>
+    <string name="choose_your_gesture">Нарисуйте Ваш жест</string>
+    <string name="enter_your_gesture">Нарисуйте Ваш жест для разблокировки</string>
+    <string name="gesture">Жест</string>
 </resources>
