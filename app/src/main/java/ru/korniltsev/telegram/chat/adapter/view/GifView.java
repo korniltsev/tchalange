@@ -29,13 +29,13 @@ import static ru.korniltsev.telegram.core.views.DownloadView.Config.FINAL_ICON_E
 
 public class GifView extends FrameLayout {
 
-    private final int dp207;
-    private final int dp154;
     final RxGlide picasso;
     final DpCalculator calc;
     final RxDownloadManager downloader;
+    private final int horizontalWidth;
+    private final int verticalWidth;
 
-//    private ImageView actionIcon;
+    //    private ImageView actionIcon;
     private ImageView preview;
 
 //    private TdApi.Video msg;
@@ -52,8 +52,10 @@ public class GifView extends FrameLayout {
         picasso = app.rxGlide;
         downloader = app.downloadManager;
         //207x165
-        dp207 = calc.dp(207);
-        dp154 = calc.dp(154);
+        int spaceLeft = app.displayWidth - calc.dp(41 + 9 + 11 + 16);
+        spaceLeft = Math.min(spaceLeft, calc.dp(300));
+        horizontalWidth = spaceLeft;
+        verticalWidth = (int) (spaceLeft * 0.7);
         blur = new BlurTransformation(12);
     }
 
@@ -107,13 +109,12 @@ public class GifView extends FrameLayout {
     }
 
     private void bindGeneral(TdApi.PhotoSize thumb, TdApi.File file) {
-        final boolean gif = true;
         this.thumb = thumb;
         float ratio = (float) thumb.width / thumb.height;
         if (ratio > 1) {
-            width = dp207;
+            width = horizontalWidth;
         } else {
-            width = dp154;
+            width = verticalWidth;
         }
         height = (int) (width / ratio);
         showLowQualityThumb(thumb);
