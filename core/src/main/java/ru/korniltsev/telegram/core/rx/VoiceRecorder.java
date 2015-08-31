@@ -7,6 +7,7 @@ import android.media.AudioTrack;
 import android.media.MediaRecorder;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import com.crashlytics.android.core.CrashlyticsCore;
 import ru.korniltsev.OpusToolsWrapper;
 import ru.korniltsev.telegram.core.audio.VoicePlayer;
@@ -19,8 +20,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
 public class VoiceRecorder {
+    private static final String TAG = "VoiceRecorder";
     private final Context ctx;
     private final File tmpFilesDir;
     private final Vibrator vibrator;
@@ -28,7 +29,6 @@ public class VoiceRecorder {
 
     @Nullable private AudioRecord audioRecord;
     @Nullable private Reader reader;
-
 
     public VoiceRecorder(Context ctx) {
         this.ctx = ctx;
@@ -42,12 +42,39 @@ public class VoiceRecorder {
         vibrator = (Vibrator) ctx.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
+    private static int[] mSampleRates = new int[]{VoicePlayer.SAMPLE_RATE_IN_HZ, 44100, 22050, 11025, 8000};
+
+    @Nullable
+    public AudioRecord findAudioRecord() {
+        for (int rate : mSampleRates) {
+            for (short audioFormat : new short[]{AudioFormat.ENCODING_PCM_16BIT, AudioFormat.ENCODING_PCM_8BIT}) {
+                for (short channelConfig : new short[]{AudioFormat.CHANNEL_IN_MONO, AudioFormat.CHANNEL_IN_STEREO}) {
+                    try {
+                        int bufferSize = AudioRecord.getMinBufferSize(rate, channelConfig, audioFormat);
+                        if (bufferSize != AudioRecord.ERROR_BAD_VALUE) {
+                            AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, rate, channelConfig, audioFormat, bufferSize);
+                            if (recorder.getState() == AudioRecord.STATE_INITIALIZED) {
+                                return recorder;
+                            }
+                        }
+                    } catch (Exception e) {
+                        CrashlyticsCore.getInstance().logException(e);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public Observable<Double> record() {
-        if (audioRecord != null){
-            return null;
+        if (audioRecord != null) {
+            return Observable.empty();
         }
         try {
-            audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
+            audioRecord = findAudioRecord();//new AudioRecord(MediaRecorder.AudioSource.DEFAULT, VoicePlayer.SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, playerBufferSize);
+            if (audioRecord == null) {
+                return Observable.empty();
+            }
             audioRecord.startRecording();
         } catch (Exception e) {
             CrashlyticsCore.getInstance().logException(e);
@@ -91,16 +118,16 @@ public class VoiceRecorder {
             CrashlyticsCore.getInstance().logException(e);
             return Observable.empty();
         }
-
     }
 
-    static class Reader implements Runnable{
+    static class Reader implements Runnable {
         final AudioRecord record;
         final File targetFile;
-        final int bufferSize ;
+        final int bufferSize;
         private final PublishSubject<Record> recordedAndEncodedFile = PublishSubject.create();
         private final PublishSubject<Double> amplitude = PublishSubject.create();
-//        volatile boolean stopped = false;
+
+        //        volatile boolean stopped = false;
         public Reader(AudioRecord record, File targetFile, int bufferSize) {
             this.record = record;
             this.targetFile = targetFile;
@@ -115,7 +142,7 @@ public class VoiceRecorder {
                 fos = new FileOutputStream(targetFile);
                 final byte[] bytes = new byte[bufferSize];
                 final int shortBufSize = bufferSize / 2;
-                final short[] shortBuff= new short[shortBufSize];
+                final short[] shortBuff = new short[shortBufSize];
                 int readTotal = 0;
                 while (true) {
                     final int shortsRead = record.read(shortBuff, 0, shortBufSize);
@@ -126,26 +153,29 @@ public class VoiceRecorder {
                         //write data
                         readTotal += shortsRead;
                         shortArrayToByteArray(shortBuff, bytes);
-                        fos.write(bytes, 0, shortsRead*2);
+                        fos.write(bytes, 0, shortsRead * 2);
                         //calc amplitude
                         final double rms = rms(shortBuff, shortsRead);
                         this.amplitude.onNext(rms);
                     } else {
-                        log("break because " + shortsRead );
+                        log("break because " + shortsRead);
                         break;
                     }
                 }
                 fos.close();
 
                 int samples = readTotal;
-                float duration = (float)samples / VoicePlayer.SAMPLE_RATE_IN_HZ;
+                float duration = (float) samples / VoicePlayer.SAMPLE_RATE_IN_HZ;
 
                 final File ogg = new File(targetFile.getParent(), "encoded_" + targetFile.getName() + ".ogg");
                 ogg.delete();
                 String[] opusEncArgs = new String[]{
                         "--raw", "--raw-chan", "1",
                         targetFile.getAbsolutePath(), ogg.getAbsolutePath()};
-                final boolean opusenc = OpusToolsWrapper.encode(targetFile.getAbsolutePath(), ogg.getAbsolutePath());
+                final int sampleRate = record.getSampleRate();
+                final int bits = record.getAudioFormat() == AudioFormat.ENCODING_PCM_16BIT ? 16 : 8;
+                final int channelCount = record.getChannelConfiguration() == AudioFormat.CHANNEL_IN_MONO ? 1 : 2;
+                final boolean opusenc = OpusToolsWrapper.encode(targetFile.getAbsolutePath(), ogg.getAbsolutePath(), bits, sampleRate, channelCount);
                 log("opusenc = " + opusenc);
                 if (opusenc) {
                     recordedAndEncodedFile.onNext(new Record(ogg, duration));
@@ -169,17 +199,15 @@ public class VoiceRecorder {
             }
         }
 
-
-
         //        public void stop() {
-//            stopped = true;
-//        }
+        //            stopped = true;
+        //        }
     }
 
     private static double rms(short[] shortBuff, int shortsRead) {
         double sqrt;
         double sum = 0f;
-        for (int i =0; i < shortsRead; ++i) {
+        for (int i = 0; i < shortsRead; ++i) {
             sum += shortBuff[i] * shortBuff[i];
         }
         final double amplitude = sum / shortsRead;
@@ -205,8 +233,8 @@ public class VoiceRecorder {
             this.duration = duration;
         }
     }
-    public static void log(String msg) {
-//        Log.d("VoiceRecorder", msg);
-    }
 
+    public static void log(String msg) {
+        //        Log.d("VoiceRecorder", msg);
+    }
 }
