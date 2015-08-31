@@ -27,11 +27,11 @@ public class DropdownPopup extends PopupWindow {
     public DropdownPopup(Context ctx, List<Item> items) {
         super();
         this.items = items;
-        final DpCalculator dpCalculator = MyApp.from(ctx).calc;
+        final DpCalculator calc = MyApp.from(ctx).calc;
         final LinearLayout linearLayout = new LinearLayout(ctx);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-        final int buttonHeight = dpCalculator.dp(56f);
-        final int dip16 = dpCalculator.dp(16f);
+        final int buttonHeight = calc.dp(50f);
+        final int dip16 = calc.dp(16f);
         List<TextView> buttons = new ArrayList<>();
         for (final Item item : items) {
             final TextView textView = new TextView(ctx);
@@ -57,8 +57,9 @@ public class DropdownPopup extends PopupWindow {
         final int heightSpec = makeMeasureSpec(0, UNSPECIFIED);
         linearLayout.measure(widthSpec, heightSpec);
         setOutsideTouchable(true);
+        final int w = Math.max(calc.dp(150), linearLayout.getMeasuredWidth());
         setWidth(
-                makeMeasureSpec(linearLayout.getMeasuredWidth(), EXACTLY));
+                makeMeasureSpec(w, EXACTLY));
         setHeight(
                 makeMeasureSpec(linearLayout.getMeasuredHeight(), EXACTLY));
         setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));

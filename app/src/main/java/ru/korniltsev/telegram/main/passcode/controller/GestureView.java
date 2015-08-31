@@ -34,6 +34,7 @@ public class GestureView extends View {
         paint.setStrokeWidth(calc.dpFloat(5) + 1f);
         paint.setStrokeCap(Paint.Cap.ROUND);
         path = new Path();
+        setWillNotDraw(false);
     }
 
 

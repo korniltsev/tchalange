@@ -255,7 +255,7 @@ public class NotificationManager {
                     soundPool.play(ringtoneId, 1.0f, 1.0f, 1, 0, 1.0f);
                 }
             });
-            ringtoneId = soundPool.load(ctx, R.raw.sound_in, 0);
+            ringtoneId = soundPool.load(ctx, R.raw.click42, 0);
         }
 
         boolean first = true;
