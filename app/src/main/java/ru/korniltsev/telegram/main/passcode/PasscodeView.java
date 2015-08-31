@@ -20,6 +20,7 @@ import ru.korniltsev.telegram.core.flow.pathview.NoAnimationTraversal;
 import ru.korniltsev.telegram.core.passcode.PasscodeManager;
 import ru.korniltsev.telegram.core.toolbar.ToolbarUtils;
 import ru.korniltsev.telegram.main.passcode.controller.Controller;
+import ru.korniltsev.telegram.main.passcode.controller.GestureController;
 import ru.korniltsev.telegram.main.passcode.controller.PasswordController;
 import ru.korniltsev.telegram.main.passcode.controller.PatternController;
 import ru.korniltsev.telegram.main.passcode.controller.PincodeController;
@@ -103,6 +104,13 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
             @Override
             public void run() {
                 toggle(PasscodeManager.TYPE_PATTERN);
+            }
+        }));
+
+        list.add(new DropdownPopup.Item(res.getString(R.string.gesture), new Runnable() {
+            @Override
+            public void run() {
+                toggle(PasscodeManager.TYPE_GESTURE);
             }
         }));
 
@@ -193,6 +201,9 @@ public class PasscodeView extends FrameLayout implements HandlesBack, NoAnimatio
             title.setText(R.string.pin);
         } else if (type == PasscodeManager.TYPE_PATTERN) {
             controller = new PatternController(this, lock, passcodeManager);
+            title.setText(R.string.pattern);
+        } if (type == PasscodeManager.TYPE_GESTURE) {
+            controller = new GestureController(this, lock, passcodeManager);
             title.setText(R.string.pattern);
         }
     }

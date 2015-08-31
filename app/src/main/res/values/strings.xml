@@ -110,14 +110,16 @@
         <item quantity="other">%1$d new messages</item>
     </plurals>
 
-    <string name="app_name">Telegram K edition</string>
+    <string name="app_name">Telegram K</string>
 
     <string name="enter_your_password">Enter your password to unlock</string>
     <string name="enter_your_pincode">Enter your PIN to unlock</string>
     <string name="enter_your_pattern">Enter your pattern to unlock</string>
+    <string name="enter_your_gesture">Draw your gesture to unlock</string>
     <string name="choose_your_password">Choose your password</string>
     <string name="choose_your_pin">Choose your PIN</string>
     <string name="choose_your_pattern">Choose your pattern</string>
+    <string name="choose_your_gesture">Draw your gesture</string>
     <string name="choose_your_password_2">Re-enter your new password</string>
     <string name="choose_your_PIN_2">Re-enter your new PIN</string>
     <string name="choose_your_pattern_2">Re-enter your new pattern</string>
@@ -175,6 +177,7 @@
     <string name="audio_files">Audio Files</string>
     <string name="passcode_title_password">Password</string>
     <string name="pattern">Pattern</string>
+    <string name="gesture">Gesture</string>
     <plurals name="auto_lock_n_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
