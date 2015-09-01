@@ -214,7 +214,10 @@ public class NotificationManager {
             }
         } else {
             try {
-                notification.get().play();
+                final Ringtone ringtone = notification.get();
+                if (ringtone != null){
+                    ringtone.play();
+                }
             } catch (Exception e) {
                 CrashlyticsCore.getInstance().logException(e);
             }
