@@ -1,1 +1,1 @@
-Конурсное приложение https://vk.com/durovschallenge
+Конкурсное приложение https://vk.com/durovschallenge
