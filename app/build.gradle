@@ -28,7 +28,7 @@ dependencies {
 android {
     defaultConfig {
         versionName "1.0.78.chalange"
-        versionCode 78
+        versionCode 79
         applicationId "ru.korniltsev.telegram"
     }
 
